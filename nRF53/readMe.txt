@@ -19,6 +19,8 @@ To do:
     - Bee counter
     - Add Edge Impulse on sound 
 
+- Rewrite module descriptions as we go and update README.rst
+
 // Module description:
 Thingy_To_nRF5340:
 nRF5340DK connects as a central to a Thingy:52 and gets access to multiple services. The services available at this time is:
