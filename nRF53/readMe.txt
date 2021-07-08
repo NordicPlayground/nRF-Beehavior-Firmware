@@ -21,6 +21,69 @@ To do:
 
 - Rewrite module descriptions as we go and update README.rst
 
+
+******** Sketch for main(): Alternative 1, assuming it is possible for nRF5340dk to have both central and peripheral role
+main(){
+    Init BLE, lights, buttons etc;
+    
+    Connect to external sensor services;
+    
+    Connect to central (9160DK);
+ 
+    for(;;){
+        Read_data_from_sensors_at_time_k;
+            - = A merge of Thingy_To_nRF5340 and scan_for_broodminder
+        
+        Buffer_data_from_sensors_at_time_k;
+            - To do
+        
+        Preprocess_data;
+            - To do
+        
+        Send_PP_data_to_Central
+            - = A merge of above mentioned functions and peripheral_nRF53_To_nRF91
+            
+        OR
+        
+        Advertise_PP_data_And_Let_9160dk_catch_them;
+            - May not require multi-role nRF5340dk?
+       
+        }
+
+
+******** Sketch for main(): Alternative 2, assuming it is not possible for nRF5340dk to have both central and peripheral role
+main(){
+    Init BLE, lights, buttons etc;
+    
+
+ 
+    for(;;){
+        Set_role_as_central;
+        Connect_to_external_sensor_services;
+        Read_data_from_
+    
+        
+        Read_data_from_sensors_at_time_k;
+            - = A merge of Thingy_To_nRF5340 and scan_for_broodminder
+        
+        Buffer_data_from_sensors_at_time_k;
+            - To do
+        
+        Preprocess_data;
+            - To do
+        
+        Set_role_as_peripheral;
+        Connect_to_central (9160dk);
+        Send_PP_data_to_Central
+            - = A merge of above mentioned functions and peripheral_nRF53_To_nRF91
+        
+        or 
+        
+        Advertise_data_and_let_9160DK_pick_up_advertisements;
+       
+        }
+        
+        
 // Module description:
 Thingy_To_nRF5340:
 nRF5340DK connects as a central to a Thingy:52 and gets access to multiple services. The services available at this time is:
