@@ -1,6 +1,6 @@
 .. _central_uart:
 
-Bluetooth: Thingy_TonRF5340dk
+Bluetooth: Thingy_To_nRF5340dk
 #######################
 
 .. contents::
