@@ -7,74 +7,38 @@ Bluetooth: Concurrent peripheral and central UART
    :local:
    :depth: 2
 
-This module will be a concurrent central and peripheral unit in the summer project of 2021: Beehavior Monitoring. 
-It will act as the interface between sensors on the bee hive and also interface the device which has a connection to :ref:`lib_nrf_cloud`. 
-By utilizing :ref:`bt_conn_ctx_readme`, this module supports up to 20 concurrent connections, where one of them is the main central unit of the system. 
-The main central unit is either :ref:`nrf9160dk_nrf52840` or :ref:`thingy91_nrf52840`. 
-The sensors connected to this module is sensors which send data to be processed by a data processing module on the same unit as this module. 
+This module is a multi-role unit meant to be the link between external sensors and the nRF Cloud unit. 
+The code is a combination of nrf/samples/bluetooth/central_uart, NordicMatt's Multi-NUS and zephyr/samples/bluetooth/scan_adv. 
+central_uart was used as a basis, and the functionality of 20 concurrent connections was added to the sample. 
+The code for switching between scanning and advertising was formed from scan_adv.
 
 Behavior
 ********
+Device should advertise in exchange with scanning until connected to a central unit. 
+While connected to a central unit, the device should not advertise.
+
+Device should scan for peripherals until maximum peripheral connections is reached. 
+While connected to the maximum connections allowed, the device should not scan. 
+
+Data is received from peripherals and processing module. Data received from peripherals is sent to processing module.
+Data received from processing module is sent to BLE->Cloud.
 
 
-Overview
-********
-
-When connected, the sample forwards any data received on the RX pin of the UART 1 peripheral to the Bluetooth LE unit.
-On Nordic Semiconductor's development kits, the UART 1 peripheral is typically gated through the SEGGER chip to a USB CDC virtual serial port.
-
-Any data sent from the Bluetooth LE unit is sent out of the UART 1 peripheral's TX pin.
-
-
-.. _central_uart_debug:
-
-Debugging
-*********
-
-In this sample, a UART console is used to send and read data over the NUS Client.
-Debug messages are not displayed in the UART console, but are printed by the RTT logger instead.
-
-If you want to view the debug messages, follow the procedure in :ref:`testing_rtt_connect`.
 
 Requirements
 ************
 
 The sample supports the following development kits:
++--------------+-----------------------------+
+|Board         |Build target                 |
++==============+=============================+
+|nRF5340-DK    |nrf5340dk_nrf5340_cpuapp     |
+|              |nrf5340dk_nrf5340_cpuappns   |
++--------------+-----------------------------+
+|nRF52840-DK   |nrf52840dk_nrf52840          |
++--------------+-----------------------------+
 
-.. table-from-rows:: /includes/sample_board_rows.txt
-   :header: heading
-   :rows: nrf5340dk_nrf5340_cpuapp_and_cpuappns, nrf52840dk_nrf52840, nrf52dk_nrf52832, nrf52833dk_nrf52833, nrf52833dk_nrf52820
-
-The sample also requires another development kit running a compatible application (see :ref:`peripheral_uart`).
-
-Building and running
-********************
-.. |sample path| replace:: :file:`samples/bluetooth/central_uart`
-
-.. include:: /includes/build_and_run.txt
-
-
-.. _central_uart_testing:
-
-Testing
-=======
-
-After programming the sample to your development kit, test it by performing the following steps:
-
-1. Connect the kit to the computer using a USB cable. The kit is assigned a COM port (Windows) or ttyACM device (Linux), which is visible in the Device Manager.
-#. |connect_terminal_specific|
-#. Optionally, connect the RTT console to display debug messages. See :ref:`central_uart_debug`.
-#. Reset the kit.
-#. Observe that the text "Starting NUS Client example" is printed on the COM listener running on the computer and the device starts scanning for Peripherals with NUS.
-#. Program the :ref:`peripheral_uart` sample to the second development kit.
-   See the documentation for that sample for detailed instructions.
-#. Observe that the kits connect.
-   When service discovery is completed, the event logs are printed on the Central's terminal.
-#. Now you can send data between the two kits.
-   To do so, type some characters in the terminal of one of the kits and hit Enter.
-   Observe that the data is displayed on the UART on the other kit.
-#. Disconnect the devices by, for example, pressing the Reset button on the Central.
-   Observe that the kits automatically reconnect and that it is again possible to send data between the two kits.
+External BLE sensors, compatible with this module. 
 
 Dependencies
 ************
