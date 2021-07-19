@@ -28,15 +28,8 @@ Data received from processing module is sent to BLE->Cloud.
 Requirements
 ************
 
-The sample supports the following development kits:
-+--------------+-----------------------------+
-|Board         |Build target                 |
-+==============+=============================+
-|nRF5340-DK    |nrf5340dk_nrf5340_cpuapp     |
-|              |nrf5340dk_nrf5340_cpuappns   |
-+--------------+-----------------------------+
-|nRF52840-DK   |nrf52840dk_nrf52840          |
-+--------------+-----------------------------+
+The sample supports the following development kits: 
+nRF5340-DK with build targets nrf5340dk_nrf5340_cpuapp and nrf5340dk_nrf5340_cpuappns, and nRF52840-DK with build target nrf52840dk_nrf52840.
 
 External BLE sensors, compatible with this module. 
 
