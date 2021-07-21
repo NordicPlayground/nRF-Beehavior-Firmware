@@ -172,6 +172,6 @@ void main(void){
     	oldSwitchBank4 = switchBank4;
     	oldSwitchBank5 = switchBank5;
     	oldSwitchBank6 = switchBank6;
-    	k_msleep(10);
+    	k_msleep(20);
 	}
 }

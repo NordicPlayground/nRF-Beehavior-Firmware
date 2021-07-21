@@ -157,18 +157,19 @@ void main(void){
 	gpio_pin_set(spi_dev, powerGate1, 0);
 	gpio_pin_set(spi_dev, powerGate2, 0);
 
-	err = spi_transceive(spi_dev, &spi_cfg, NULL, &rx);
-	if (err) {
-		printk("SPI error: %d\n", err);
-	} else {
-		//Code to save the data from reading??
-		switchBank1 = err;
-		switchBank2 = err;
-		switchBank3 = err;
-		switchBank4 = err;
-		switchBank5 = err;
-		switchBank6 = err;
-	}
+	err = spi_read(spi_dev, &spi_cfg, &rx);
+    	if (err)
+		{
+			printk("SPI error: %d\n", err);
+		}
+		else{
+			switchBank1 = rx_buffer[0];
+			switchBank2 = rx_buffer[1];
+			switchBank3 = rx_buffer[2];
+			switchBank4 = rx_buffer[3];
+			switchBank5 = rx_buffer[4];
+			switchBank6 = rx_buffer[5];
+		}
 
 	if (switchBank1 != oldSwitchBank1 || switchBank2 != oldSwitchBank2 || switchBank3 != oldSwitchBank3 || switchBank4 != oldSwitchBank4 || switchBank5 != oldSwitchBank5 || switchBank6 != oldSwitchBank6)
 	{
