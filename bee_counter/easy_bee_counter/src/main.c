@@ -8,16 +8,13 @@ Dank code for the dank people @ nordicsemi
 #include <drivers/gpio.h>
 #include <timing/timing.h>
 #include <device.h>
+#include <stdio.h>
 
-#define LED0_NODE DT_ALIAS(led0)
-#define LED0	DT_GPIO_LABEL(LED0_NODE, gpios)
-#define PIN	DT_GPIO_PIN(LED0_NODE, gpios) //LED for testing
+#define LED0 6
+#define LATCH 3 //A5 on the itsybitsy, used to pulse and load the shift registers
 
-#define LATCH 3 //A5 on the DK, used to pulse and load the shift registers
-#define SS_PIN //Slave-select pin
-
-#define powerGate1 5 //10 on the DK
-#define powerGate2 26 //11 on the DK
+#define powerGate1 5 //10 on the itsybitsy
+#define powerGate2 26 //11 on the itsybitsy
 
 #define numberOfGates 24
 #define startGate 0
@@ -26,8 +23,7 @@ Dank code for the dank people @ nordicsemi
 #define outputDelay 15000
 
 unsigned long lastOutput = 0;
-
-//To do: Clean up this code so it looks more aesthetic...
+timing_t start_time, end_time;
 
 bool inSensorReading[numberOfGates];
 bool outSensorReading[numberOfGates];
@@ -87,26 +83,19 @@ int n = 0;
 static const struct spi_config spi_cfg = {
 	.operation = SPI_OP_MODE_MASTER | SPI_WORD_SET(8) | SPI_TRANSFER_MSB |
 		     SPI_MODE_CPOL, //Setting SPI mode 2 (hopefully)
-	.frequency = 4000000,
+	.frequency = 3000000,
 	.slave = 0,
 };
 
 struct device * spi_dev;
-struct device * led_dev;
 struct device * dev;
 
 static void peri_init(void)
 {
-	const char* const spiName = "SPI_1";
-	spi_dev = device_get_binding(spiName);
-	struct device * led_dev = device_get_binding("GPIO_1");
-	struct device * dev = device_get_binding("GPIO_0");
+	const struct device * spi_dev = device_get_binding("SPI_1");
+	const struct device * dev = device_get_binding("GPIO_0");
 	if (spi_dev == NULL) {
-		printk("Could not get %s device\n", spiName);
-		return;
-	}
-	else if (!led_dev){
-		printk("Device not found\n");
+		printk("SPI device not found\n");
 		return;
 	}
 	else if (!dev) {
@@ -115,25 +104,26 @@ static void peri_init(void)
 	}
 }
 
-void setup(){
-	gpio_pin_configure(dev, LATCH, GPIO_OUTPUT_ACTIVE); 
-	gpio_pin_configure(spi_dev, powerGate1, GPIO_OUTPUT_INACTIVE);
-	gpio_pin_configure(spi_dev, powerGate2, GPIO_OUTPUT_INACTIVE);
-	gpio_pin_configure(led_dev, LED0, GPIO_OUTPUT);
+unsigned long current_time(timing_t *start_time, timing_t *end_time){ 
+    *end_time = timing_counter_get(); 
+	unsigned long long current_time_ns = timing_cycles_to_ns(timing_cycles_get(start_time, end_time)) * 0.000001; //Converts to ms
+	return current_time_ns; 
 }
 
-
-
-
+void setup(){
+	gpio_pin_configure(dev, LATCH, GPIO_OUTPUT_ACTIVE); 
+	gpio_pin_configure(dev, powerGate1, GPIO_OUTPUT_INACTIVE);
+	gpio_pin_configure(dev, powerGate2, GPIO_OUTPUT_INACTIVE);
+	gpio_pin_configure(dev, LED0, GPIO_OUTPUT); //LED pin is 6, one could use aliases here
+}
 
 void main(void){
-	while(true){
-	timing_init();
-    timing_start();
+	setup();
 	peri_init();
-
+	while(true){
+	start_time = timing_counter_get();
 	int err;
-	static uint8_t rx_buffer[6];
+	static uint8_t rx_buffer[6]; //6 shift regisers requires an array with length 6
 
 	struct spi_buf rx_buf = {
 		.buf = rx_buffer,
@@ -144,18 +134,18 @@ void main(void){
 		.count = 1
 	};
 
-	gpio_pin_set(spi_dev, powerGate1, 1);
-	gpio_pin_set(spi_dev, powerGate2, 1);
-	k_usleep(75); //Setting first 24 gates takes ~ 15us, while the gates closer to the end takes ~40-75us. This needs to be verified.
+	gpio_pin_set(dev, powerGate1, 1);
+	gpio_pin_set(dev, powerGate2, 1);
+	k_busy_wait(75); //Setting first 24 gates takes ~ 15us, while the gates closer to the end takes ~40-75us. This needs to be verified.
 	 
 	gpio_pin_set(dev, LATCH, 0);
-	k_usleep(3);
+	k_busy_wait(3);
 	gpio_pin_set(dev, LATCH, 1);
 
-	k_usleep(3);
+	k_busy_wait(3);
 
-	gpio_pin_set(spi_dev, powerGate1, 0);
-	gpio_pin_set(spi_dev, powerGate2, 0);
+	gpio_pin_set(dev, powerGate1, 0);
+	gpio_pin_set(dev, powerGate2, 0);
 
 	err = spi_read(spi_dev, &spi_cfg, &rx);
     	if (err)
@@ -253,10 +243,10 @@ void main(void){
 	{ 
     if(inSensorReading[i] == true || outSensorReading[i] == true) 
     {
-     	gpio_pin_set(led_dev, LED0, 1);
+     	gpio_pin_set(dev, LED0, 1);
       	break;
 		}
-    	gpio_pin_set(led_dev, LED0, 0);
+    	gpio_pin_set(dev, LED0, 0);
   	}
 
   
@@ -266,114 +256,99 @@ void main(void){
     	{ 
       		checkStateIn[i] = 0;
       		lastInSensorReading[i] = inSensorReading[i];
-      		inSensorTime[i] = timing_counter_get();
-      		//printk(i);
-      		//printk(", ");
-      		//printkln(inSensorReading[i]);
+      		inSensorTime[i] = current_time(&start_time, &end_time);
     	} 
     	if(outSensorReading[i] != lastOutSensorReading[i])  //change of state on OUT sensor
     	{ 
       		checkStateOut[i] = 0;
       		lastOutSensorReading[i] = outSensorReading[i];
-      		outSensorTime[i] = current_time;
-     		 //printk(i);
-     		 //printk(", ");
-     		 //printkln(outSensorReading[i]);
+      		outSensorTime[i] = current_time(&start_time, &end_time);
    		}       
-    	if(current_time - inSensorTime[i] > debeebounce && checkStateIn[i] == 0)  //debounce IN sensor
+    	if(((current_time(&start_time, &end_time) - inSensorTime[i]) > debeebounce) && (checkStateIn[i] == 0))  //debounce IN sensor
     	{
-      		checkStateIn[i] = 1; //passed debounce         
-      		//printk(i);
-      		//printk(", IN sensor - high_or_low: ");
-      		//printkln(inSensorReading[i]);
+      		checkStateIn[i] = 1; //passed debounce      
       		if(inSensorReading[i] == 1) //a bee just entered the sensor
       	{
-       		startInReadingTime[i] = current_time;
-        	//printk(i);
-        	//printk(", I ,");
-        	//printkln(current_time);
+			startInReadingTime[i] = current_time(&start_time, &end_time);
       	}
       		if(inSensorReading[i] == 0)  //a bee just exits the sensor; that is, it was 1, now it is LOW (empty)
       	{  
-        	lastInFinishedTime[i] = current_time;            
-        	inReadingTimeHigh[i] = current_time - startInReadingTime[i]; //this variable is how long the bee was present for
-        	printk(i);
+        	lastInFinishedTime[i] = current_time(&start_time, &end_time);            
+        	inReadingTimeHigh[i] = current_time(&start_time, &end_time) - startInReadingTime[i]; //this variable is how long the bee was present for
+        	printk("%i", i);
         	printk(", IT ,");
-        	printk(inReadingTimeHigh[i]);
+        	printk("%ld", inReadingTimeHigh[i]);
         	printk(", ");    
-        	if(outReadingTimeHigh[i] < 650 && inReadingTimeHigh[i] < 650){ //should be less than 650ms
-          if(current_time - lastOutFinishedTime[i] < 200){ //the sensors are pretty cose together so the time it takes to trigger on and then the other should be small.. ~200ms
+        	if(outReadingTimeHigh[i] < 650 && inReadingTimeHigh[i] < 650000000){ //should be less than 650ms
+          if((current_time(&start_time, &end_time) - lastOutFinishedTime[i]) < 200){ //the sensors are pretty cose together so the time it takes to trigger on and then the other should be small.. ~200ms
             inTotal++;
-            printk(current_time);
+			unsigned long long print_time = current_time(&start_time, &end_time);
+            printk("%lld", print_time);
             printk(",");
-            printk(1); //Serial.printkln igjen
+            printk("1\n");
           }else{
-            printk(current_time); //Serial.println må kanskje endres?
+			 	unsigned long long print_time = current_time(&start_time, &end_time);
+            	printk("%lld\n", print_time); 
           }
         }else{
-          printk(current_time); //Serial.println må kanskje endres?
+			unsigned long long print_time = current_time(&start_time, &end_time);
+         	printk("%lld\n", print_time); 
         }
       }           
     }
-    if(current_time - outSensorTime[i] > debeebounce && checkStateOut[i] == 0)  //debounce OUT sensor
+    if((current_time(&start_time, &end_time) - outSensorTime[i]) > debeebounce && checkStateOut[i] == 0)  //debounce OUT sensor
     {
       checkStateOut[i] = 1; //passed debounce         
-      //printk(i);
-      //printk(", IN sensor - high_or_low: ");
-      //printkln(outSensorReading[i]);
       if(outSensorReading[i] == 1) //a bee just entered the sensor
       {
-        startOutReadingTime[i] = current_time;
-        //printk(i);
-        //printk(", O ,");
-        //printkln(current_time);
+        startOutReadingTime[i] = current_time(&start_time, &end_time);
       }
       if(outSensorReading[i] == 0)  //a bee just exits the sensor; that is, it was HIGH, now it is LOW (empty)
       {  
-        lastOutFinishedTime[i] = current_time;            
-        outReadingTimeHigh[i] = current_time - startOutReadingTime[i]; //this variable is how long the bee was present for
-        printk(i);
+        lastOutFinishedTime[i] = current_time(&start_time, &end_time);
+        outReadingTimeHigh[i] = (current_time(&start_time, &end_time) - startOutReadingTime[i]); //this variable is how long the bee was present for
+        printk("%i", i);
         printk(", OT ,");
-        printk(outReadingTimeHigh[i]);
+        printk("%ld", outReadingTimeHigh[i]);
         printk(", ");        
         if(outReadingTimeHigh[i] < 600 && inReadingTimeHigh[i] < 600){ //should be less than 600ms
-          if(current_time - lastInFinishedTime[i] < 200){ //the sensors are pretty cose together so this time should be small
+          if((current_time(&start_time, &end_time) - lastInFinishedTime[i]) < 200){ //the sensors are pretty cose together so this time should be small
             outTotal++;
-            printk(current_time);
+            printk("%ld", current_time(&start_time, &end_time));
             printk(",");
-            printk(1); //Serial.println må kanskje endres?
+            printk("1\n"); 
           }else{
-            printk(current_time); //Serial.println må kanskje endres?
+			unsigned long long printable_time = current_time(&start_time, &end_time);
+            printk("%lld\n", printable_time); 
           }
         }else{
-          printk(current_time); //Serial.println må kanskje endres?
+		  	unsigned long long printable_time = current_time(&start_time, &end_time);
+        	printk("%lld\n", printable_time); 
         }
       }          
     }        
   }    
 
-  k_usleep(15);   // debounce
-
-  if (current_time - lastOutput > outputDelay) 
+  	k_busy_wait(15);   // debounce
+  	if ((current_time(&start_time, &end_time) - lastOutput) > outputDelay) 
     {
     //printkln("sending data");
-    sendData(); 
-    lastOutput = current_time; 
+    //sendData(); 
+    lastOutput = current_time(&start_time, &end_time); 
     inTotal = 0;
     outTotal = 0; 
   }
 }
 }
       
-
+/*
 void sendData() {
   printk("T, ");
-  printk(outTotal);
+  printk("%i", outTotal);
   printk(", ");
-  printk(inTotal); //Serial.println må kanskje endres?
+  printk("%i", inTotal); //Serial.println må kanskje endres?
 // over wifi or ethernet or serial
 //Innsett bluetooth til nrf91 her
 }
-
-		
+*/
 
