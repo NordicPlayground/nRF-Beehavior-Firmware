@@ -185,7 +185,7 @@ static uint8_t on_received_temperature(struct bt_conn *conn,
 			data_array[1] = ((uint8_t *)data)[1];
 			k_sem_give(&temperature_received);
 		}
-		LOG_INF("Temperature: %d,%d, degrees Celsius.", ((uint8_t *)data)[0], ((uint8_t *)data)[1]);
+		LOG_INF("Temperature: %d,%d, degrees Celsius.\n", ((uint8_t *)data)[0], ((uint8_t *)data)[1]);
 
 	} else {
 		LOG_INF("Temperature notification with 0 length\n");
@@ -202,7 +202,7 @@ static uint8_t on_received_humidity(struct bt_conn *conn,
 			data_array[2] = ((uint8_t *)data)[0];
 			k_sem_give(&humidity_received);
 		}
-		LOG_INF("Humidity: %d %\n", ((uint8_t *)data)[0]);
+		LOG_INF("Humidity: %d \n", ((uint8_t *)data)[0]);
 
 	} else {
 		LOG_INF("Humidity notification with 0 length\n");

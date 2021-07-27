@@ -46,16 +46,16 @@ static float lbs_to_kg(float weight);
 
 static void ble_scan_start_fn(struct k_work *work)
 {
-	LOG_INF("Scanning starting");
+	LOG_INF("Scanning for bm_w starting");
 	int err = scan_init(false);
 	if(err){
-		LOG_INF("Scanning failed to initialize");
+		LOG_INF("Scanning for bm_w failed to initialize");
 		// return;
 	}
 
 	err = bt_scan_start(BT_SCAN_TYPE_SCAN_ACTIVE);
 	if (err) {
-		LOG_INF("Scanning failed to start (err %d)", err);
+		LOG_INF("Scanning for bm_w failed to start (err %d)", err);
 		// return;
 	}
 	k_work_reschedule(&weight_interval ,K_MINUTES(1));
@@ -110,17 +110,17 @@ void scan_filter_match(struct bt_scan_device_info *device_info,
 
 		float realTimeWeightKg = lbs_to_kg(realTimeWeight);
 
-		printk("Real Time Weight: %.2f\n", realTimeWeightKg);
+		printk("Real Time Weight in Kg: %.2f\n", realTimeWeightKg);
 
-		printf("%.2f\n", realTimeWeight);
+		printf("Real Time Weight in lbs %.2f\n", realTimeWeight);
 
 		float realTimeTemperature = ((float)(broodminder_data[11] * 256 + broodminder_data[13] - 5000) / 100); // * 9 / 5 + 32 (for Fahrenheit)
 
 		int roundedRTT = (int)realTimeTemperature;
 
-		printk("Real time Temperature: %d\n", roundedRTT);
+		printk("Real time Temperature rounded: %d\n", roundedRTT);
 
-		printf("%.2f\n", realTimeTemperature);
+		printf("Real time Temperature float: %.2f\n", realTimeTemperature);
 
 		bt_addr_le_to_str(device_info->recv_info->addr, addr, sizeof(addr));
 
@@ -128,10 +128,10 @@ void scan_filter_match(struct bt_scan_device_info *device_info,
 
 		float weightR = broodminder_data[12 + 1] * 256 + broodminder_data[12 + 0] - 32767;
 		float weightScaledR = weightR / 100;
-		printf("%.2f\n", lbs_to_kg(weightScaledR));
+		printf("weightScaledR in Kg%.2f\n", lbs_to_kg(weightScaledR));
 		float weightL = broodminder_data[14 + 1] * 256 + broodminder_data[14 + 0] - 32767;
 		float weightScaledL = weightL / 100;
-		printf("%.2f\n", lbs_to_kg(weightScaledL));
+		printf("weightScaledL in Kg %.2f\n", lbs_to_kg(weightScaledL));
 
 	}
 	k_sleep(K_MINUTES(1));
@@ -153,11 +153,11 @@ static int scan_init(bool first){
 	// bt_scan_init(&scan_init);
 	// bt_scan_cb_register(&scan_cb);
 
-    LOG_INF("Changing filters");
+    LOG_INF("Changing filters\n");
 	if(first){
 		err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_ADDR, BROODMINDER_ADDR);
 		if (err){
-			LOG_INF("Filters cannot be set (err %d)", err);
+			LOG_INF("Filters cannot be set (err %d)\n", err);
 			return err;
 		}
 	}
@@ -166,7 +166,7 @@ static int scan_init(bool first){
 
 	err = bt_scan_filter_enable(BT_SCAN_ADDR_FILTER, false);
     if (err) {
-        LOG_INF("Filters cannot be turned on (err %d)", err);
+        LOG_INF("Filters cannot be turned on (err %d)\n", err);
         return err;
 	}
 
@@ -178,9 +178,9 @@ static int scan_init(bool first){
 
 void module_thread_fn(void)
 {
-    LOG_INF("STOP!...");
+    LOG_INF("STOP!...\n");
     k_sem_take(&thingy_ready, K_FOREVER);
-    LOG_INF("HAMMERTIME!");
+    LOG_INF("HAMMERTIME!\n");
 
 	struct bt_le_scan_param scan_param = {
 		.type       = BT_HCI_LE_SCAN_PASSIVE,
@@ -210,7 +210,7 @@ void module_thread_fn(void)
 
 	err = scan_init(true);
 	if(err){
-		LOG_INF("Scanning failed to initialize");
+		LOG_INF("Scanning failed to initialize\n");
 		return;
 	}
 
@@ -221,15 +221,15 @@ void module_thread_fn(void)
 	// 	LOG_INF("Scanning parameters failed to set");
 	// }
 	
-    LOG_INF("Checkpoint 3");
+    LOG_INF("Checkpoint 3\n");
 
 	err = bt_scan_start(BT_SCAN_TYPE_SCAN_ACTIVE);
 	if (err) {
-		LOG_INF("Scanning failed to start (err %d)", err);
+		LOG_INF("Scanning for bm_w failed to start (err %d)\n", err);
 		return;
 	}
 
-	LOG_INF("Scanning succesfully started");
+	LOG_INF("Scanning for bm_w succesfully started\n");
 	
 	k_work_init_delayable(&weight_interval, ble_scan_start_fn);
 
@@ -243,7 +243,7 @@ static bool event_handler(const struct event_header *eh)
 
 		struct ble_event *event = cast_ble_event(eh);
 		if(event->type==THINGY_READY){
-			LOG_INF("Thingy connected");
+			LOG_INF("Thingy connected\n");
 			k_sem_give(&thingy_ready);
 			return false;
 		}
