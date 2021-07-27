@@ -367,11 +367,13 @@ static bool event_handler(const struct event_header *eh)
 			if(strcmp(event->address, "Placeholder")){
 				nrf_cloud_process();
 				
-				int strip = (event->dyndata.size==20) ? 0 : 2; 
-				LOG_INF("Publishing message: %.*s", event->dyndata.size-strip, event->dyndata.data);// %.*s", event->dyndata.size, event->dyndata.size
+				// int strip = (event->dyndata.size==20) ? 0 : 2; 
+				LOG_INF("Publishing message: %.*s", event->dyndata.size, event->dyndata.data);// %.*s", event->dyndata.size, event->dyndata.size
 				char message[100]; 
-				snprintf(message, 100, "{\"payload\":{\"message\":\"%.*s\",\"address\":\"%.17s\"}}",event->dyndata.size-strip, event->dyndata.data, log_strdup(event->address));
+				// err = snprintf(message, 100, "{\"payload\":{\"message\":\"%.*s\",\"address\":\"%.17s\"}}",event->dyndata.size-strip, event->dyndata.data, log_strdup(event->address));
+				err = snprintf(message, 100, "{\"message\":\"%.*s\"}",event->dyndata.size, event->dyndata.data);
 				LOG_INF("Message formatted: %s", message);
+				LOG_INF("Returned: %i", err);
 				
 				struct cloud_msg msg = {
 					.qos = CLOUD_QOS_AT_MOST_ONCE,
@@ -394,6 +396,48 @@ static bool event_handler(const struct event_header *eh)
 				if (err) {
 					LOG_ERR("cloud_send failed, error: %d", err);
 				}
+			}
+			return false;
+		}
+		if(event->type==BLE_STATUS){
+			LOG_INF("BLE_STATUS");
+			//nrf_cloud_process();
+			LOG_INF("BLE_STATUS still");
+			
+			// int strip = (event->dyndata.size==20) ? 0 : 2; 
+			// LOG_INF("{\"message\":\"Connected: %i, Missing: %i\"}", event->dyndata.data[0],event->dyndata.data[1]);// %.*s", event->dyndata.size, event->dyndata.size
+			char message[100]; 
+			// err = snprintf(message, 100, "{\"payload\":{\"message\":\"%.*s\",\"address\":\"%.17s\"}}",event->dyndata.size-strip, event->dyndata.data, log_strdup(event->address));
+			err = snprintf(message, 100, "{\"message\":\"Connected: %c, Missing: %c\"}", (char)event->dyndata.data[0], (char)event->dyndata.data[1]);
+
+			LOG_INF("%c, %c, %c", (char)event->dyndata.data[0], (char)event->dyndata.data[1], (char)event->dyndata.data[2]);
+
+			char test = (char)event->dyndata.data[0];
+			LOG_INF("%i",(uint8_t)test);
+			// err = snprintf(message, 100, "{\"message\":\"Placeholder\"}");
+			LOG_INF("Message formatted: %s", message);
+			// LOG_INF("Returned: %i", err);
+			
+			struct cloud_msg msg = {
+				.qos = CLOUD_QOS_AT_MOST_ONCE,
+				.buf = message,
+				.len = err
+			};
+			
+			/* When using the nRF Cloud backend data is sent to the message topic.
+			* This is in order to visualize the data in the web UI terminal.
+			* For Azure IoT Hub and AWS IoT, messages are addressed directly to the
+			* device twin (Azure) or device shadow (AWS).
+			*/
+			msg.endpoint.type = CLOUD_EP_MSG; //For nRF Cloud
+			
+			//msg.endpoint.type = CLOUD_EP_STATE; //For the inferior Clouds
+
+			err = cloud_send(cloud_backend, &msg);
+			LOG_INF("Published message with code: %i", err);
+
+			if (err) {
+				LOG_ERR("cloud_send failed, error: %d", err);
 			}
 			return false;
 		}

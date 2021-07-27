@@ -5,7 +5,7 @@ enum cloud_event_type_abbr {
 	CLOUD_DISCONNECTED,
     CLOUD_SLEEP,
     CLOUD_RECEIVED,
-	CLOUD_SENT
+	CLOUD_SEND
 };
 
 struct cloud_event_abbr {

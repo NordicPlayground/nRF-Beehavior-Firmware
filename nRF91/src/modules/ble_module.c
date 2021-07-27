@@ -51,6 +51,8 @@
 
 #include <dk_buttons_and_leds.h>
 
+#include "cJSON.h"
+
 LOG_MODULE_REGISTER(MODULE, CONFIG_LOG_DEFAULT_LEVEL);
 
 static K_SEM_DEFINE(cloud_connected, 0, 1);
@@ -88,6 +90,12 @@ static struct bt_conn *default_conn;
 BT_CONN_CTX_DEF(conns, CONFIG_BT_MAX_CONN, sizeof(struct bt_nus_client));
 static bool routedMessage = false;
 static bool messageStart = true;
+
+#define BT_UUID_BEEHAVIOUR_MONITORING_VAL \
+	BT_UUID_128_ENCODE(0x6e400001, 0xb5b3, 0xf393, 0xe1a9, 0xe50e14dcea9e)
+
+
+#define BT_UUID_BEEHAVIOUR_MONITORING_SERVICE   BT_UUID_DECLARE_128(BT_UUID_BEEHAVIOUR_MONITORING_VAL)
 
 #define ROUTED_MESSAGE_CHAR '*'
 #define BROADCAST_INDEX 99
@@ -149,46 +157,43 @@ static void ble_data_sent(uint8_t err, const uint8_t *const data, uint16_t len)
 	}
 }
 
-/*	New function for sending data into the multi-NUS
-* 	Extensions to the behavior of message routing can be made here.
-*	If the first character is *, this indicates a routed message.
-*	If the first character is not *, then this is a broadcast message sent to all peers.
-* 	If the message is routed, the two characters after the * will be read as the peer number
-*	and the message will be sent only to that peer. Numbers must be written as two digits, i.e 01 for 1.
-*	The default behavior will be to broadcast in the case of failure of message parsing.
-*/
-
-//multi_nus_send()
-
-/*	This function has been updated to add the ability for a peer to route a message by
-*	appending a '*' as in the multi-NUS send function. So a peer could send the message
-*	*00 to send a message to peer 0. If the peer sends a *99, that message is broadcast to 
-*	all peers
-*/
-
 static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
 {
 	LOG_INF("ble_data_received");
-	char data_received[len];
+	char data_string[100];
+	// char data_received[len];
 	char addr[BT_ADDR_LE_STR_LEN];
-	for(int i = 0; i < len; i++){
-		data_received[i] = (char)data[i];
-	}
-	if(data_received[0]=='*'){
-		int id = (int)data_received[1]-(int)'0';
-		LOG_INF("%i", id);  
-		strcpy(addr, address_array[id]);
-	}
-	LOG_INF("Received: %s", log_strdup(data_received));
-	LOG_INF("From %s", log_strdup(addr));
 
-	struct ble_event *ble_event = new_ble_event(len);
+	LOG_INF("%.*s", len, data);
+	// for(int i = 0; i < len; i++){
+	// 	data_received[i] = (char)data[i];
+	// }
+	// 	LOG_INF("Temperature: %i,%i, Humidity: %i", (uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4]);
+	// if(len==3){
+	// }
+	if((char)data[0]=='*'){
+		strcpy(addr, address_array[(uint8_t)data[1]]);
+		if(len==10){	
+			LOG_INF("WeightR: %i,%i, WeightL: %i,%i, RealTimeWeight: %i,%i, Temperature: %i,%i, received from %s, id: %i", (uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint8_t)data[5], (uint8_t)data[6], (uint8_t)data[7], (uint8_t)data[8], (uint8_t)data[9], log_strdup(addr), (uint8_t)data[1]);
+			int err = snprintf(data_string, 100, "WeightR: %i,%i, WeightL: %i,%i, RealTimeWeight: %i,%i, Temperature: %i,%i, id: %i", (uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint8_t)data[5], (uint8_t)data[6], (uint8_t)data[7], (uint8_t)data[8], (uint8_t)data[9], (uint8_t)data[1]);
+			LOG_INF("Did it work? %i", err);
+		}
+		if(len==5){	
+			LOG_INF("Temperature: %i,%i, Humidity: %i, received from %s, id: %i", (uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], log_strdup(addr), (uint8_t)data[1]);
+			int err = snprintf(data_string, 100, "Temperature: %i,%i, Humidity: %i, id: %i", (uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint8_t)data[1]);
+			LOG_INF("Did it work? %i", err);
+		}
+	}
+	// LOG_INF("Received: %s", log_strdup(data_received));
+	// LOG_INF("From %s", log_strdup(addr));
+
+	struct ble_event *ble_event = new_ble_event(100);
 
 	ble_event->type = BLE_RECEIVED;
 	
 	memcpy(ble_event->address, log_strdup(addr), 17);
 
-	memcpy(ble_event->dyndata.data, data_received, len);
+	memcpy(ble_event->dyndata.data, data_string, 100);
 
 	EVENT_SUBMIT(ble_event);
 
@@ -396,7 +401,7 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 	default_conn = NULL;
 
 	for(int i = 0; i<CONFIG_BT_MAX_CONN; i++){
-		if(address_array[0]=='\0'){
+		if(address_array[i][0]=='\0'){
 			LOG_INF("Array %i is empty", i);
 			continue;
 		}
@@ -484,13 +489,13 @@ static int scan_init(void)
 	bt_scan_cb_register(&scan_cb);
 
 	char *name = "TeppanTest";
-	err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, name);
+	err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_UUID, BT_UUID_BEEHAVIOUR_MONITORING_SERVICE);
 	if (err) {
 		LOG_ERR("Scanning filters cannot be set (err %d)", err);
 		return err;
 	}
 
-	err = bt_scan_filter_enable(BT_SCAN_NAME_FILTER, false);
+	err = bt_scan_filter_enable(BT_SCAN_UUID_FILTER, false);
 	if (err) {
 		LOG_ERR("Filters cannot be turned on (err %d)", err);
 		return err;
@@ -621,6 +626,96 @@ static bool event_handler(const struct event_header *eh)
 		}
 		if(event->type==CLOUD_SLEEP){
 			scan_start(true);
+			return false;
+		}
+		if(event->type==CLOUD_RECEIVED){
+			cJSON *obj = NULL;
+			obj = cJSON_Parse(event->dyndata.data);
+			cJSON *message = cJSON_GetObjectItem(obj, "message");
+			if(message!=NULL){
+				if(message->valuestring!=NULL){
+					LOG_INF("JSON message: %s, Length: %i", message->valuestring, strlen(message->valuestring));
+					if(message->valuestring[0]=='*'){
+						LOG_INF("Should be sent to BLE");
+						struct ble_event *ble_event_routed = new_ble_event(strlen(message->valuestring));
+
+						ble_event_routed->type = BLE_SEND;
+						
+						// char *address_ptr = "Placeholder"; //Finne ut hvordan man kan velge mellom to devicer.
+						// char address_temp[17];
+						// for(int i=0;i<17;i++){
+						// 	address_temp[i]=address_ptr[i];
+						// }
+						char addr[2];
+						addr[0]=message->valuestring[0];
+						addr[1]=message->valuestring[1];
+						// ble_event->address = address_temp;
+						memcpy(ble_event_routed->address, addr, 2);
+
+						memcpy(ble_event_routed->dyndata.data, message->valuestring, strlen(message->valuestring));
+
+						EVENT_SUBMIT(ble_event_routed);
+						return false;
+					}
+					if(!strcmp(message->valuestring, "StartScan")){
+						scan_start(true);
+						return false;
+					}
+					if(!strcmp(message->valuestring,"BLE_status")){
+						LOG_INF("Checkpoint 1");
+						char status[2];
+						uint8_t connected = 0;
+						LOG_INF("Checkpoint 2");
+						for(int i=0; i < CONFIG_BT_MAX_CONN; i++){
+							LOG_INF("Checkpoint 3");
+							if(address_array[i][0]!='\0'){
+								LOG_INF("Checkpoint 4");
+								connected++;
+							}
+						}
+
+						status[0] = '0' + (char)connected;
+
+						status[1] = '0' + (char)(CONFIG_BT_MAX_CONN - connected);
+
+						LOG_INF("Checkpoint 2, %i, %c, %c", connected, status[0], status[1]);
+
+						// LOG_INF("%c, %c, %c", (char)status[0], (char)status[1], (char)connected);
+
+						// char toretang = '1';
+
+						// LOG_INF("%i", (uint8_t)toretang);
+
+						struct ble_event *ble_event = new_ble_event(strlen(status));
+						
+						ble_event->type = BLE_STATUS;
+						
+						LOG_INF("Checkpoint 3");
+						
+						memcpy(ble_event->address, "Placeholder", strlen("Placeholder"));
+
+						memcpy(ble_event->dyndata.data, status, strlen(status));
+
+						LOG_INF("Checkpoint 4");
+						EVENT_SUBMIT(ble_event);
+						return false;
+					}
+				}
+				return false;
+			}
+			else{
+				LOG_INF("Message is null");
+				return false;
+			}
+			//char addr[17] = event->address;
+
+			// led_on=!led_on;
+			
+			// dk_set_led(DK_LED1, led_on);
+
+			LOG_INF("Message: %.*s",event->dyndata.size, event->dyndata.data);
+
+			return false;
 		}
 		return false;
 	}

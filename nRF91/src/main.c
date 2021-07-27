@@ -40,87 +40,87 @@ static bool event_handler(const struct event_header *eh)
 		return false;
 	}*/
 	
-	if (is_cloud_event_abbr(eh)) {
+	// if (is_cloud_event_abbr(eh)) {
 
-		struct cloud_event_abbr *event = cast_cloud_event_abbr(eh);
-		cJSON *obj = NULL;
-		obj = cJSON_Parse(event->dyndata.data);
-		cJSON *message = cJSON_GetObjectItem(obj, "message");
-		if(message!=NULL){
-			if(message->valuestring!=NULL){
-				if(message->valuestring[0]=='*'){
-					LOG_INF("Should be sent to BLE");
-					struct ble_event *ble_event_routed = new_ble_event(strlen(message->valuestring));
+	// 	struct cloud_event_abbr *event = cast_cloud_event_abbr(eh);
+	// 	cJSON *obj = NULL;
+	// 	obj = cJSON_Parse(event->dyndata.data);
+	// 	cJSON *message = cJSON_GetObjectItem(obj, "message");
+	// 	if(message!=NULL){
+	// 		if(message->valuestring!=NULL){
+	// 			if(message->valuestring[0]=='*'){
+	// 				LOG_INF("Should be sent to BLE");
+	// 				struct ble_event *ble_event_routed = new_ble_event(strlen(message->valuestring));
 
-					ble_event_routed->type = BLE_SEND;
+	// 				ble_event_routed->type = BLE_SEND;
 					
-					// char *address_ptr = "Placeholder"; //Finne ut hvordan man kan velge mellom to devicer.
-					// char address_temp[17];
-					// for(int i=0;i<17;i++){
-					// 	address_temp[i]=address_ptr[i];
-					// }
-					char addr[2];
-					addr[0]=message->valuestring[0];
-					addr[1]=message->valuestring[1];
-					// ble_event->address = address_temp;
-					memcpy(ble_event_routed->address, addr, 2);
+	// 				// char *address_ptr = "Placeholder"; //Finne ut hvordan man kan velge mellom to devicer.
+	// 				// char address_temp[17];
+	// 				// for(int i=0;i<17;i++){
+	// 				// 	address_temp[i]=address_ptr[i];
+	// 				// }
+	// 				char addr[2];
+	// 				addr[0]=message->valuestring[0];
+	// 				addr[1]=message->valuestring[1];
+	// 				// ble_event->address = address_temp;
+	// 				memcpy(ble_event_routed->address, addr, 2);
 
-					memcpy(ble_event_routed->dyndata.data, message->valuestring, strlen(message->valuestring));
+	// 				memcpy(ble_event_routed->dyndata.data, message->valuestring, strlen(message->valuestring));
 
-					EVENT_SUBMIT(ble_event_routed);
-					return false;
-				}
-				if(!strcmp(message->valuestring, "StartScan")){
-					scan_start(true);
-					return false;
-				}
-				//LOG_INF("Checkpoint 5");
-				LOG_INF("JSON message: %s, Length: %i", message->valuestring, strlen(message->valuestring));
-				if(!strcmp(message->valuestring,"LedOn")){
-					LOG_INF("Checkpoint 6");
-					dk_set_led(DK_LED1, 0);
-					return false;
-				}
-				else if(!strcmp(message->valuestring,"LedOff")){
-					LOG_INF("Checkpoint 7");
-					dk_set_led(DK_LED1, 1);
-					return false;
-				}
-				else if(!strcmp(message->valuestring,"BLE_LED_ON")){
-					struct ble_event *ble_event = new_ble_event(strlen(message->valuestring));
+	// 				EVENT_SUBMIT(ble_event_routed);
+	// 				return false;
+	// 			}
+	// 			if(!strcmp(message->valuestring, "StartScan")){
+	// 				scan_start(true);
+	// 				return false;
+	// 			}
+	// 			//LOG_INF("Checkpoint 5");
+	// 			LOG_INF("JSON message: %s, Length: %i", message->valuestring, strlen(message->valuestring));
+	// 			if(!strcmp(message->valuestring,"LedOn")){
+	// 				LOG_INF("Checkpoint 6");
+	// 				dk_set_led(DK_LED1, 0);
+	// 				return false;
+	// 			}
+	// 			else if(!strcmp(message->valuestring,"LedOff")){
+	// 				LOG_INF("Checkpoint 7");
+	// 				dk_set_led(DK_LED1, 1);
+	// 				return false;
+	// 			}
+	// 			else if(!strcmp(message->valuestring,"BLE_LED_ON")){
+	// 				struct ble_event *ble_event = new_ble_event(strlen(message->valuestring));
 
-					ble_event->type = BLE_SEND;
+	// 				ble_event->type = BLE_SEND;
 					
-					char *address_ptr = "Placeholder"; //Finne ut hvordan man kan velge mellom to devicer.
-					char address_temp[17];
-					for(int i=0;i<17;i++){
-						address_temp[i]=address_ptr[i];
-					}
-					// ble_event->address = address_temp;
-					memcpy(ble_event->address, address_temp, 17);
+	// 				char *address_ptr = "Placeholder"; //Finne ut hvordan man kan velge mellom to devicer.
+	// 				char address_temp[17];
+	// 				for(int i=0;i<17;i++){
+	// 					address_temp[i]=address_ptr[i];
+	// 				}
+	// 				// ble_event->address = address_temp;
+	// 				memcpy(ble_event->address, address_temp, 17);
 
-					memcpy(ble_event->dyndata.data, message->valuestring, strlen(message->valuestring));
+	// 				memcpy(ble_event->dyndata.data, message->valuestring, strlen(message->valuestring));
 
-					EVENT_SUBMIT(ble_event);
-					return false;
-				}
-			}
-			return false;
-		}
-		else{
-			LOG_INF("Message is null");
-			return false;
-		}
-		//char addr[17] = event->address;
+	// 				EVENT_SUBMIT(ble_event);
+	// 				return false;
+	// 			}
+	// 		}
+	// 		return false;
+	// 	}
+	// 	else{
+	// 		LOG_INF("Message is null");
+	// 		return false;
+	// 	}
+	// 	//char addr[17] = event->address;
 
-		// led_on=!led_on;
+	// 	// led_on=!led_on;
 		
-		// dk_set_led(DK_LED1, led_on);
+	// 	// dk_set_led(DK_LED1, led_on);
 
-		LOG_INF("Message: %.*s",event->dyndata.size, event->dyndata.data);
+	// 	LOG_INF("Message: %.*s",event->dyndata.size, event->dyndata.data);
 
-		return false;
-	}
+	// 	return false;
+	// }
 
 	return false;
 }

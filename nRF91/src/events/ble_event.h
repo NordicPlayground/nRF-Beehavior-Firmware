@@ -6,6 +6,7 @@ enum ble_event_type {
 	BLE_DISCONNECTED,
         BLE_SCANNING,
         BLE_DONE_SCANNING,
+	BLE_STATUS,
 	BLE_RECEIVED,
 	BLE_SEND
 };
