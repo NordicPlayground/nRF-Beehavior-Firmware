@@ -10,6 +10,28 @@ Dank code for the dank people @ nordicsemi
 #include <device.h>
 #include <stdio.h>
 
+#include <bluetooth/bluetooth.h>
+#include <bluetooth/uuid.h>
+#include <bluetooth/gatt.h>
+#include <bluetooth/hci.h>
+
+#include <bluetooth/services/nus.h>
+
+#define DEVICE_NAME CONFIG_BT_DEVICE_NAME
+#define DEVICE_NAME_LEN	(sizeof(DEVICE_NAME) - 1)
+
+static struct bt_conn *current_conn;
+
+static const struct bt_data ad[] = {
+	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
+	BT_DATA(BT_DATA_NAME_COMPLETE, DEVICE_NAME, DEVICE_NAME_LEN),
+};
+
+static const struct bt_data sd[] = {
+	BT_DATA_BYTES(BT_DATA_UUID128_ALL, BT_UUID_NUS_VAL),
+};
+
+
 #define LED0 6
 #define LATCH 3 //A5 on the itsybitsy, used to pulse and load the shift registers
 
@@ -34,8 +56,8 @@ bool lastOutSensorReading[numberOfGates];
 bool checkStateIn[numberOfGates];
 bool checkStateOut[numberOfGates];
 
-int inCount[numberOfGates];
-int outCount[numberOfGates];
+unsigned int inCount[numberOfGates];
+unsigned int outCount[numberOfGates];
 
 unsigned long startInReadingTime[numberOfGates];
 unsigned long startOutReadingTime[numberOfGates];
@@ -96,8 +118,110 @@ unsigned long current_time(timing_t *start_time, timing_t *end_time){
 	return current_time_ns; 
 }
 
+static void connected(struct bt_conn *conn, uint8_t err)
+{
+	char addr[BT_ADDR_LE_STR_LEN];
+
+	if (err) {
+		printk("Connection failed (err %u)", err);
+		return;
+	}
+
+	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
+	printk("Connected %.*s\n", BT_ADDR_LE_STR_LEN, addr);
+
+	current_conn = bt_conn_ref(conn);
+}
+
+static void disconnected(struct bt_conn *conn, uint8_t reason)
+{
+	char addr[BT_ADDR_LE_STR_LEN];
+
+	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
+
+	printk("Disconnected: %.*s (reason %u)\n", BT_ADDR_LE_STR_LEN, addr, reason);
+
+	if (current_conn) {
+		bt_conn_unref(current_conn);
+		current_conn = NULL;
+	}
+}
+
+static struct bt_conn_cb conn_callbacks = {
+	.connected    = connected,
+	.disconnected = disconnected,
+};
+
+static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
+			  uint16_t len)
+{
+	int err;
+	char addr[BT_ADDR_LE_STR_LEN] = {0};
+
+	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, ARRAY_SIZE(addr));
+
+	printk("Received data from: %.*s\n", BT_ADDR_LE_STR_LEN, addr);
+
+	printk("%.*s\n", len, data);
+
+}
+
+static struct bt_nus_cb nus_cb = {
+	.received = bt_receive_cb,
+};
+
+void error(void)
+{
+	printk("Error\n");
+
+	while (true) {
+		/* Spin for ever */
+		k_sleep(K_MSEC(1000));
+	}
+}
+
+void sendData() {
+	printk("Total out: ");
+	printk("%i", outTotal);
+	printk("\n");
+	printk("Total in: %i\n", inTotal); 
+	if(current_conn){
+		char msg[20];
+		uint8_t length = snprintf(msg, 20, "%i,%i\n", outTotal, inTotal);
+		bt_nus_send(current_conn, msg, length);
+	}//Innsett bluetooth til nrf53 her
+}
+
 
 void main(void){
+
+	bt_conn_cb_register(&conn_callbacks);
+
+	int err = bt_enable(NULL);
+	if (err) {
+		error();
+	}
+
+	printk("Bluetooth initialized");
+
+	if (IS_ENABLED(CONFIG_SETTINGS)) {
+		settings_load();
+	}
+
+	err = bt_nus_init(&nus_cb);
+	if (err) {
+		printk("Failed to initialize UART service (err: %d)", err);
+		return;
+	}
+
+	err = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), sd,
+			      ARRAY_SIZE(sd));
+	if (err) {
+		printk("Advertising failed to start (err %d)", err);
+	}
+
+	printk("Starting Nordic UART service example\n");
+
 	const struct device *spi_dev = device_get_binding("SPI_1");
 	const struct device * dev = device_get_binding("GPIO_0");
 	if (spi_dev == NULL) {
@@ -108,25 +232,24 @@ void main(void){
 		printk("Device not found\n");
 		return;
 	}
+	static uint8_t rx_buffer[6]; //6 shift regisers requires an array with length 6
+	
+	struct spi_buf rx_buf = {
+		.buf = rx_buffer,
+		.len = sizeof(rx_buffer),
+	};
+	const struct spi_buf_set rx = {
+		.buffers = &rx_buf,
+		.count = 1
+	};
+
+	gpio_pin_configure(dev, LATCH, GPIO_OUTPUT_ACTIVE); 
+	gpio_pin_configure(dev, powerGate1, GPIO_OUTPUT_INACTIVE);
+	gpio_pin_configure(dev, powerGate2, GPIO_OUTPUT_INACTIVE);
+	gpio_pin_configure(dev, LED0, GPIO_OUTPUT); //LED pin is 6, one could use aliases here
+	
 	while(1){
 		start_time = timing_counter_get();
-		static uint8_t rx_buffer[6]; //6 shift regisers requires an array with length 6
-
-		struct spi_buf rx_buf = {
-			.buf = rx_buffer,
-			.len = sizeof(rx_buffer),
-		};
-		const struct spi_buf_set rx = {
-			.buffers = &rx_buf,
-			.count = 1
-		};
-
-		gpio_pin_configure(dev, LATCH, GPIO_OUTPUT_ACTIVE); 
-		gpio_pin_configure(dev, powerGate1, GPIO_OUTPUT_INACTIVE);
-		gpio_pin_configure(dev, powerGate2, GPIO_OUTPUT_INACTIVE);
-		gpio_pin_configure(dev, LED0, GPIO_OUTPUT); //LED pin is 6, one could use aliases here
-		
-		int err;	
 
 		gpio_pin_set(dev, powerGate1, 1);
 		gpio_pin_set(dev, powerGate2, 1);
@@ -143,18 +266,18 @@ void main(void){
 		gpio_pin_set(dev, powerGate2, 0);
 
 		err = spi_read(spi_dev, &spi_cfg, &rx);
-		 	if (err)
-			{
-				printk("SPI error: %d\n", err);
-			}
-			else{
-				switchBank1 = rx_buffer[0];
-				switchBank2 = rx_buffer[1];
-				switchBank3 = rx_buffer[2];
-				switchBank4 = rx_buffer[3];
-				switchBank5 = rx_buffer[4];
-				switchBank6 = rx_buffer[5];
-			}
+		if (err)
+		{
+			printk("SPI error: %d\n", err);
+		}
+		else{
+			switchBank1 = rx_buffer[0];
+			switchBank2 = rx_buffer[1];
+			switchBank3 = rx_buffer[2];
+			switchBank4 = rx_buffer[3];
+			switchBank5 = rx_buffer[4];
+			switchBank6 = rx_buffer[5];
+		}
 
 		if (switchBank1 != oldSwitchBank1 || switchBank2 != oldSwitchBank2 || switchBank3 != oldSwitchBank3 || switchBank4 != oldSwitchBank4 || switchBank5 != oldSwitchBank5 || switchBank6 != oldSwitchBank6)
 		{
@@ -226,27 +349,27 @@ void main(void){
 		   		else inSensorReading[gate] = false;      
 		   		gate++;  
 		 	}  
-		 oldSwitchBank1 = switchBank1;
-		 oldSwitchBank2 = switchBank2;
-		 oldSwitchBank3 = switchBank3;
-		 oldSwitchBank4 = switchBank4;
-		 oldSwitchBank5 = switchBank5;
-		 oldSwitchBank6 = switchBank6;
-			}
+			oldSwitchBank1 = switchBank1;
+			oldSwitchBank2 = switchBank2;
+			oldSwitchBank3 = switchBank3;
+			oldSwitchBank4 = switchBank4;
+			oldSwitchBank5 = switchBank5;
+			oldSwitchBank6 = switchBank6;
+		}
 
 		for (int i = startGate; i < endGate; i++) 
 		{ 
-		 if(inSensorReading[i] == true || outSensorReading[i] == true) 
-		 {
-		  	gpio_pin_set(dev, LED0, 1);
-		   	break;
+			if(inSensorReading[i] == true || outSensorReading[i] == true) 
+			{
+				gpio_pin_set(dev, LED0, 1);
+				break;
 			}
 		 	gpio_pin_set(dev, LED0, 0);
-			}
+		}
 
 		
-			for (int i = startGate; i < endGate; i++) 
-			{ 
+		for (int i = startGate; i < endGate; i++) 
+		{ 
 		 	if(inSensorReading[i] != lastInSensorReading[i])  //change of state on IN sensor
 		 	{ 
 		   		checkStateIn[i] = 0;
@@ -258,95 +381,81 @@ void main(void){
 		   		checkStateOut[i] = 0;
 		   		lastOutSensorReading[i] = outSensorReading[i];
 		   		outSensorTime[i] = current_time(&start_time, &end_time);
-				}    
+			}    
 
 		 	if(((current_time(&start_time, &end_time) - inSensorTime[i]) > debeebounce) && (checkStateIn[i] == 0)){  //debounce IN sensor
 		   		checkStateIn[i] = 1; //passed debounce      
 		   		if(inSensorReading[i] == 1) //a bee just entered the sensor
-		   	{
-				startInReadingTime[i] = current_time(&start_time, &end_time);
-		   	}
+			   	{
+					startInReadingTime[i] = current_time(&start_time, &end_time);
+		   		}
 		   		if(inSensorReading[i] == 0)  //a bee just exits the sensor; that is, it was 1, now it is LOW (empty)
-		   	{  
-		     	lastInFinishedTime[i] = current_time(&start_time, &end_time);            
-		     	inReadingTimeHigh[i] = current_time(&start_time, &end_time) - startInReadingTime[i]; //this variable is how long the bee was present for
-		     	printk("%i", i);
-		     	printk(", IT ,");
-		     	printk("%ld", inReadingTimeHigh[i]);
-		     	printk(", ");    
-		     	if(outReadingTimeHigh[i] < 650 && inReadingTimeHigh[i] < 650000000){ //should be less than 650ms
-		       if((current_time(&start_time, &end_time) - lastOutFinishedTime[i]) < 200){ //the sensors are pretty cose together so the time it takes to trigger on and then the other should be small.. ~200ms
-		         inTotal++;
-				unsigned long print_time = current_time(&start_time, &end_time);
-		         printk("%ld", print_time);
-		         printk(",");
-		         printk("1\n");
-		       }else{
-				 	unsigned long print_time = current_time(&start_time, &end_time);
-		         	printk("%ld\n", print_time); 
-		       }
-		     }else{
-				unsigned long print_time = current_time(&start_time, &end_time);
-		      	printk("%ld\n", print_time); 
-		     }
-		   }           
-		 }
-		 if((current_time(&start_time, &end_time) - outSensorTime[i]) > debeebounce && checkStateOut[i] == 0)  //debounce OUT sensor
-		 {
-		   checkStateOut[i] = 1; //passed debounce         
-		   if(outSensorReading[i] == 1) //a bee just entered the sensor
-		   {
-		     startOutReadingTime[i] = current_time(&start_time, &end_time);
-		   }
-		   if(outSensorReading[i] == 0)  //a bee just exits the sensor; that is, it was HIGH, now it is LOW (empty)
-		   {  
-		     lastOutFinishedTime[i] = current_time(&start_time, &end_time);
-		     outReadingTimeHigh[i] = (current_time(&start_time, &end_time) - startOutReadingTime[i]); //this variable is how long the bee was present for
-		     printk("%i", i);
-		     printk(", OT ,");
-		     printk("%ld", outReadingTimeHigh[i]);
-		     printk(", ");        
-		     if(outReadingTimeHigh[i] < 600 && inReadingTimeHigh[i] < 600){ //should be less than 600ms
-		       if((current_time(&start_time, &end_time) - lastInFinishedTime[i]) < 200){ //the sensors are pretty cose together so this time should be small
-		         	outTotal++;
-		         	unsigned long printable_time = current_time(&start_time, &end_time);
-		     		printk("%ld\n", printable_time);
-		         	printk(",");
-		        	printk("1\n"); 
-		       }
-			   else{
-				unsigned long printable_time = current_time(&start_time, &end_time);
-		         printk("%ld\n", printable_time); 
-		       		}
-		     	}
-				else{
-			  	unsigned long printable_time = current_time(&start_time, &end_time);
-		     	printk("%ld\n", printable_time); 
-		     }
-		   }          
-		 }        
-
-
-		k_busy_wait(15);   // debounce
-		if ((current_time(&start_time, &end_time) - lastOutput) > outputDelay) 
-		{
-		printk("sending data\n");
-		sendData(); 
-		lastOutput = current_time(&start_time, &end_time); 
-		inTotal = 0;
-		outTotal = 0; 
- 	 	}
-	}
+				{  
+					lastInFinishedTime[i] = current_time(&start_time, &end_time);            
+					inReadingTimeHigh[i] = current_time(&start_time, &end_time) - startInReadingTime[i]; //this variable is how long the bee was present for
+					printk("%i", i);
+					printk(", IT ,");
+					printk("%ld", inReadingTimeHigh[i]);
+					printk(", ");    
+					if(outReadingTimeHigh[i] < 650 && inReadingTimeHigh[i] < 650000000){ //should be less than 650ms
+		       			if((current_time(&start_time, &end_time) - lastOutFinishedTime[i]) < 200){ //the sensors are pretty cose together so the time it takes to trigger on and then the other should be small.. ~200ms
+		         			inTotal++;
+							unsigned long print_time = current_time(&start_time, &end_time);
+							printk("%ld", print_time);
+							printk(",");
+							printk("1\n");
+		       			}else{
+							unsigned long print_time = current_time(&start_time, &end_time);
+							printk("%ld\n", print_time); 
+						}
+		     		}else{
+						unsigned long print_time = current_time(&start_time, &end_time);
+						printk("%ld\n", print_time); 
+					}
+		   		}           
+		 	}
+			if((current_time(&start_time, &end_time) - outSensorTime[i]) > debeebounce && checkStateOut[i] == 0)  //debounce OUT sensor
+			{
+				checkStateOut[i] = 1; //passed debounce         
+				if(outSensorReading[i] == 1) //a bee just entered the sensor
+		   		{
+		     		startOutReadingTime[i] = current_time(&start_time, &end_time);
+		   		}
+				if(outSensorReading[i] == 0)  //a bee just exits the sensor; that is, it was HIGH, now it is LOW (empty)
+				{  
+					lastOutFinishedTime[i] = current_time(&start_time, &end_time);
+					outReadingTimeHigh[i] = (current_time(&start_time, &end_time) - startOutReadingTime[i]); //this variable is how long the bee was present for
+					printk("%i", i);
+					printk(", OT ,");
+					printk("%ld", outReadingTimeHigh[i]);
+					printk(", ");        
+					if(outReadingTimeHigh[i] < 600 && inReadingTimeHigh[i] < 600){ //should be less than 600ms
+						if((current_time(&start_time, &end_time) - lastInFinishedTime[i]) < 200){ //the sensors are pretty cose together so this time should be small
+							outTotal++;
+							unsigned long printable_time = current_time(&start_time, &end_time);
+							printk("%ld\n", printable_time);
+							printk(",");
+							printk("1\n"); 
+						}
+						else{
+							unsigned long printable_time = current_time(&start_time, &end_time);
+							printk("%ld\n", printable_time); 
+						}
+					}
+					else{
+						unsigned long printable_time = current_time(&start_time, &end_time);
+						printk("%ld\n", printable_time); 
+					}
+		   		}          
+		 	}        
+			k_busy_wait(15);   // debounce
+			if ((current_time(&start_time, &end_time) - lastOutput) > outputDelay) {
+				printk("sending data\n");
+				sendData(); 
+				lastOutput = current_time(&start_time, &end_time); 
+				inTotal = 0;
+				outTotal = 0; 
+			}
+		}
 	}
 }
-      
-
-void sendData() {
-  printk("Total out: ");
-  printk("%i", outTotal);
-  printk("\n");
-  printk("Total in: %i\n", inTotal); 
-//Innsett bluetooth til nrf53 her
-}
-
-
