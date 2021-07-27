@@ -23,7 +23,7 @@
 
 #include "cJSON.h"
 
-LOG_MODULE_REGISTER(MODULE, CONFIG_APPLICATION_MODULE_LOG_LEVEL);
+LOG_MODULE_REGISTER(app_module, CONFIG_LOG_DEFAULT_LEVEL);
 
 bool led_on;
 
@@ -133,6 +133,8 @@ void main(void)
 		LOG_ERR("Could not initialize leds, err code: %d\n", err);
 		return err;
 	}
+
+	LOG_INF("Starting program");
 
 	if(event_manager_init()){
 		LOG_INF("Well this sucks");

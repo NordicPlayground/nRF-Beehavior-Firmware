@@ -111,6 +111,8 @@ static void ble_scan_stop_fn(struct k_work *work)
 		LOG_ERR("Stop LE scan failed (err %d)", err);
 	}
 
+	LOG_INF("Stopping scan");
+
 	struct ble_event *ble_stopped_scanning = new_ble_event(strlen("Stopped scanning"));
 
 	ble_stopped_scanning->type = BLE_DONE_SCANNING;
@@ -488,14 +490,14 @@ static int scan_init(void)
 	bt_scan_init(&scan_init);
 	bt_scan_cb_register(&scan_cb);
 
-	char *name = "TeppanTest";
-	err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_UUID, BT_UUID_BEEHAVIOUR_MONITORING_SERVICE);
+	char *name = "5340Andreas"; /* Name for nRF53 */
+	err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, name);
 	if (err) {
 		LOG_ERR("Scanning filters cannot be set (err %d)", err);
 		return err;
 	}
 
-	err = bt_scan_filter_enable(BT_SCAN_UUID_FILTER, false);
+	err = bt_scan_filter_enable(BT_SCAN_NAME_FILTER, false);
 	if (err) {
 		LOG_ERR("Filters cannot be turned on (err %d)", err);
 		return err;
@@ -767,8 +769,9 @@ static bool event_handler(const struct event_header *eh)
 
 K_THREAD_DEFINE(ble_module_thread, STACKSIZE,
 		module_thread_fn, NULL, NULL, NULL,
-		K_LOWEST_APPLICATION_THREAD_PRIO, 0, 0);
+		K_HIGHEST_APPLICATION_THREAD_PRIO, 0, 0);
 
+// SYS_INIT(module_thread_fn, APPLICATION, 49);
 
 EVENT_LISTENER(MODULE, event_handler);
 EVENT_SUBSCRIBE(MODULE, ble_event);
