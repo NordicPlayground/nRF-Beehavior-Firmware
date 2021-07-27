@@ -105,7 +105,7 @@ static void scan_filter_match(struct bt_scan_device_info *device_info,
 
 			printk("Real Time Weight: %.2f\n", realTimeWeightKg);
 
-			printf("%.2f\n", realTimeWeight);
+			printf("Real Time Weight in lbs: %.2f\n", realTimeWeight);
 
 			float realTimeTemperature = ((float)(broodminder_data[11] * 256 + broodminder_data[13] - 5000) / 100); // * 9 / 5 + 32 (for Fahrenheit)
 
@@ -113,7 +113,7 @@ static void scan_filter_match(struct bt_scan_device_info *device_info,
 
 			printk("Real time Temperature: %d\n", roundedRTT);
 
-			printf("%.2f\n", realTimeTemperature);
+			printf("Real time Temperature float: %.2f\n", realTimeTemperature);
 
 			bt_addr_le_to_str(device_info->recv_info->addr, addr, sizeof(addr));
 
@@ -121,10 +121,10 @@ static void scan_filter_match(struct bt_scan_device_info *device_info,
 
 			float weightR = broodminder_data[12 + 1] * 256 + broodminder_data[12 + 0] - 32767;
 			float weightScaledR = weightR / 100;
-			printf("%.2f\n", lbs_to_kg(weightScaledR));
+			printf("weightScaledR in Kg: %.2f\n", lbs_to_kg(weightScaledR));
 			float weightL = broodminder_data[14 + 1] * 256 + broodminder_data[14 + 0] - 32767;
 			float weightScaledL = weightL / 100;
-			printf("%.2f\n", lbs_to_kg(weightScaledL));
+			printf("weightScaledL in Kg: %.2f\n", lbs_to_kg(weightScaledL));
 
 		}
 		

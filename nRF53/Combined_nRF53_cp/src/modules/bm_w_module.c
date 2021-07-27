@@ -128,7 +128,7 @@ void scan_filter_match(struct bt_scan_device_info *device_info,
 
 		float weightR = broodminder_data[12 + 1] * 256 + broodminder_data[12 + 0] - 32767;
 		float weightScaledR = weightR / 100;
-		printf("weightScaledR in Kg%.2f\n", lbs_to_kg(weightScaledR));
+		printf("weightScaledR in Kg: %.2f\n", lbs_to_kg(weightScaledR));
 		float weightL = broodminder_data[14 + 1] * 256 + broodminder_data[14 + 0] - 32767;
 		float weightScaledL = weightL / 100;
 		printf("weightScaledL in Kg %.2f\n", lbs_to_kg(weightScaledL));

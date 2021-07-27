@@ -65,8 +65,12 @@ static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
 	BT_DATA(BT_DATA_NAME_COMPLETE, DEVICE_NAME, DEVICE_NAME_LEN),
 };
+
 #define BT_UUID_BEEHAVIOUR_MONITORING_VAL \
 	BT_UUID_128_ENCODE(0x6e400001, 0xb5b3, 0xf393, 0xe1a9, 0xe50e14dcea9e)
+	
+
+// #define BT_UUID_BEEHAVIOUR_MONITORING_SERVICE   BT_UUID_DECLARE_128(BT_UUID_BEEHAVIOUR_MONITORING_VAL)
 
 static const struct bt_data sd[] = {
 	BT_DATA_BYTES(BT_DATA_UUID128_ALL, BT_UUID_BEEHAVIOUR_MONITORING_VAL),
@@ -143,7 +147,7 @@ void peripheral_module_thread_fn(void)
 static bool event_handler(const struct event_header *eh)
 {
 	if (is_ble_event(eh)) {
-        LOG_INF("Event is being handled\n");
+        LOG_INF("BM_W event is being handled\n");
 		struct ble_event *event = cast_ble_event(eh);
 		if(event->type==BM_W_READ){
 			LOG_INF("BM-W ready\n");

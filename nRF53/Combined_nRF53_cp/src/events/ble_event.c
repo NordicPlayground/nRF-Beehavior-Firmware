@@ -1,4 +1,5 @@
 #include "ble_event.h"
+#include <stdio.h>
 
 static int log_ble_event(const struct event_header *eh, char *buf,
                             size_t buf_len)
