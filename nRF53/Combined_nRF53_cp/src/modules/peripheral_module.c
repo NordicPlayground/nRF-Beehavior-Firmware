@@ -86,11 +86,11 @@ static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
 			data_received[i] = (char)data[i];
 		}
 
-	LOG_INF("Received data from %s: %s", log_strdup(addr), log_strdup(data_received));
+	LOG_INF("Received data from %s: %s\n", log_strdup(addr), log_strdup(data_received));
 
 	if(data_received[0]=='*'){
 		id=data_received[1];
-		LOG_INF("New ID is: %c", id);
+		LOG_INF("New ID is: %c\n", id);
         hub_conn = conn;
 	}
 
@@ -116,9 +116,9 @@ void peripheral_module_thread_fn(void)
 	// LOG_INF("Bluetooth initialized");
 
     /* Don't go any further until BLE is initialized */
-    LOG_INF("What it do!");
+    LOG_INF("What it do!\n");
 	k_sem_take(&ble_init_ok, K_FOREVER);
-    LOG_INF("What it is!");
+    LOG_INF("What it is!\n");
 
     int err;
 
@@ -128,14 +128,14 @@ void peripheral_module_thread_fn(void)
 
 	err = bt_nus_init(&nus_cb);
 	if (err) {
-		LOG_ERR("Failed to initialize UART service (err: %d)", err);
+		LOG_ERR("Failed to initialize UART service (err: %d)\n", err);
 		return;
 	}
 
 	err = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), sd,
 			      ARRAY_SIZE(sd));
 	if (err) {
-		LOG_ERR("Advertising failed to start (err %d)", err);
+		LOG_ERR("Advertising failed to start (err %d)\n", err);
 	}
 
 }
@@ -143,10 +143,10 @@ void peripheral_module_thread_fn(void)
 static bool event_handler(const struct event_header *eh)
 {
 	if (is_ble_event(eh)) {
-        LOG_INF("Event is being handled");
+        LOG_INF("Event is being handled\n");
 		struct ble_event *event = cast_ble_event(eh);
 		if(event->type==BM_W_READ){
-			LOG_INF("BM-W ready");
+			LOG_INF("BM-W ready\n");
 			k_sem_give(&ble_init_ok);
 			return false;
 		}
@@ -154,12 +154,12 @@ static bool event_handler(const struct event_header *eh)
 	}
 
     if (is_thingy_event(eh)) {
-        LOG_INF("Thingy event is being handled");
+        LOG_INF("Thingy event is being handled\n");
 		struct thingy_event *event = cast_thingy_event(eh);
-		LOG_INF("Temperature: %i,%i, Humidity: %i, id: %i", event->data_array[0], event->data_array[1], event->data_array[2], id-(uint8_t)'0');
+		LOG_INF("Temperature: %i,%i, Humidity: %i, id: %i\n", event->data_array[0], event->data_array[1], event->data_array[2], id-(uint8_t)'0');
         uint8_t thingy_data[5] = { (uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2]};
         if(hub_conn){
-            LOG_INF("Hub is connected");
+            LOG_INF("Hub is connected\n");
             int err = bt_nus_send(hub_conn, thingy_data, 5);
         }
 		return false;
