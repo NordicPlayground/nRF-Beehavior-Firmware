@@ -1,21 +1,16 @@
 .. _bluetooth-scan-adv-sample:
 
-Bluetooth: Scan & Advertise
+Bluetooth: Scan for external sensor data
 ###########################
 
 Overview
 ********
 
-A simple application demonstrating combined BLE Broadcaster & Observer
-role functionality. The application will periodically send out
-advertising packets with a manufacturer data element. The content of the
-data is a single byte indicating how many advertising packets the device
-has received (the number will roll back to 0 after 255).
+The application scans for advertised sensor data from the Broodminder-W scale. 
 
 Requirements
 ************
 
-* BlueZ running on the host, or
 * A board with BLE support
 
 Building and Running

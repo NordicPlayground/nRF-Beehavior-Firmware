@@ -92,7 +92,7 @@ static void scan_filter_match(struct bt_scan_device_info *device_info,
 
 		/* Don't update weight value if the advertised data is a scan response */
 		if (adv_data_type != BT_DATA_NAME_COMPLETE){
-			printk("Advertising data length: %i\n", device_info->adv_data->len);
+			printk("Bm_w advertising data length: %i\n", device_info->adv_data->len);
 
 			uint8_t broodminder_data[device_info->adv_data->len - 1];
 
@@ -140,35 +140,35 @@ static void scan_connecting_error(struct bt_scan_device_info *device_info)
 static void scan_connecting(struct bt_scan_device_info *device_info,
 			    struct bt_conn *conn)
 {
-	LOG_INF("Scan connecting");
+	LOG_INF("Scan connecting\n");
 	char addr[BT_ADDR_LE_STR_LEN];
 
 	bt_addr_le_to_str(device_info->recv_info->addr, addr, sizeof(addr));
 
 	if(!strncmp(addr, "06:09:16:57:01:FD", 17)){
-		LOG_INF("Weight connecting");
+		LOG_INF("Weight connecting\n");
 		return;
 	}
 	// default_conn = bt_conn_ref(conn);
 }
 
 BT_SCAN_CB_INIT(scan_cb, scan_filter_match, NULL,
-		scan_connecting_error, scan_connecting);
+		NULL, NULL);
 
 void ble_module_thread_fn(void)
 {
 	int err;
 
-	LOG_INF("Starting BLE");
+	LOG_INF("Starting BLE\n");
 	err = bt_enable(NULL);
 	if (err) {
-		LOG_ERR("Bluetooth init failed (err %d)", err);
+		LOG_ERR("Bluetooth init failed (err %d)\n", err);
 		return;
 	}
-	LOG_INF("Bluetooth initialized");
+	LOG_INF("Bluetooth initialized\n");
 
 	if (IS_ENABLED(CONFIG_SETTINGS)) {
-		LOG_INF("Loading settings");
+		LOG_INF("Loading settings\n");
 		settings_load();
 	}
 

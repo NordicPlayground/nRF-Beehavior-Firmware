@@ -49,7 +49,7 @@ int module_get_next_msg(struct module_data *module, void *msg)
 
 		event->log_event(&evt_proto->header, buf, sizeof(buf));
 
-		LOG_DBG("%s module: Dequeued %s",
+		LOG_DBG("%s module: Dequeued %s\n",
 			module->name,
 			log_strdup(buf));
 	}
@@ -63,7 +63,7 @@ int module_enqueue_msg(struct module_data *module, void *msg)
 
 	err = k_msgq_put(module->msg_q, msg, K_NO_WAIT);
 	if (err) {
-		LOG_WRN("%s: Message could not be enqueued, error code: %d",
+		LOG_WRN("%s: Message could not be enqueued, error code: %d\n",
 			module->name, err);
 			/* Purge message queue before reporting an error. This
 			 * makes sure that the calling module can
@@ -86,7 +86,7 @@ int module_enqueue_msg(struct module_data *module, void *msg)
 
 		event->log_event(&evt_proto->header, buf, sizeof(buf));
 
-		LOG_DBG("%s module: Enqueued: %s", log_strdup(module->name),
+		LOG_DBG("%s module: Enqueued: %s\n", log_strdup(module->name),
 			log_strdup(buf));
 	}
 
@@ -99,7 +99,7 @@ bool modules_shutdown_register(uint32_t id_reg)
 	struct module_data *module, *next_module = NULL;
 
 	if (id_reg == 0) {
-		LOG_WRN("Passed in module ID cannot be 0");
+		LOG_WRN("Passed in module ID cannot be 0\n");
 		return false;
 	}
 
@@ -115,7 +115,7 @@ bool modules_shutdown_register(uint32_t id_reg)
 				atomic_dec(&modules_info.active_modules_count);
 				atomic_dec(&modules_info.shutdown_supported_count);
 
-				LOG_WRN("Module \"%s\" shutdown registered", module->name);
+				LOG_WRN("Module \"%s\" shutdown registered\n", module->name);
 			} else {
 				goto exit;
 			}
@@ -136,12 +136,12 @@ exit:
 int module_start(struct module_data *module)
 {
 	if (module == NULL) {
-		LOG_ERR("Module metadata is NULL");
+		LOG_ERR("Module metadata is NULL\n");
 		return -EINVAL;
 	}
 
 	if (module->name == NULL) {
-		LOG_ERR("Module name is NULL");
+		LOG_ERR("Module name is NULL\n");
 		return -EINVAL;
 	}
 
@@ -158,9 +158,9 @@ int module_start(struct module_data *module)
 	k_mutex_unlock(&module_list_lock);
 
 	if (module->thread_id) {
-		LOG_DBG("Module \"%s\" with thread ID %p started", module->name, module->thread_id);
+		LOG_DBG("Module \"%s\" with thread ID %p started\n", module->name, module->thread_id);
 	} else {
-		LOG_DBG("Module \"%s\" started", module->name);
+		LOG_DBG("Module \"%s\" started\n", module->name);
 	}
 
 	return 0;
