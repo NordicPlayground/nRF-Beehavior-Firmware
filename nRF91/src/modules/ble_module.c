@@ -164,22 +164,25 @@ static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
 	char addr[BT_ADDR_LE_STR_LEN];
 
 	LOG_INF("%.*s", len, data);
-	// for(int i = 0; i < len; i++){
-	// 	data_received[i] = (char)data[i];
-	// }
-	// 	LOG_INF("Temperature: %i,%i, Humidity: %i", (uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4]);
-	// if(len==3){
-	// }
+
 	if((char)data[0]=='*'){
 		strcpy(addr, address_array[(uint8_t)data[1]]);
 		if(len==10){	
-			LOG_INF("WeightR: %i,%i, WeightL: %i,%i, RealTimeWeight: %i,%i, Temperature: %i,%i, received from %s, id: %i", (uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint8_t)data[5], (uint8_t)data[6], (uint8_t)data[7], (uint8_t)data[8], (uint8_t)data[9], log_strdup(addr), (uint8_t)data[1]);
-			int err = snprintf(data_string, 100, "WeightR: %i,%i, WeightL: %i,%i, RealTimeWeight: %i,%i, Temperature: %i,%i, id: %i", (uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint8_t)data[5], (uint8_t)data[6], (uint8_t)data[7], (uint8_t)data[8], (uint8_t)data[9], (uint8_t)data[1]);
+			LOG_INF("WeightR: %i,%i, WeightL: %i,%i, RealTimeWeight: %i,%i, Temperature: %i,%i, received from %s, ID: %i", \
+					(uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint8_t)data[5], (uint8_t)data[6], (uint8_t)data[7],\
+					(uint8_t)data[8], (uint8_t)data[9], log_strdup(addr), (uint8_t)data[1]);
+
+			int err = snprintf(data_string, 100, "WeightR: %i,%i, WeightL: %i,%i, RealTimeWeight: %i,%i, Temperature: %i,%i, ID: %i", \
+					 (uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint8_t)data[5], (uint8_t)data[6], (uint8_t)data[7], \
+					 (uint8_t)data[8], (uint8_t)data[9], (uint8_t)data[1]);
 			LOG_INF("Did it work? %i", err);
 		}
-		if(len==5){	
-			LOG_INF("Temperature: %i,%i, Humidity: %i, received from %s, id: %i", (uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], log_strdup(addr), (uint8_t)data[1]);
-			int err = snprintf(data_string, 100, "Temperature: %i,%i, Humidity: %i, id: %i", (uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint8_t)data[1]);
+		if(len==11){	
+			LOG_INF("Temperature [C]: %i,%i, Humidity [%%]: %i, Air Pressure [hPa]: %i,%i, received from %s, ID: %i", \
+						(uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint8_t)data[5],(uint8_t)data[6], log_strdup(addr), (uint8_t)data[1]);
+
+			int err = snprintf(data_string, 100, "Temperature [C]: %i,%i, Humidity [%%]: %i, Air Pressure [hPa]: %i,%i, ID: %i", \
+						(uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4],(uint8_t)data[5],(uint8_t)data[6], (uint8_t)data[1]);
 			LOG_INF("Did it work? %i", err);
 		}
 	}
@@ -488,6 +491,7 @@ static int scan_init(void)
 	bt_scan_cb_register(&scan_cb);
 
 	char *name = "Andreas53Test";
+	// char *name = "TeppanTest";
 	// err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_UUID, BT_UUID_BEEHAVIOUR_MONITORING_SERVICE);
 	err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, name);
 	if (err) {
