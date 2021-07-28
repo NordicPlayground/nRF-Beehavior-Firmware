@@ -218,7 +218,7 @@ static uint8_t on_received_humidity(struct bt_conn *conn,
 			data_array[2] = ((uint8_t *)data)[0];
 			k_sem_give(&humidity_received);
 		}
-		LOG_INF("Relative humidity [percent]: %d \n", ((uint8_t *)data)[0]);
+		LOG_INF("Relative humidity [%%]: %d \n", ((uint8_t *)data)[0]);
 
 	} else {
 		LOG_INF("Humidity notification with 0 length\n");

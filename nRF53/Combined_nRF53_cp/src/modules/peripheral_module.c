@@ -143,14 +143,15 @@ static bool event_handler(const struct event_header *eh)
     if (is_thingy_event(eh)) {
         LOG_INF("Thingy event is being handled\n");
 		struct thingy_event *event = cast_thingy_event(eh);
-		LOG_INF("Temperature [C]: %i,%i, Humidity [Percent]: %i, Air pressure [hPa]: %d,%i ID: %i\n", event->data_array[0], \
+		LOG_INF("Temperature [C]: %i,%i, Humidity [%%]: %i, Air pressure [hPa]: %d,%i ID: %i\n", event->data_array[0], \
 				event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, id-(uint8_t)'0');
 
-        uint8_t thingy_data[7] = { (uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2],\
+
+        uint8_t thingy_data[11] = { (uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2],\
 									event->pressure_int, event->pressure_float};
         if(hub_conn){
             LOG_INF("Hub is connected\n");
-            int err = bt_nus_send(hub_conn, thingy_data, 7);
+            int err = bt_nus_send(hub_conn, thingy_data, 11);
         }
 		return false;
 	}
