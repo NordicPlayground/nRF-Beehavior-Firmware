@@ -94,7 +94,6 @@ static bool messageStart = true;
 #define BT_UUID_BEEHAVIOUR_MONITORING_VAL \
 	BT_UUID_128_ENCODE(0x6e400001, 0xb5b3, 0xf393, 0xe1a9, 0xe50e14dcea9e)
 
-
 #define BT_UUID_BEEHAVIOUR_MONITORING_SERVICE   BT_UUID_DECLARE_128(BT_UUID_BEEHAVIOUR_MONITORING_VAL)
 
 #define ROUTED_MESSAGE_CHAR '*'
@@ -488,14 +487,15 @@ static int scan_init(void)
 	bt_scan_init(&scan_init);
 	bt_scan_cb_register(&scan_cb);
 
-	char *name = "TeppanTest";
-	err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_UUID, BT_UUID_BEEHAVIOUR_MONITORING_SERVICE);
+	char *name = "Andreas53Test";
+	// err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_UUID, BT_UUID_BEEHAVIOUR_MONITORING_SERVICE);
+	err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, name);
 	if (err) {
 		LOG_ERR("Scanning filters cannot be set (err %d)", err);
 		return err;
 	}
 
-	err = bt_scan_filter_enable(BT_SCAN_UUID_FILTER, false);
+	err = bt_scan_filter_enable(BT_SCAN_NAME_FILTER, false);
 	if (err) {
 		LOG_ERR("Filters cannot be turned on (err %d)", err);
 		return err;

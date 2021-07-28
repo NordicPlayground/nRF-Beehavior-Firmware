@@ -38,6 +38,8 @@ static K_SEM_DEFINE(ble_scanning, 0, 1);
  */
 static bool cloud_connected;
 
+static bool first = true;
+
 static void connect_work_fn(struct k_work *work)
 {
 	int err;
@@ -126,7 +128,12 @@ void cloud_event_handler(const struct cloud_backend *const backend,
 		LOG_INF("CLOUD_EVT_READY");
 		struct cloud_event_abbr *cloud_event_ready = new_cloud_event_abbr(strlen("Cloud ready"));
 
-        cloud_event_ready->type = CLOUD_CONNECTED;
+        if(first){
+			cloud_disconnect(cloud_backend);
+			first = false;
+		}
+
+		cloud_event_ready->type = CLOUD_CONNECTED;
 
         // ble_event->address = address_temp;
         //memcpy(ble_event->address, address_temp, 17);

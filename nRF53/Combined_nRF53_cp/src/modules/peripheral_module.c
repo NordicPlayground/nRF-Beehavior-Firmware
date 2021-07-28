@@ -39,7 +39,7 @@
 
 #include "events/ble_event.h"
 #include "events/thingy_event.h"
-// #include "events/bm_w_event.h"
+#include "events/bm_w_event.h"
 
 #include <drivers/uart.h>
 
@@ -164,6 +164,24 @@ static bool event_handler(const struct event_header *eh)
         }
 		return false;
 	}
+	
+	if (is_bm_w_event(eh)) {
+        LOG_INF("BM_W event is being handled\n");
+		struct bm_w_event *event = cast_bm_w_event(eh);
+		LOG_INF("WeightR: %.2f, WeightL: %.2f, RTWeight: %.2f, Temperature: %.2f, id: %i\n", event->weightR, event->weightL, event->realTimeWeight, event->temperature, id-(uint8_t)'0');
+        uint8_t bm_w_data[10] = { (uint8_t)'*', id-(uint8_t)'0', (uint8_t)event->weightR, (uint8_t)((event->weightR - (uint8_t)event->weightR) * 100)
+			, (uint8_t)event->weightL, (uint8_t)((event->weightL - (uint8_t)event->weightL) * 100)
+			, (uint8_t)event->realTimeWeight, (uint8_t)((event->realTimeWeight - (uint8_t)event->realTimeWeight) * 100) 
+			, (uint8_t)event->temperature, (uint8_t)((event->temperature - (uint8_t)event->temperature) * 100) };
+        if(hub_conn){
+            LOG_INF("Hub is connected\n");
+            int err = bt_nus_send(hub_conn, bm_w_data, 10);
+        }
+		else{
+			//Save untill reconnected
+		}
+		return false;
+	}
     
 	return false;
 }
@@ -176,4 +194,4 @@ K_THREAD_DEFINE(peripheral_module_thread, 1024,
 EVENT_LISTENER(MODULE, event_handler);
 EVENT_SUBSCRIBE(MODULE, ble_event);
 EVENT_SUBSCRIBE(MODULE, thingy_event);
-// EVENT_SUBSCRIBE(MODULE, bm_w_event);
+EVENT_SUBSCRIBE(MODULE, bm_w_event);

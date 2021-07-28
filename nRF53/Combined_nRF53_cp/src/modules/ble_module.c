@@ -92,6 +92,12 @@ static void scan_filter_match(struct bt_scan_device_info *device_info,
 
 		/* Don't update weight value if the advertised data is a scan response */
 		if (adv_data_type != BT_DATA_NAME_COMPLETE){
+			float data_array[4];
+
+			bt_addr_le_to_str(device_info->recv_info->addr, addr, sizeof(addr));
+
+			printk("Device found: %s\n", addr);
+
 			printk("Bm_w advertising data length: %i\n", device_info->adv_data->len);
 
 			uint8_t broodminder_data[device_info->adv_data->len - 1];
@@ -99,33 +105,29 @@ static void scan_filter_match(struct bt_scan_device_info *device_info,
 			bt_data_parse((device_info->adv_data), data_cb, (void*)broodminder_data);
 			printk("\n");
 
-			float realTimeWeight = (float)(broodminder_data[22] * 256 + broodminder_data[21] - 32767 ) / 100 ;
+			data_array[2] = lbs_to_kg((float)(broodminder_data[22] * 256 + broodminder_data[21] - 32767 ) / 100);
 
-			float realTimeWeightKg = lbs_to_kg(realTimeWeight);
+			printk("Real Time Weight: %.2f\n", data_array[2]);
 
-			printk("Real Time Weight: %.2f\n", realTimeWeightKg);
+			data_array[3] = ((float)(broodminder_data[11] * 256 + broodminder_data[13] - 5000) / 100); // * 9 / 5 + 32 (for Fahrenheit)
 
-			printf("%.2f\n", realTimeWeight);
+			printf("%.2f\n", data_array[3]);
 
-			float realTimeTemperature = ((float)(broodminder_data[11] * 256 + broodminder_data[13] - 5000) / 100); // * 9 / 5 + 32 (for Fahrenheit)
+			data_array[0]  = lbs_to_kg((float)(broodminder_data[12 + 1] * 256 + broodminder_data[12 + 0] - 32767) / 100);
+			
+			printf("%.2f\n", data_array[0]);
+			
+			data_array[1] = lbs_to_kg((float)(broodminder_data[14 + 1] * 256 + broodminder_data[14 + 0] - 32767) / 100);
+			printf("%.2f\n", data_array[1]);
 
-			int roundedRTT = (int)realTimeTemperature;
+			struct bm_w_event *bm_w_send = new_bm_w_event();
 
-			printk("Real time Temperature: %d\n", roundedRTT);
+			bm_w_send->weightR = data_array[0];
+			bm_w_send->weightL = data_array[1];
+			bm_w_send->realTimeWeight = data_array[2];
+			bm_w_send->temperature = data_array[3];
 
-			printf("%.2f\n", realTimeTemperature);
-
-			bt_addr_le_to_str(device_info->recv_info->addr, addr, sizeof(addr));
-
-			printk("Device found: %s\n", addr);
-
-			float weightR = broodminder_data[12 + 1] * 256 + broodminder_data[12 + 0] - 32767;
-			float weightScaledR = weightR / 100;
-			printf("%.2f\n", lbs_to_kg(weightScaledR));
-			float weightL = broodminder_data[14 + 1] * 256 + broodminder_data[14 + 0] - 32767;
-			float weightScaledL = weightL / 100;
-			printf("%.2f\n", lbs_to_kg(weightScaledL));
-
+			EVENT_SUBMIT(bm_w_send);
 		}
 		
 		//k_sleep(K_SECONDS(30));
