@@ -229,11 +229,11 @@ static uint8_t on_received_air_pressure(struct bt_conn *conn,
 {
 	if (length > 0) {
 		if(configured){
-			data_array[0] = ((uint8_t *)data)[0];
+			data_array[0] = ((int32_t *)data)[0];
 			data_array[1] = ((uint8_t *)data)[1];
 			k_sem_give(&air_pressure_received);
 		}
-		LOG_INF("Air Pressure [hPa]: %d \n", ((uint8_t *)data)[0]);
+		LOG_INF("Air Pressure [hPa]: %d,%i \n", ((int32_t *)data)[0], ((uint8_t *)data)[1]);
 
 	} else {
 		LOG_INF("Air Pressure notification with 0 length\n");
@@ -818,9 +818,9 @@ void thingy_module_thread_fn(void)
 {
 	int err;
 	
-	LOG_INF("STOP!...");
+	LOG_INF("STOP!... (Wait for BLE to be ready)\n");
     k_sem_take(&ble_ready, K_FOREVER);
-    LOG_INF("HAMMERTIME!");
+    LOG_INF("HAMMERTIME! (BLE ready.\n");
 	
 	err = bt_conn_auth_cb_register(&conn_auth_callbacks);
 	if (err) {
@@ -835,9 +835,6 @@ void thingy_module_thread_fn(void)
 		LOG_INF("Failed to initialize scan: %i", err);
 	}
 
-	LOG_INF("Starting Bluetooth Central UART example\n");
-
-
 	err = bt_scan_start(BT_SCAN_TYPE_SCAN_ACTIVE);
 	if (err) {
 		LOG_ERR("Scanning failed to start (err %d)", err);
@@ -845,7 +842,7 @@ void thingy_module_thread_fn(void)
 	}
 
 	LOG_INF("Scanning successfully started");
-	LOG_INF("Scanning for name: %d", BT_SCAN_FILTER_TYPE_NAME);
+	LOG_INF("Scanning for Thingy:52 with name: %d", BT_SCAN_FILTER_TYPE_NAME);
 
 	for(;;){
 		k_sem_take(&temperature_received, K_FOREVER);
