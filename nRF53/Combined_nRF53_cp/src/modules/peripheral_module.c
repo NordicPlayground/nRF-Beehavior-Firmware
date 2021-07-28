@@ -46,7 +46,7 @@
 #include <device.h>
 #include <soc.h>
 
-#define MODULE peripheral_uart
+#define MODULE peripheral_module
 LOG_MODULE_REGISTER(MODULE);
 
 // #define STACKSIZE CONFIG_BT_NUS_THREAD_STACK_SIZE
@@ -102,23 +102,10 @@ static struct bt_nus_cb nus_cb = {
 
 void peripheral_module_thread_fn(void)
 {
-	// bt_conn_cb_register(&conn_callbacks);
-
-	// if (IS_ENABLED(CONFIG_BT_NUS_SECURITY_ENABLED)) {
-	// 	bt_conn_auth_cb_register(&conn_auth_callbacks);
-	// }
-
-	// err = bt_enable(NULL);
-	// if (err) {
-	// 	error();
-	// }
-
-	// LOG_INF("Bluetooth initialized");
-
     /* Don't go any further until BLE is initialized */
-    LOG_INF("What it do!\n");
+    LOG_INF("What it do! (Wait for BLE to be initialized) \n");
 	k_sem_take(&ble_init_ok, K_FOREVER);
-    LOG_INF("What it is!\n");
+    LOG_INF("What it is! (BLE is initialized) \n");
 
     int err;
 
@@ -143,7 +130,7 @@ void peripheral_module_thread_fn(void)
 static bool event_handler(const struct event_header *eh)
 {
 	if (is_ble_event(eh)) {
-        LOG_INF("Event is being handled\n");
+        LOG_INF("BLE event is being handled\n");
 		struct ble_event *event = cast_ble_event(eh);
 		if(event->type==BM_W_READ){
 			LOG_INF("BM-W ready\n");
@@ -156,11 +143,14 @@ static bool event_handler(const struct event_header *eh)
     if (is_thingy_event(eh)) {
         LOG_INF("Thingy event is being handled\n");
 		struct thingy_event *event = cast_thingy_event(eh);
-		LOG_INF("Temperature: %i,%i, Humidity: %i, id: %i\n", event->data_array[0], event->data_array[1], event->data_array[2], id-(uint8_t)'0');
-        uint8_t thingy_data[5] = { (uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2]};
+		LOG_INF("Temperature [C]: %i,%i, Humidity [Percent]: %i, Air pressure [hPa]: %d,%i ID: %i\n", event->data_array[0], \
+				event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, id-(uint8_t)'0');
+
+        uint8_t thingy_data[7] = { (uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2],\
+									event->pressure_int, event->pressure_float};
         if(hub_conn){
             LOG_INF("Hub is connected\n");
-            int err = bt_nus_send(hub_conn, thingy_data, 5);
+            int err = bt_nus_send(hub_conn, thingy_data, 7);
         }
 		return false;
 	}
@@ -168,7 +158,7 @@ static bool event_handler(const struct event_header *eh)
 	if (is_bm_w_event(eh)) {
         LOG_INF("BM_W event is being handled\n");
 		struct bm_w_event *event = cast_bm_w_event(eh);
-		LOG_INF("WeightR: %.2f, WeightL: %.2f, RTWeight: %.2f, Temperature: %.2f, id: %i\n", event->weightR, event->weightL, event->realTimeWeight, event->temperature, id-(uint8_t)'0');
+		LOG_INF("WeightR: %.2f, WeightL: %.2f, RTWeight: %.2f, Temperature: %.2f, ID: %i\n", event->weightR, event->weightL, event->realTimeWeight, event->temperature, id-(uint8_t)'0');
         uint8_t bm_w_data[10] = { (uint8_t)'*', id-(uint8_t)'0', (uint8_t)event->weightR, (uint8_t)((event->weightR - (uint8_t)event->weightR) * 100)
 			, (uint8_t)event->weightL, (uint8_t)((event->weightL - (uint8_t)event->weightL) * 100)
 			, (uint8_t)event->realTimeWeight, (uint8_t)((event->realTimeWeight - (uint8_t)event->realTimeWeight) * 100) 
@@ -178,7 +168,7 @@ static bool event_handler(const struct event_header *eh)
             int err = bt_nus_send(hub_conn, bm_w_data, 10);
         }
 		else{
-			//Save untill reconnected
+			//Save untill reconnected TO DO
 		}
 		return false;
 	}

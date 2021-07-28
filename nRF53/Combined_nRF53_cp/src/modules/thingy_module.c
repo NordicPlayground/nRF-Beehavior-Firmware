@@ -50,6 +50,9 @@ bool configured = false;
 
 uint8_t data_array[3];
 
+int32_t pressure_int;
+uint8_t pressure_float;
+
 #define MODULE thingy_module
 LOG_MODULE_REGISTER(MODULE, 4);
 
@@ -229,11 +232,12 @@ static uint8_t on_received_air_pressure(struct bt_conn *conn,
 {
 	if (length > 0) {
 		if(configured){
-			data_array[0] = ((int32_t *)data)[0];
-			data_array[1] = ((uint8_t *)data)[1];
+			pressure_int = ((int32_t *)data)[0];
+			pressure_float = ((uint8_t *)data)[1];
 			k_sem_give(&air_pressure_received);
 		}
-		LOG_INF("Air Pressure [hPa]: %d,%i \n", ((int32_t *)data)[0], ((uint8_t *)data)[1]);
+		LOG_INF("Air Pressure [hPa]: %d,%d \n", ((int32_t *)data)[0], ((uint8_t *)data)[1]);
+		LOG_INF("Air Pressure [hPa]: %d,%d \n", pressure_int, pressure_float);
 
 	} else {
 		LOG_INF("Air Pressure notification with 0 length\n");
@@ -272,7 +276,7 @@ void write_cb (struct bt_conn *conn, uint8_t err, struct bt_gatt_write_params *p
 static void discovery_write_completed(struct bt_gatt_dm *disc, void *ctx){
 	//Write to Thingy to update configuration
 
-	char data[12] = { 0x60,0xEA,0x10,0x27,0x60,0xEA,0x10,0x27,0x03,0xFF,0x00,0x00};
+	char data[12] = { 0x60,0xEA,0x60,0xEA,0x60,0xEA,0x10,0x27,0x03,0xFF,0x00,0x00};
 
 	LOG_INF("%d", data[0]);
 
@@ -854,6 +858,8 @@ void thingy_module_thread_fn(void)
 		thingy_send->data_array[0] = data_array[0];
 		thingy_send->data_array[1] = data_array[1];
 		thingy_send->data_array[2] = data_array[2];
+		thingy_send->pressure_int = pressure_int;
+		thingy_send->pressure_float = pressure_float;
 
 		EVENT_SUBMIT(thingy_send);
 	}

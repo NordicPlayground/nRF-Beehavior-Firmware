@@ -11,6 +11,9 @@
 //Når cloud og BLE scan kjører samtidig
 //W: opcode 0x0000 pool id 3 pool 0x2001530c != &hci_cmd_pool 0x20015364
 
+/* SOME BLOAT/DUPLICATE CODE MAY BE RESIDING IN THIS MODULE WHICH ARE
+ REDUNDANT DUE TO BEEING INCLUDED IN OTHER MODULES. NOT SURE WHAT.*/ 
+
 #include <event_manager.h>
 
 #include <zephyr/types.h>
@@ -94,6 +97,7 @@ void scan_filter_match(struct bt_scan_device_info *device_info,
 	
 	/* Don't update weight value if the advertised data is a scan response */
 	if (adv_data_type != BT_DATA_NAME_COMPLETE){
+		LOG_INF("DO WE EVER USE THIS? \n");
 		printk("Advertising data length: %i\n", device_info->adv_data->len);
 
 		uint8_t broodminder_data[device_info->adv_data->len - 1];
@@ -138,7 +142,6 @@ void scan_filter_match(struct bt_scan_device_info *device_info,
 
 }
 
-
 BT_SCAN_CB_INIT(scan_cb, scan_filter_match, NULL, NULL, NULL);
 
 
@@ -147,11 +150,6 @@ static int scan_init(bool first){
 	struct bt_scan_init_param scan_init = {
 		.connect_if_match = 0,
 	};
-
-    //LOG_INF("Scan Initilazing");
-
-	// bt_scan_init(&scan_init);
-	// bt_scan_cb_register(&scan_cb);
 
     LOG_INF("Changing filters\n");
 	if(first){
@@ -178,9 +176,9 @@ static int scan_init(bool first){
 
 void module_thread_fn(void)
 {
-    LOG_INF("STOP!...\n");
+    LOG_INF("STOP!... (Wait for thingy_ready semaphore)\n");
     k_sem_take(&thingy_ready, K_FOREVER);
-    LOG_INF("HAMMERTIME!\n");
+    LOG_INF("HAMMERTIME! (Thingy is ready) \n");
 
 	struct bt_le_scan_param scan_param = {
 		.type       = BT_HCI_LE_SCAN_PASSIVE,
@@ -190,38 +188,13 @@ void module_thread_fn(void)
 	};
 	int err;
 
-	//LOG_INF("Starting Scanner Demo\n");
-
-	
-
-	/* Initialize the Bluetooth Subsystem */	
-	/* err = bt_enable(NULL);
-	if (err) {
-		LOG_INF("Bluetooth init failed (err %d)\n", err);
-		return;
-	} */
-
-	// LOG_INF("Bluetooth initialized\n");
-
-	// if (IS_ENABLED(CONFIG_SETTINGS)) {
-	// 	LOG_INF("Loading settings");
-	// 	settings_load();
-	// }
-
 	err = scan_init(true);
 	if(err){
 		LOG_INF("Scanning failed to initialize\n");
 		return;
 	}
-
-    // LOG_INF("Checkpoint 2");
-
-	// err = bt_scan_params_set(&scan_param);
-	// if (err){
-	// 	LOG_INF("Scanning parameters failed to set");
-	// }
 	
-    LOG_INF("Checkpoint 3\n");
+    LOG_INF("Checkpoint 2 \n");
 
 	err = bt_scan_start(BT_SCAN_TYPE_SCAN_ACTIVE);
 	if (err) {

@@ -45,22 +45,12 @@
 #define MODULE ble_module
 LOG_MODULE_REGISTER(MODULE, 4);
 
-// typedef enum {false, true} bool;
-
 bool console_prints = true; /*Toggle this to display console prints*/
-
-// static struct bt_conn *default_conn;
 
 static float lbs_to_kg(float lbs){
 	return lbs*0.4536;
 }
 
-// Commented due to declaration at top
-// static struct bt_conn_cb conn_callbacks = {
-// 	.connected = connected,
-// 	.disconnected = disconnected,
-// 	.security_changed = security_changed
-// };
 
 static bool data_cb(struct bt_data *data, void *user_data)
 {
@@ -72,9 +62,7 @@ static bool data_cb(struct bt_data *data, void *user_data)
 
 		len = data->data_len;
 		memcpy(broodminder_data, data->data, len);
-		// for (int i = 0; i < len+8; i++){
-		// 	printk("%i: %02x\n", i, broodminder_data[i]);
-		// }
+
 		return false;
 	default:
 		return true;

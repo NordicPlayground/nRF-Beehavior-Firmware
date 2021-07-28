@@ -5,7 +5,8 @@ static int log_thingy_event(const struct event_header *eh, char *buf,
 {
         struct thingy_event *event = cast_thingy_event(eh);
 
-        return snprintf(buf, buf_len, "Temperature: %i,%i, Humidity: %i", event->data_array[0], event->data_array[1], event->data_array[2]);
+        return snprintf(buf, buf_len, "Temperature [C]: %i,%i, Humidity [Percentage]: %i, Air pressure [hPa]: %d,%i \n", event->data_array[0], event->data_array[1], event->data_array[2], \
+                        event->pressure_int, event ->pressure_float);                       
 }
 
 EVENT_TYPE_DEFINE(thingy_event,      /* Unique event name. */
