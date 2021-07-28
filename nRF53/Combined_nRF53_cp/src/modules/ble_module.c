@@ -13,6 +13,7 @@
 #include <sys/byteorder.h>
 #include <sys/printk.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <string.h>
 #include <sys/printk.h>
 
@@ -43,6 +44,10 @@
 
 #define MODULE ble_module
 LOG_MODULE_REGISTER(MODULE, 4);
+
+// typedef enum {false, true} bool;
+
+bool console_prints = true; /*Toggle this to display console prints*/
 
 // static struct bt_conn *default_conn;
 
@@ -96,29 +101,35 @@ static void scan_filter_match(struct bt_scan_device_info *device_info,
 
 			bt_addr_le_to_str(device_info->recv_info->addr, addr, sizeof(addr));
 
-			printk("Device found: %s\n", addr);
-
-			printk("Bm_w advertising data length: %i\n", device_info->adv_data->len);
-
 			uint8_t broodminder_data[device_info->adv_data->len - 1];
 
 			bt_data_parse((device_info->adv_data), data_cb, (void*)broodminder_data);
-			printk("\n");
 
 			data_array[2] = lbs_to_kg((float)(broodminder_data[22] * 256 + broodminder_data[21] - 32767 ) / 100);
 
-			printk("Real Time Weight: %.2f\n", data_array[2]);
-
 			data_array[3] = ((float)(broodminder_data[11] * 256 + broodminder_data[13] - 5000) / 100); // * 9 / 5 + 32 (for Fahrenheit)
-
-			printf("%.2f\n", data_array[3]);
 
 			data_array[0]  = lbs_to_kg((float)(broodminder_data[12 + 1] * 256 + broodminder_data[12 + 0] - 32767) / 100);
 			
-			printf("%.2f\n", data_array[0]);
-			
 			data_array[1] = lbs_to_kg((float)(broodminder_data[14 + 1] * 256 + broodminder_data[14 + 0] - 32767) / 100);
-			printf("%.2f\n", data_array[1]);
+
+
+			if (console_prints){ /*Print outputs for debugging purposes */
+				printk("Device found: %s\n", addr);
+
+				printk("Bm_w advertising data length: %i\n", device_info->adv_data->len);
+
+				printk("\n");
+
+				printk("Real Time Weight [Kg]: %.2f\n", data_array[2]);
+
+				printf("Temperature [Celsius]: %.2f\n", data_array[3]);
+
+				printf("WeightR [Kg]: %.2f\n", data_array[0]);
+
+				printf("WeightL [Kg]: %.2f\n", data_array[1]);
+
+			}
 
 			struct bm_w_event *bm_w_send = new_bm_w_event();
 
