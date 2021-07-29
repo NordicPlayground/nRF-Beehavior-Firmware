@@ -188,6 +188,32 @@ static bool event_handler(const struct event_header *eh)
 
 		LOG_INF("Checking Thingy_data element 4,5,6,7, 8: %d,%d,%d,%d,%d\n", thingy_data[5], thingy_data[6], thingy_data[7], thingy_data[8],thingy_data[9]);
 		LOG_INF("HEX VERSION Checking Thingy_data element 4,5,6,7, 8: %x,%x,%x,%x,%x \n", thingy_data[5], thingy_data[6], thingy_data[7], thingy_data[8],thingy_data[9]);
+
+		uint8_t temp[4];
+		for (uint8_t i = 5; i <= 8; i++){
+			temp[i-5] = thingy_data[i];
+			printf("i: %i\n", i);
+			printf("temp[i]: %i\n", temp[i-5]);
+		}
+		printf("\n");
+
+		int32_t tempvar;//= (int32_t)temp;
+
+		
+		char buff[100];
+		// int x[]={0,1,2,3,4,5,6};
+		for (uint8_t i=0; i<=3; i++) {
+			sprintf(&buff[i],"%d",temp[i]);
+		}
+		tempvar = atoi(buff);
+
+    	printf("the number is %d \n",tempvar);
+
+		printf("Sizeof temp and tempvar %i, %i\n", sizeof(temp), sizeof(tempvar));
+		// memcpy(tempvar, temp, sizeof(int32_t));
+		// tempvar = (int32_t)ntohs((int32_t)tempvar);
+		printf("From int to array to int %i, %X \n", tempvar, tempvar);
+
         if(hub_conn){
             LOG_INF("Hub is connected\n");
             int err = bt_nus_send(hub_conn, thingy_data, 11);
