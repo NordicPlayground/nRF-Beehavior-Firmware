@@ -156,6 +156,7 @@ static void ble_data_sent(uint8_t err, const uint8_t *const data, uint16_t len)
 	}
 }
 
+
 static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
 {
 	LOG_INF("ble_data_received");
@@ -182,7 +183,7 @@ static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
 						(uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint8_t)data[5],(uint8_t)data[6], log_strdup(addr), (uint8_t)data[1]);
 
 			int err = snprintf(data_string, 100, "Temperature [C]: %i,%i, Humidity [%%]: %i, Air Pressure [hPa]: %i,%i, ID: %i", \
-						(uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4],(uint8_t)data[5],(uint8_t)data[6], (uint8_t)data[1]);
+						(uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4],(int32_t)data[5],(uint8_t)data[6], (uint8_t)data[1]);
 			LOG_INF("Did it work? %i", err);
 		}
 	}
