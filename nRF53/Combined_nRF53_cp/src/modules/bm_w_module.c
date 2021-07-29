@@ -29,7 +29,7 @@
 
 #include "events/ble_event.h"
 // #include "events/thingy_event.h"
-// #include "events/bm_w_event.h"
+#include "events/bm_w_event.h"
 
 static K_SEM_DEFINE(thingy_ready, 0, 1);
 
@@ -61,6 +61,11 @@ static void ble_scan_start_fn(struct k_work *work)
 		LOG_INF("Scanning for bm_w failed to start (err %d)", err);
 		// return;
 	}
+	// struct ble_event *bm_w_read = new_ble_event();
+
+	// bm_w_read->type = BM_W_READ;
+
+	// EVENT_SUBMIT(bm_w_read);
 	k_work_reschedule(&weight_interval ,K_MINUTES(1));
 }
 
@@ -215,7 +220,7 @@ static bool event_handler(const struct event_header *eh)
 	if (is_ble_event(eh)) {
 
 		struct ble_event *event = cast_ble_event(eh);
-		if(event->type==THINGY_READY){
+		if(event->type==HUB_CONNECTED){
 			LOG_INF("Thingy connected\n");
 			k_sem_give(&thingy_ready);
 			return false;

@@ -57,6 +57,13 @@ LOG_MODULE_REGISTER(MODULE);
 
 char id;
 
+union tagname{
+	int a;
+	unsigned char s[4];
+};
+
+union tagname object;
+
 static K_SEM_DEFINE(ble_init_ok, 0, 1);
 
 static struct bt_conn *hub_conn;
@@ -124,7 +131,11 @@ void peripheral_module_thread_fn(void)
 	if (err) {
 		LOG_ERR("Advertising failed to start (err %d)\n", err);
 	}
+	struct ble_event *peripheral_ready = new_ble_event();
 
+	peripheral_ready->type = HUB_CONNECTED;
+
+	EVENT_SUBMIT(peripheral_ready);
 }
 
 static bool event_handler(const struct event_header *eh)
@@ -132,8 +143,8 @@ static bool event_handler(const struct event_header *eh)
 	if (is_ble_event(eh)) {
         LOG_INF("BLE event is being handled\n");
 		struct ble_event *event = cast_ble_event(eh);
-		if(event->type==BM_W_READ){
-			LOG_INF("BM-W ready\n");
+		if(event->type==THINGY_READY){
+			LOG_INF("Thingy ready\n");
 			k_sem_give(&ble_init_ok);
 			return false;
 		}
@@ -146,9 +157,37 @@ static bool event_handler(const struct event_header *eh)
 		LOG_INF("Temperature [C]: %i,%i, Humidity [%%]: %i, Air pressure [hPa]: %d,%i ID: %i\n", event->data_array[0], \
 				event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, id-(uint8_t)'0');
 
+		LOG_INF("Hex-version: Temperature [C]: %x,%x, Humidity [%%]: %x, Air pressure [hPa]: %x,%x ID: %x\n", event->data_array[0], \
+				event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, id-(uint8_t)'0');
+		
 
-        uint8_t thingy_data[11] = { (uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2],\
+		object.a = event->pressure_int;
+		LOG_INF("Object.a = %d, %x \n", object.a, object.a);
+		printf("%d\n",sizeof(object));
+		printf("%X\n",object.a);
+		printf("%X\n", object.s);
+
+        uint8_t thingy_data[11] = { (uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2]};//,\
 									event->pressure_int, event->pressure_float};
+
+		printf("Individual bytes: \n");
+		for(char i=0;  i<=3; i++){
+			printf("i: %i\n", i);
+			printf("%02X \n",object.s[i]);
+			printf("Test %X \n",object.s[i]);
+			thingy_data[8-i] = object.s[i];
+		}
+		printf("\n");
+		printf("%d\n",sizeof(thingy_data));
+		thingy_data[9] = event->pressure_float;
+ 		// int i;
+		// for (i = 5; i <=8; i++){
+		// 	thingy_data[i] = object.s[i-5];
+		// }
+		// thingy_data[9] = event->pressure_float;
+
+		LOG_INF("Checking Thingy_data element 4,5,6,7, 8: %d,%d,%d,%d,%d\n", thingy_data[5], thingy_data[6], thingy_data[7], thingy_data[8],thingy_data[9]);
+		LOG_INF("HEX VERSION Checking Thingy_data element 4,5,6,7, 8: %x,%x,%x,%x,%x \n", thingy_data[5], thingy_data[6], thingy_data[7], thingy_data[8],thingy_data[9]);
         if(hub_conn){
             LOG_INF("Hub is connected\n");
             int err = bt_nus_send(hub_conn, thingy_data, 11);
@@ -169,7 +208,7 @@ static bool event_handler(const struct event_header *eh)
             int err = bt_nus_send(hub_conn, bm_w_data, 10);
         }
 		else{
-			//Save untill reconnected TO DO
+			//Save untill reconnected to nrf91 TO DO
 		}
 		return false;
 	}
