@@ -178,7 +178,13 @@ static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
 					 (uint8_t)data[8], (uint8_t)data[9], (uint8_t)data[1]);
 			LOG_INF("Did it work? %i", err);
 		}
-		if(len==11){	
+		if(len==11){
+			// uint32_t temp[4];
+			// for (uint8_t i = 5; i <= )
+			// int32_t air_pressure;
+			// memcpy(&air_pressure, testResponse, sizeof(int32_t));
+			// air_pressure = (int32_t)ntohs((int32_t)air_pressure);
+
 			LOG_INF("Temperature [C]: %i,%i, Humidity [%%]: %i, Air Pressure [hPa]: %i,%i, received from %s, ID: %i", \
 						(uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint8_t)data[5],(uint8_t)data[6], log_strdup(addr), (uint8_t)data[1]);
 
