@@ -103,7 +103,15 @@ K_SEM_DEFINE(service_ready, 0, 1)
 	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
 			    0x33, 0x49, 0x35, 0x9B, 0x06, 0x02, 0x68, 0xEF)
 
-#define PACKED packed
+				/* Thingy Environment User Interface UUID */
+#define BT_UUID_UIS                                                            \
+	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
+			    0x33, 0x49, 0x35, 0x9B, 0x00, 0x03, 0x68, 0xEF)
+
+				/* Thingy Environment LED UUID */
+#define BT_UUID_LED                                                            \
+	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
+			    0x33, 0x49, 0x35, 0x9B, 0x01, 0x03, 0x68, 0xEF)
 
 struct ble_tes_color_config_t
 {
@@ -258,9 +266,7 @@ static uint8_t on_received_orientation(struct bt_conn *conn,
 	return BT_GATT_ITER_CONTINUE;
 }
 
-
-/* ----------------------- Write to Thingy callbacks -------------------------*/
-void write_cb (struct bt_conn *conn, uint8_t err, struct bt_gatt_write_params *params){
+void write_to_led_cb (struct bt_conn *conn, uint8_t err, struct bt_gatt_write_params *params){
 	LOG_INF("Write callback started, %i, length: %i, offset: %i, handle: %i", err, params->length, params->offset, params->handle);
 
 	configured = true;
@@ -270,6 +276,78 @@ void write_cb (struct bt_conn *conn, uint8_t err, struct bt_gatt_write_params *p
 	thingy_ready->type = THINGY_READY;
 
 	EVENT_SUBMIT(thingy_ready);
+	// char *test = params->data;
+	// LOG_INF("%.12s", log_strdup(test));
+}
+
+static void discovery_write_to_led_completed(struct bt_gatt_dm *disc, void *ctx){
+	
+
+	uint8_t data[1] = {0x00};
+
+	const struct bt_gatt_dm_attr *chrc;
+	const struct bt_gatt_dm_attr *desc;
+
+	chrc = bt_gatt_dm_char_by_uuid(disc, BT_UUID_LED);
+	if (!chrc) {
+		LOG_INF("Missing Thingy configuration characteristic\n");
+	}
+
+	desc = bt_gatt_dm_desc_by_uuid(disc, chrc, BT_UUID_LED);
+	if (!desc) {
+	 	LOG_INF("Missing Thingy configuration char value descriptor\n");
+	}
+	struct bt_gatt_write_params params;
+	params.func = write_to_led_cb;
+	params.data = data;
+	uint16_t test = 0;
+	params.handle = desc->handle;
+	LOG_INF("Handle: %i", desc->handle);
+	params.offset = 0;
+	params.length = 1;
+	int err = bt_gatt_write(bt_gatt_dm_conn_get(disc), &params);
+	//int err = bt_gatt_write_without_response(bt_gatt_dm_conn_get(disc), desc->handle, data, 12, 0);
+	LOG_INF("Error: %i", err);
+	
+	LOG_INF("Releasing write discovery\n");
+	err = bt_gatt_dm_data_release(disc);
+	if (err) {
+		LOG_INF("Could not release write to led discovery data, err: %d\n", err);
+	}
+
+}
+static void discovery_write_to_led_service_not_found(struct bt_conn *conn, void *ctx)
+{
+	LOG_INF("Thingy write service not found!\n");
+}
+
+static void discovery_write_to_led_error_found(struct bt_conn *conn, int err, void *ctx)
+{
+	LOG_INF("The write discovery procedure failed, err %d\n", err);
+}
+
+static struct bt_gatt_dm_cb discovery_write_to_led_cb = {
+	.completed = discovery_write_to_led_completed,
+	.service_not_found = discovery_write_to_led_service_not_found,
+	.error_found = discovery_write_to_led_error_found,
+};
+
+static void write_to_led_gattp(struct bt_conn *conn){
+	int err;
+
+	// ----------------------- Write to Thingy ---------------------------
+    LOG_INF("Entering TES service bt_gatt_dm_start;\n");
+	err = bt_gatt_dm_start(conn, BT_UUID_UIS, &discovery_write_to_led_cb, NULL);
+	if (err) {
+		LOG_INF("Could not start write  to led service discovery, err %d\n", err);
+	}
+	LOG_INF("Gatt write DM started with code: %i\n", err);
+}
+
+
+/* ----------------------- Write to Thingy callbacks -------------------------*/
+void write_cb (struct bt_conn *conn, uint8_t err, struct bt_gatt_write_params *params){
+	LOG_INF("Write callback started, %i, length: %i, offset: %i, handle: %i", err, params->length, params->offset, params->handle);
 
 }
 
@@ -310,6 +388,7 @@ static void discovery_write_completed(struct bt_gatt_dm *disc, void *ctx){
 	if (err) {
 		LOG_INF("Could not release humidity discovery data, err: %d\n", err);
 	}
+	write_to_led_gattp(bt_gatt_dm_conn_get(disc));
 
 }
 static void discovery_write_service_not_found(struct bt_conn *conn, void *ctx)
