@@ -180,37 +180,37 @@ static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
 		}
 		if(len==11){
 
-		char temp[4];
+		char pressure_arr[4];
 		for (uint8_t i = 5; i <= 8; i++){
-			temp[i-5] = data[i];
+			pressure_arr[i-5] = data[i];
 			/*printf("index of temp: %i\n", i-5);
 			printf("Address of this element: %pn \n",&temp[i-5]);
 			printf("Value of element: %X\n", temp[i-5]);*/
 
 		}
-		printf("\n"); 
-		int32_t tempvar;//= (int32_t)temp;
-		int32_t tempvar2;
+		// printf("\n"); 
+		int32_t pressure_big_endian;//= (int32_t)temp;
+		int32_t pressure_little_endian;
 
-		memcpy(&tempvar, temp, sizeof(tempvar));
-		printf("The number is %X,%i \n",tempvar,tempvar);
+		// memcpy(&pressure_big_endian, pressure_arr, sizeof(pressure_big_endian));
+		// printf("The number is %X,%i \n",tempvar,tempvar);
 
-		char reverse_temp[4];
+		char reverse_press_arr[4];
 		for (uint8_t i = 0; i <=3; i++){
-			reverse_temp[i] = temp[3-i];
-			printf("Index of reverse temp %i \n", i);
-			printf("temp[i] after reversing: %X\n", reverse_temp[i]);
+			reverse_press_arr[i] = pressure_arr[3-i];
+			// printf("Index of reverse temp %i \n", i);
+			// printf("temp[i] after reversing: %X\n", reverse_temp[i]);
 		}
 
-		memcpy(&tempvar2, reverse_temp, sizeof(tempvar2));
+		memcpy(&pressure_little_endian, reverse_press_arr, sizeof(pressure_little_endian));
 		
-    	printf("The number after reversing is %X,%i \n",tempvar2,tempvar2);
+    	// printf("The number after reversing is %X,%i \n",tempvar2,tempvar2);
 
 			LOG_INF("Temperature [C]: %i,%i, Humidity [%%]: %i, Air Pressure [hPa]: %i,%i, received from %s, ID: %i", \
-						(uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint32_t)tempvar2,(uint8_t)data[9], log_strdup(addr), (uint8_t)data[1]);
+						(uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint32_t)reverse_press_arr, (uint8_t)data[9], log_strdup(addr), (uint8_t)data[1]);
 
 			int err = snprintf(data_string, 100, "Temperature [C]: %i,%i, Humidity [%%]: %i, Air Pressure [hPa]: %i,%i, ID: %i", \
-						(uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4],(uint32_t)tempvar2,(uint8_t)data[9], (uint8_t)data[1]);
+						(uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4],(uint32_t)reverse_press_arr, (uint8_t)data[9], (uint8_t)data[1]);
 			LOG_INF("Did it work? %i", err);
 		}
 	}
