@@ -137,6 +137,26 @@ void peripheral_module_thread_fn(void)
 
 	EVENT_SUBMIT(peripheral_ready);
 }
+// Testing array reverse and print functions
+// void print(int arr[], int n)
+// {
+//     for (int i = 0; i < n; i++) {
+//         printf("Reversed array index i with value: %i, %X \n", i, arr[i]);
+//     }
+// }
+
+// void reverse(int arr[], int n)
+// {
+//     int aux[n];
+ 
+//     for (int i = 0; i < n; i++) {
+//         aux[n - 1 - i] = arr[i];
+//     }
+ 
+//     for (int i = 0; i < n; i++) {
+//         arr[i] = aux[i];
+//     }
+// }
 
 static bool event_handler(const struct event_header *eh)
 {
@@ -162,57 +182,56 @@ static bool event_handler(const struct event_header *eh)
 		
 
 		object.a = event->pressure_int;
-		LOG_INF("Object.a = %d, %x \n", object.a, object.a);
+		/*LOG_INF("Object.a = %d, %x \n", object.a, object.a);
 		printf("%d\n",sizeof(object));
 		printf("%X\n",object.a);
-		printf("%X\n", object.s);
+		printf("%X\n", object.s);*/
 
         uint8_t thingy_data[11] = { (uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2]};//,\
 									event->pressure_int, event->pressure_float};
 
 		printf("Individual bytes: \n");
 		for(char i=0;  i<=3; i++){
-			printf("i: %i\n", i);
-			printf("%02X \n",object.s[i]);
-			printf("Test %X \n",object.s[i]);
+			// printf("index of data_array: %i\n", 8-i);
+			// printf("%02X \n",object.s[i]);
+			// printf("Test %X \n",object.s[i]);
 			thingy_data[8-i] = object.s[i];
 		}
-		printf("\n");
-		printf("%d\n",sizeof(thingy_data));
+		// printf("\n");
+		// printf("%d\n",sizeof(thingy_data));
 		thingy_data[9] = event->pressure_float;
- 		// int i;
-		// for (i = 5; i <=8; i++){
-		// 	thingy_data[i] = object.s[i-5];
+
+		// LOG_INF("Checking Thingy_data element 4,5,6,7, 8: %d,%d,%d,%d,%d\n", thingy_data[5], thingy_data[6], thingy_data[7], thingy_data[8],thingy_data[9]);
+		// LOG_INF("HEX VERSION Checking Thingy_data element 4,5,6,7, 8: %x,%x,%x,%x,%x \n", thingy_data[5], thingy_data[6], thingy_data[7], thingy_data[8],thingy_data[9]);
+
+		// char temp[4];
+		// for (uint8_t i = 5; i <= 8; i++){
+		// 	temp[i-5] = thingy_data[i];
+		// 	/*printf("index of temp: %i\n", i-5);
+		// 	printf("Address of this element: %pn \n",&temp[i-5]);
+		// 	printf("Value of element: %X\n", temp[i-5]);*/
+
 		// }
-		// thingy_data[9] = event->pressure_float;
+		// printf("\n"); 
+		// int32_t tempvar;//= (int32_t)temp;
+		// int32_t tempvar2;
 
-		LOG_INF("Checking Thingy_data element 4,5,6,7, 8: %d,%d,%d,%d,%d\n", thingy_data[5], thingy_data[6], thingy_data[7], thingy_data[8],thingy_data[9]);
-		LOG_INF("HEX VERSION Checking Thingy_data element 4,5,6,7, 8: %x,%x,%x,%x,%x \n", thingy_data[5], thingy_data[6], thingy_data[7], thingy_data[8],thingy_data[9]);
+		// memcpy(&tempvar, temp, sizeof(tempvar));
+		// printf("The number is %X,%i \n",tempvar,tempvar);
 
-		uint8_t temp[4];
-		for (uint8_t i = 5; i <= 8; i++){
-			temp[i-5] = thingy_data[i];
-			printf("i: %i\n", i);
-			printf("temp[i]: %i\n", temp[i-5]);
-		}
-		printf("\n");
+		// char reverse_temp[4];
+		// for (uint8_t i = 0; i <=3; i++){
+		// 	reverse_temp[i] = temp[3-i];
+		// 	printf("Index of reverse temp %i \n", i);
+		// 	printf("temp[i] after reversing: %X\n", reverse_temp[i]);
+		// }
 
-		int32_t tempvar;//= (int32_t)temp;
-
+		// memcpy(&tempvar2, reverse_temp, sizeof(tempvar2));
 		
-		char buff[100];
-		// int x[]={0,1,2,3,4,5,6};
-		for (uint8_t i=0; i<=3; i++) {
-			sprintf(&buff[i],"%d",temp[i]);
-		}
-		tempvar = atoi(buff);
+    	// printf("The number after reversing is %X,%i \n",tempvar2,tempvar2);
 
-    	printf("the number is %d \n",tempvar);
-
-		printf("Sizeof temp and tempvar %i, %i\n", sizeof(temp), sizeof(tempvar));
-		// memcpy(tempvar, temp, sizeof(int32_t));
-		// tempvar = (int32_t)ntohs((int32_t)tempvar);
-		printf("From int to array to int %i, %X \n", tempvar, tempvar);
+		// printf("From int to array to int %i, %X \n", tempvar, tempvar);
+		// printf("From int to array to int %i, %X \n", tempvar2, tempvar2);
 
         if(hub_conn){
             LOG_INF("Hub is connected\n");
