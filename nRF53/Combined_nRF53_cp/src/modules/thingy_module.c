@@ -113,6 +113,10 @@ K_SEM_DEFINE(service_ready, 0, 1)
 	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
 			    0x33, 0x49, 0x35, 0x9B, 0x01, 0x03, 0x68, 0xEF)
 
+#define BT_UUID_BTRY                                                            \
+	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
+			    0x33, 0x49, 0x35, 0x9B, 0x0F, 0x18, 0x68, 0xEF)
+
 struct ble_tes_color_config_t
 {
     uint8_t  led_red;
@@ -180,6 +184,18 @@ static struct bt_gatt_dm_cb discovery_orientation_cb = {
 	.error_found = discovery_orientation_error_found,
 };
 
+/* ------------------ Battery headers and cb --------------------
+	This can be left out or used for alarm purposes, i.e "Notify when battery level is low and trigger alarm"
+// */
+// static void discovery_battery_completed(struct bt_gatt_dm *disc, void *ctx);
+// static void discovery_battery_service_not_found(struct bt_conn *conn, void *ctx);
+// static void discovery_battery_error_found(struct bt_conn *conn, int err, void *ctx);
+
+// static struct bt_gatt_dm_cb discovery_battery_cb = {
+// 	.completed = discovery_battery_completed,
+// 	.service_not_found = discovery_battery_service_not_found,
+// 	.error_found = discovery_battery_error_found,
+// };
 
 /* ------------------------ Declaration of connection and gattp functions ----------------------*/
 static void connected(struct bt_conn *conn, uint8_t conn_err);
@@ -190,6 +206,7 @@ static void discover_temperature_gattp(struct bt_conn *conn);
 static void discover_humidity_gattp(struct bt_conn *conn);
 static void discover_air_pressure_gattp(struct bt_conn *conn);
 static void discover_orientation_gattp(struct bt_conn *conn);
+// static void discover_battery_gattp(struct bt_conn *conn);
 
 // ------------------ Connected struct
 static struct bt_conn_cb conn_callbacks = {
@@ -266,6 +283,19 @@ static uint8_t on_received_orientation(struct bt_conn *conn,
 	return BT_GATT_ITER_CONTINUE;
 }
 
+// static uint8_t on_received_battery(struct bt_conn *conn,
+// 			struct bt_gatt_subscribe_params *params,
+// 			const void *data, uint16_t length)
+// {
+// 	if (length > 0) {
+// 		LOG_INF("Battery: %x %%\n", ((uint8_t *)data)[0]);
+
+// 	} else {
+// 		LOG_INF("Battery notification with 0 length\n");
+// 	}
+// 	return BT_GATT_ITER_CONTINUE;
+// }
+
 void write_to_led_cb (struct bt_conn *conn, uint8_t err, struct bt_gatt_write_params *params){
 	LOG_INF("Write callback started, %i, length: %i, offset: %i, handle: %i", err, params->length, params->offset, params->handle);
 
@@ -309,11 +339,12 @@ static void discovery_write_to_led_completed(struct bt_gatt_dm *disc, void *ctx)
 	//int err = bt_gatt_write_without_response(bt_gatt_dm_conn_get(disc), desc->handle, data, 12, 0);
 	LOG_INF("Error: %i", err);
 	
-	LOG_INF("Releasing write discovery\n");
+	LOG_INF("Releasing write to led discovery\n");
 	err = bt_gatt_dm_data_release(disc);
 	if (err) {
 		LOG_INF("Could not release write to led discovery data, err: %d\n", err);
 	}
+	
 
 }
 static void discovery_write_to_led_service_not_found(struct bt_conn *conn, void *ctx)
@@ -670,7 +701,8 @@ release:
 	if (err) {
 		LOG_INF("Could not release orientation discovery data, err: %d\n", err);
 	}
-	write_to_characteristic_gattp(bt_gatt_dm_conn_get(disc));
+	// discover_battery_gattp(bt_gatt_dm_conn_get(disc));
+	
 }
 
 static void discovery_orientation_service_not_found(struct bt_conn *conn, void *ctx)
@@ -681,6 +713,72 @@ static void discovery_orientation_service_not_found(struct bt_conn *conn, void *
 static void discovery_orientation_error_found(struct bt_conn *conn, int err, void *ctx)
 {
 	LOG_INF("The orientation discovery procedure failed, err %d\n", err);
+}
+
+
+// /* -------------------- Battery discovery functions ---------------------*/
+// static void discovery_battery_completed(struct bt_gatt_dm *disc, void *ctx)
+// {
+// 	int err;
+
+// 	/* Must be statically allocated */
+// 	static struct bt_gatt_subscribe_params param = {
+// 		.notify = on_received_battery,
+// 	};
+// 	param.value = BT_GATT_CCC_NOTIFY;
+
+// 	const struct bt_gatt_dm_attr *chrc;
+// 	const struct bt_gatt_dm_attr *desc;
+
+// 	chrc = bt_gatt_dm_char_by_uuid(disc, BT_UUID_BTRY);
+// 	if (!chrc) {
+// 		LOG_INF("Missing Thingy battery characteristic\n");
+// 		goto release;
+// 	}
+
+// 	desc = bt_gatt_dm_desc_by_uuid(disc, chrc, BT_UUID_BTRY);
+// 	if (!desc) {
+// 		LOG_INF("Missing Thingy battery char value descriptor\n");
+// 		goto release;
+// 	}
+
+// 	param.value_handle = desc->handle,
+
+// 	desc = bt_gatt_dm_desc_by_uuid(disc, chrc, BT_UUID_GATT_CCC);
+// 	if (!desc) {
+// 		LOG_INF("Missing Thingy battery char CCC descriptor\n");
+// 		goto release;
+// 	}
+
+// 	param.ccc_handle = desc->handle;
+
+// 	// if(!resubscribe){
+// 		err = bt_gatt_subscribe(bt_gatt_dm_conn_get(disc), &param);
+// 		if (err) {
+// 			LOG_INF("Subscribe to battery service failed (err %d)\n", err);
+// 		}
+
+// 	LOG_INF("Battery discovery completed\n");
+
+// release:
+// 	LOG_INF("Releasing battery discovery\n");
+// 	err = bt_gatt_dm_data_release(disc);
+// 	if (err) {
+// 		LOG_INF("Could not release battery discovery data, err: %d\n", err);
+// 	}
+	
+
+// }
+
+
+// static void discovery_battery_service_not_found(struct bt_conn *conn, void *ctx)
+// {
+// 	LOG_INF("Thingy battery service not found!\n");
+// }
+
+// static void discovery_battery_error_found(struct bt_conn *conn, int err, void *ctx)
+// {
+// 	LOG_INF("The battery discovery procedure failed, err %d\n", err);
 }
 
 /* ----------------------- gattp functions ------------------------*/ 
@@ -733,6 +831,18 @@ static void discover_orientation_gattp(struct bt_conn *conn)
 	LOG_INF("Gatt motion DM started with code: %i\n", err);
 }
 
+// static void discover_battery_gattp(struct bt_conn *conn)
+// {
+
+// 	int err;
+
+//     LOG_INF("Entering BTRY service bt_gatt_dm_start;\n");
+// 	err = bt_gatt_dm_start(conn, BT_UUID_BTRY, &discovery_battery_cb, NULL);
+// 	if (err) {
+// 		LOG_INF("Could not start battery service discovery, err %d\n", err);
+// 	}
+// 	LOG_INF("Gatt battery DM started with code: %i\n", err);
+// }
 /*------------------------- Connectivity, scanning and pairing functions -------------------------- */
 static void connected(struct bt_conn *conn, uint8_t conn_err)
 {
