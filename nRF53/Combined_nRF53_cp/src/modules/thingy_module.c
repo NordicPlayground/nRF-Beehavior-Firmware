@@ -938,7 +938,8 @@ static int scan_init(bool first)
 {
 	int err;
 	if(first){
-		err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, "T52And2");
+		// err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, "T52And2");
+		err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, "T52Andre");
 		if (err) {
 			LOG_ERR("Scanning filters cannot be set (err %d)\n", err);
 			return err;
