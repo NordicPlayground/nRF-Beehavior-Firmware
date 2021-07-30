@@ -262,7 +262,7 @@ static uint8_t on_received_air_pressure(struct bt_conn *conn,
 			k_sem_give(&air_pressure_received);
 		}
 		LOG_INF("Air Pressure [hPa]: %d,%d \n", ((int32_t *)data)[0], ((uint8_t *)data)[1]);
-		LOG_INF("Air Pressure [hPa]: %d,%d \n", pressure_int, pressure_float);
+		// LOG_INF("Air Pressure [hPa]: %d,%d \n", pressure_int, pressure_float);
 
 	} else {
 		LOG_INF("Air Pressure notification with 0 length\n");
@@ -701,6 +701,7 @@ release:
 	if (err) {
 		LOG_INF("Could not release orientation discovery data, err: %d\n", err);
 	}
+	write_to_characteristic_gattp(bt_gatt_dm_conn_get(disc));
 	// discover_battery_gattp(bt_gatt_dm_conn_get(disc));
 	
 }
@@ -779,7 +780,7 @@ static void discovery_orientation_error_found(struct bt_conn *conn, int err, voi
 // static void discovery_battery_error_found(struct bt_conn *conn, int err, void *ctx)
 // {
 // 	LOG_INF("The battery discovery procedure failed, err %d\n", err);
-}
+// }
 
 /* ----------------------- gattp functions ------------------------*/ 
 static void discover_temperature_gattp(struct bt_conn *conn)
@@ -1036,7 +1037,7 @@ void thingy_module_thread_fn(void)
 	}
 
 	LOG_INF("Scanning successfully started");
-	LOG_INF("Scanning for Thingy:52 with name: %d", BT_SCAN_FILTER_TYPE_NAME);
+	LOG_INF("Scanning for Thingy:52 with name T52Andre: %d", BT_SCAN_FILTER_TYPE_NAME);
 
 	for(;;){
 		k_sem_take(&temperature_received, K_FOREVER);

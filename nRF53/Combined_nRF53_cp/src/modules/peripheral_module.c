@@ -57,6 +57,7 @@ LOG_MODULE_REGISTER(MODULE);
 
 char id;
 
+// Used for thingy_event
 union tagname{
 	int a;
 	unsigned char s[4];
@@ -116,10 +117,6 @@ void peripheral_module_thread_fn(void)
 
     int err;
 
-	// if (IS_ENABLED(CONFIG_SETTINGS)) {
-	// 	settings_load();
-	// }
-
 	err = bt_nus_init(&nus_cb);
 	if (err) {
 		LOG_ERR("Failed to initialize UART service (err: %d)\n", err);
@@ -137,26 +134,7 @@ void peripheral_module_thread_fn(void)
 
 	EVENT_SUBMIT(peripheral_ready);
 }
-// Testing array reverse and print functions
-// void print(int arr[], int n)
-// {
-//     for (int i = 0; i < n; i++) {
-//         printf("Reversed array index i with value: %i, %X \n", i, arr[i]);
-//     }
-// }
 
-// void reverse(int arr[], int n)
-// {
-//     int aux[n];
- 
-//     for (int i = 0; i < n; i++) {
-//         aux[n - 1 - i] = arr[i];
-//     }
- 
-//     for (int i = 0; i < n; i++) {
-//         arr[i] = aux[i];
-//     }
-// }
 
 static bool event_handler(const struct event_header *eh)
 {
@@ -171,6 +149,7 @@ static bool event_handler(const struct event_header *eh)
 		return false;
 	}
 
+	/* The comments in this part of the code is only for debugging and implementation. Functional code is in ble_module.c in nrf91*/
     if (is_thingy_event(eh)) {
         LOG_INF("Thingy event is being handled\n");
 		struct thingy_event *event = cast_thingy_event(eh);
