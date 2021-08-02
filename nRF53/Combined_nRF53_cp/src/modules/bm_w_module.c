@@ -37,6 +37,7 @@
 static K_SEM_DEFINE(thingy_ready, 0, 1);
 
 static struct k_work_delayable weight_interval;
+static struct k_work_delayable temperature_interval;
 
 #define LOG_MODULE_NAME bm_w_module
 LOG_MODULE_REGISTER(LOG_MODULE_NAME, 4);
@@ -44,8 +45,11 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME, 4);
 #define REAL_TIME_WEIGHT 0x16
 #define BROODMINDER_ADDR ((bt_addr_le_t[]) { { 0, \
 			 { { 0xFD, 0x01, 0x57, 0x16, 0x09, 0x06 } } } })
+#define BROODMINDER_ADDR_TEMPERATURE ((bt_addr_le_t[]) { { 0, \
+			 { { 0x93, 0x05, 0x47, 0x16, 0x09, 0x06 } } } })
 
-
+#define USE_BMW;
+#define USE_TEMPERATURE;
 static int scan_init(bool first);
 static bool data_cb(struct bt_data *data, void *user_data);
 static float lbs_to_kg(float weight);

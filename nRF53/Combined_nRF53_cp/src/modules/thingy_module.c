@@ -913,9 +913,17 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 		return;
 	}
 
-	LOG_INF("Disconnected from Thingy:52: %s (reason %u)\n", log_strdup(addr),	reason);
-	LOG_INF("Thingy:52 disconnected, LED 1 toggled off\n");
-	dk_set_led_off(LED_1);
+	LOG_INF("Bluetooth disconnection occured: %s (reason %u)\n", log_strdup(addr),	reason);
+	if(!strncmp(addr, "DF:91:24:65:5F:88", 17)){
+		LOG_INF("LED 1 toggled off. Thingy:52  disconnected. \n");
+		dk_set_led_off(LED_1);
+	}
+	else{
+		LOG_INF("LED 2 toggled off. 91 disconnected. \n");
+		dk_set_led_off(LED_2);
+	};
+	
+	
 
 	err = bt_gatt_disconnected(conn);
 	LOG_INF("Gatt cleared: %i", err);
@@ -927,7 +935,7 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 	if (thingy_conn != conn) {
 		LOG_INF("Central hub disconnected");
 		LOG_INF("LED 2 toggled off. Disconnected from 91.");
-		dk_set_led_on(LED_2);
+		dk_set_led_off(LED_2);
 		return;
 	}
 
