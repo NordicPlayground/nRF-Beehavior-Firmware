@@ -85,7 +85,8 @@ static void scan_filter_match(struct bt_scan_device_info *device_info,
 
 	LOG_INF("Filters matched. Address: %s connectable: %d\n", log_strdup(addr), connectable);
 
-	if(!strncmp(addr, "06:09:16:57:01:FD", 17)){
+	// if(!strncmp(addr, "06:09:16:57:01:FD", 17)){
+	if(!strncmp(addr, "06:09:16:47:05:93", 17)){
 		uint8_t adv_data_type = net_buf_simple_pull_u8(device_info->adv_data);
 
 		/* Don't update weight value if the advertised data is a scan response */
@@ -108,11 +109,11 @@ static void scan_filter_match(struct bt_scan_device_info *device_info,
 
 
 			if (console_prints){ /*Print outputs for debugging purposes */
+				printk("\n");
+
 				printk("Device found: %s\n", addr);
 
 				printk("Bm_w advertising data length: %i\n", device_info->adv_data->len);
-
-				printk("\n");
 
 				printk("Real Time Weight [Kg]: %.2f\n", data_array[2]);
 
@@ -132,6 +133,8 @@ static void scan_filter_match(struct bt_scan_device_info *device_info,
 			bm_w_send->temperature = data_array[3];
 
 			EVENT_SUBMIT(bm_w_send);
+			LOG_INF("LED 3  toggled off. Data from BM has been sent from 53 to 91.\n");
+			dk_set_led_off(LED_3);
 		}
 		
 		//k_sleep(K_SECONDS(30));
@@ -151,8 +154,10 @@ static void scan_connecting(struct bt_scan_device_info *device_info,
 
 	bt_addr_le_to_str(device_info->recv_info->addr, addr, sizeof(addr));
 
-	if(!strncmp(addr, "06:09:16:57:01:FD", 17)){
-		LOG_INF("Weight connecting\n");
+	// if(!strncmp(addr, "06:09:16:57:01:FD", 17)){
+	if(!strncmp(addr, "06:09:16:47:05:93", 17)){
+		// LOG_INF("Weight connecting\n");
+		LOG_INF("Temperature connecting.\n");
 		return;
 	}
 	// default_conn = bt_conn_ref(conn);

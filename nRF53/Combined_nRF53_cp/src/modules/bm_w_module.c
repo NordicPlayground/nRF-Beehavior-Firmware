@@ -48,8 +48,8 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME, 4);
 #define BROODMINDER_ADDR_TEMPERATURE ((bt_addr_le_t[]) { { 0, \
 			 { { 0x93, 0x05, 0x47, 0x16, 0x09, 0x06 } } } })
 
-#define USE_BMW;
-#define USE_TEMPERATURE;
+// #define USE_BMW;
+// #define USE_TEMPERATURE;
 static int scan_init(bool first);
 static bool data_cb(struct bt_data *data, void *user_data);
 static float lbs_to_kg(float weight);
@@ -171,8 +171,16 @@ static int scan_init(bool first){
 	};
 
     LOG_INF("Changing filters\n");
+	// if(first){
+	// 	err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_ADDR, BROODMINDER_ADDR);
+	// 	if (err){
+	// 		LOG_INF("Filters cannot be set (err %d)\n", err);
+	// 		return err;
+	// 	}
+	// }
+
 	if(first){
-		err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_ADDR, BROODMINDER_ADDR);
+		err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_ADDR, BROODMINDER_ADDR_TEMPERATURE);
 		if (err){
 			LOG_INF("Filters cannot be set (err %d)\n", err);
 			return err;
