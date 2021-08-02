@@ -33,6 +33,8 @@
 
 #include <settings/settings.h>
 
+#include <dk_buttons_and_leds.h>
+
 #include <drivers/uart.h>
 
 #include <logging/log.h>
@@ -40,6 +42,7 @@
 #include "events/ble_event.h"
 #include "events/thingy_event.h"
 #include "events/bm_w_event.h"
+#include "led/led.h"
 
 #include <drivers/uart.h>
 
@@ -127,7 +130,11 @@ void peripheral_module_thread_fn(void)
 			      ARRAY_SIZE(sd));
 	if (err) {
 		LOG_ERR("Advertising failed to start (err %d)\n", err);
+		// LOG_INF("Toggling LED 4 off. \n");
+		// dk_set_led_off(LED_4);
 	}
+	// LOG_INF("Advertising data from 53? Setting LED 4.\n");
+	// dk_set_led_on(LED_4);
 	struct ble_event *peripheral_ready = new_ble_event();
 
 	peripheral_ready->type = HUB_CONNECTED;
@@ -152,6 +159,8 @@ static bool event_handler(const struct event_header *eh)
 	/* The comments in this part of the code is only for debugging and implementation. Functional code is in ble_module.c in nrf91*/
     if (is_thingy_event(eh)) {
         LOG_INF("Thingy event is being handled\n");
+		LOG_INF("Toggling LED 4 while Thingy event is handled.\n");
+		dk_set_led_on(LED_4);
 		struct thingy_event *event = cast_thingy_event(eh);
 		LOG_INF("Temperature [C]: %i,%i, Humidity [%%]: %i, Air pressure [hPa]: %d,%i ID: %i\n", event->data_array[0], \
 				event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, id-(uint8_t)'0');
@@ -169,7 +178,7 @@ static bool event_handler(const struct event_header *eh)
         uint8_t thingy_data[11] = { (uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2]};//,\
 									event->pressure_int, event->pressure_float};
 
-		printf("Individual bytes: \n");
+		// printf("Individual bytes: \n");
 		for(char i=0;  i<=3; i++){
 			// printf("index of data_array: %i\n", 8-i);
 			// printf("%02X \n",object.s[i]);
@@ -216,7 +225,10 @@ static bool event_handler(const struct event_header *eh)
             LOG_INF("Hub is connected\n");
             int err = bt_nus_send(hub_conn, thingy_data, 11);
         }
+		LOG_INF("Toggling LED 4 off after finishing Thingy Event.\n");
+		dk_set_led_off(LED_4);
 		return false;
+		
 	}
 	
 	if (is_bm_w_event(eh)) {

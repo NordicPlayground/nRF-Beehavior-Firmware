@@ -31,15 +31,22 @@
 
 #include <settings/settings.h>
 
+#include <dk_buttons_and_leds.h>
+
 #include <drivers/uart.h>
 
 #include <logging/log.h>
 
 #include "events/ble_event.h"
 #include "events/thingy_event.h"
+#include "led/led.h"
+// #include "ble_module.c"
 // #include "events/bm_w_event.h"
 
 // #include "ble.h"
+
+
+
 
 static K_SEM_DEFINE(ble_ready, 0, 1);
 static K_SEM_DEFINE(temperature_received, 0, 1);
@@ -874,9 +881,13 @@ static void connected(struct bt_conn *conn, uint8_t conn_err)
 		thingy_conn = bt_conn_ref(conn);
 	}
 	else{
-		LOG_INF("Connected to central hub");
-	}
+		LOG_INF("Connected to central hub (91).\n");
+		LOG_INF("Setting LED 2 for successful connection with 91.");
+		dk_set_led_on(LED_2);
 
+	}
+	LOG_INF("Setting LED 1 Status for successful connection with T:52\n");
+	dk_set_led_on(LED_1);
 	LOG_INF("Connected: %.17s", log_strdup(addr));
 	LOG_INF("Starting Thingy:52 service discovery chain. \n");
 	LOG_INF("Discovering temperature service:"); /* Starts the service discovery chain*/
@@ -902,7 +913,9 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 		return;
 	}
 
-	LOG_INF("Disconnected: %s (reason %u)\n", log_strdup(addr),	reason);
+	LOG_INF("Disconnected from Thingy:52: %s (reason %u)\n", log_strdup(addr),	reason);
+	LOG_INF("Thingy:52 disconnected, LED 1 toggled off\n");
+	dk_set_led_off(LED_1);
 
 	err = bt_gatt_disconnected(conn);
 	LOG_INF("Gatt cleared: %i", err);
@@ -913,6 +926,8 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 
 	if (thingy_conn != conn) {
 		LOG_INF("Central hub disconnected");
+		LOG_INF("LED 2 toggled off. Disconnected from 91.");
+		dk_set_led_on(LED_2);
 		return;
 	}
 
