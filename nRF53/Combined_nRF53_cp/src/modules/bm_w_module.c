@@ -27,9 +27,12 @@
 #include <logging/log.h>
 #include <zephyr.h>
 
+#include <dk_buttons_and_leds.h>
+
 #include "events/ble_event.h"
 // #include "events/thingy_event.h"
 #include "events/bm_w_event.h"
+#include "led/led.h"
 
 static K_SEM_DEFINE(thingy_ready, 0, 1);
 
@@ -49,16 +52,23 @@ static float lbs_to_kg(float weight);
 
 static void ble_scan_start_fn(struct k_work *work)
 {
-	LOG_INF("Scanning for bm_w starting");
+	LOG_INF("Scanning for bm_w starting.");
+	LOG_INF("LED 3 toggled while scanning. \n");
+	dk_set_led_on(LED_3);
+
 	int err = scan_init(false);
 	if(err){
 		LOG_INF("Scanning for bm_w failed to initialize");
+		LOG_INF("LED 3 toggled off.\n");
+		dk_set_led_off(LED_3);
 		// return;
 	}
 
 	err = bt_scan_start(BT_SCAN_TYPE_SCAN_ACTIVE);
 	if (err) {
 		LOG_INF("Scanning for bm_w failed to start (err %d)", err);
+		LOG_INF("LED 3 toggled off.\n");
+		dk_set_led_off(LED_3);
 		// return;
 	}
 	// struct ble_event *bm_w_read = new_ble_event();
@@ -204,10 +214,14 @@ void module_thread_fn(void)
 	err = bt_scan_start(BT_SCAN_TYPE_SCAN_ACTIVE);
 	if (err) {
 		LOG_INF("Scanning for bm_w failed to start (err %d)\n", err);
+		LOG_INF("LED 3 toggled off.\n");
+		dk_set_led_off(LED_3);
 		return;
 	}
 
 	LOG_INF("Scanning for bm_w succesfully started\n");
+	LOG_INF("LED 3 toggled while scanning for BM_Weight. \n");
+	dk_set_led_on(LED_3);
 	
 	k_work_init_delayable(&weight_interval, ble_scan_start_fn);
 

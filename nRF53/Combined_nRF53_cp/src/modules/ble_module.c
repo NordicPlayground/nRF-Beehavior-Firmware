@@ -30,6 +30,8 @@
 #include <bluetooth/gatt_dm.h>
 #include <bluetooth/scan.h>
 
+#include <dk_buttons_and_leds.h>
+
 #include <settings/settings.h>
 
 #include <drivers/uart.h>
@@ -39,8 +41,11 @@
 #include "events/ble_event.h"
 #include "events/thingy_event.h"
 #include "events/bm_w_event.h"
+#include "led/led.h"
 
 // #include "ble.h"
+
+
 
 #define MODULE ble_module
 LOG_MODULE_REGISTER(MODULE, 4);
@@ -158,7 +163,22 @@ BT_SCAN_CB_INIT(scan_cb, scan_filter_match, NULL,
 
 void ble_module_thread_fn(void)
 {
+	/*Initializing Buttons and LEDS */ 
 	int err;
+
+	// err = dk_buttons_init(button_changed);
+	// if (err) {
+	// 	LOG_ERR("Cannot init buttons (err: %d)", err);
+	// }
+
+	err = dk_leds_init();
+	if (err) {
+		LOG_ERR("Cannot init LEDs (err: %d)", err);
+	}
+	else{
+		LOG_INF("Leds initialized and set to LED1 = 53 Connected to T52, LED2 = 53 Connected to T91, LED3 = 53 Scanning for BM_Weight.\n");
+	}
+
 
 	LOG_INF("Starting BLE\n");
 	err = bt_enable(NULL);
