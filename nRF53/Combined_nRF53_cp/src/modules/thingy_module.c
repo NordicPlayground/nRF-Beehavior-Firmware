@@ -914,23 +914,21 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 	}
 
 	LOG_INF("Bluetooth disconnection occured: %s (reason %u)\n", log_strdup(addr),	reason);
-	if(!strncmp(addr, "DF:91:24:65:5F:88", 17)){
+	struct bt_conn_info conn_info;
+	
+	bt_conn_get_info(conn, &conn_info);
+	// if(!strncmp(addr, "DF:91:24:65:5F:88", 17)){ // This must be change to not be hard coded
+	if(!conn_info.role){
+		// LOG_INF("Thingy:52 Connected");
 		LOG_INF("LED 1 toggled off. Thingy:52  disconnected. \n");
 		dk_set_led_off(LED_1);
 	}
-	else{
-		LOG_INF("LED 2 toggled off. 91 disconnected. \n");
-		dk_set_led_off(LED_2);
-	};
+	// else{
+	// 	LOG_INF("LED 2 toggled off. 91 disconnected. \n");
+	// 	dk_set_led_off(LED_2);
+	// };
 	
 	
-
-	err = bt_gatt_disconnected(conn);
-	LOG_INF("Gatt cleared: %i", err);
-
-	scan_init(false);
-
-	bt_scan_start(BT_SCAN_TYPE_SCAN_ACTIVE);
 
 	if (thingy_conn != conn) {
 		LOG_INF("Central hub disconnected");
@@ -938,6 +936,13 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 		dk_set_led_off(LED_2);
 		return;
 	}
+
+	err = bt_gatt_disconnected(conn);
+	LOG_INF("Gatt cleared: %i", err);
+
+	scan_init(false);
+
+	bt_scan_start(BT_SCAN_TYPE_SCAN_ACTIVE);
 
 	bt_conn_unref(thingy_conn);
 	thingy_conn = NULL;

@@ -170,22 +170,22 @@ static int scan_init(bool first){
 		.connect_if_match = 0,
 	};
 
-    LOG_INF("Changing filters\n");
-	// if(first){
-	// 	err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_ADDR, BROODMINDER_ADDR);
-	// 	if (err){
-	// 		LOG_INF("Filters cannot be set (err %d)\n", err);
-	// 		return err;
-	// 	}
-	// }
-
+    LOG_INF("Changing filters. \n");
 	if(first){
-		err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_ADDR, BROODMINDER_ADDR_TEMPERATURE);
+		err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_ADDR, BROODMINDER_ADDR);
 		if (err){
 			LOG_INF("Filters cannot be set (err %d)\n", err);
 			return err;
 		}
 	}
+
+	// if(first){
+	// 	err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_ADDR, BROODMINDER_ADDR_TEMPERATURE);
+	// 	if (err){
+	// 		LOG_INF("Filters cannot be set (err %d)\n", err);
+	// 		return err;
+	// 	}
+	// }
 
     LOG_INF("Checkpoint 1");
 

@@ -59,6 +59,8 @@ LOG_MODULE_REGISTER(MODULE);
 #define DEVICE_NAME_LEN	(sizeof(DEVICE_NAME) - 1)
 
 char id;
+uint16_t T52_Counter = 0;
+uint16_t BM_Counter = 0;
 
 // Used for thingy_event
 union tagname{
