@@ -127,12 +127,11 @@ static bool event_handler(const struct event_header *eh)
 
 void main(void)
 {	
-	int err = dk_leds_init();
-	dk_set_leds_state(DK_ALL_LEDS_MSK, 0);
-	if (err) {
-		LOG_ERR("Could not initialize leds, err code: %d\n", err);
-		return err;
-	}
+	// int err;
+	// // if (err) {
+	// // 	LOG_ERR("Could not initialize leds, err code: %d\n", err);
+	// // 	return err;
+	// // }
 
 	if(event_manager_init()){
 		LOG_INF("Well this sucks");
