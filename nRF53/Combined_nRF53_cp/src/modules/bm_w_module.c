@@ -180,7 +180,7 @@ static int scan_init(bool first){
 	// }
 
 	if(first){
-		err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_ADDR, BROODMINDER_ADDR_TEMPERATURE);
+		err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_ADDR, BROODMINDER_ADDR);
 		if (err){
 			LOG_INF("Filters cannot be set (err %d)\n", err);
 			return err;

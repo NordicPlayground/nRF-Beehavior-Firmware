@@ -46,7 +46,7 @@
 
 // #include "ble.h"
 
-primary_feed
+
 
 #define MODULE ble_module
 LOG_MODULE_REGISTER(MODULE, 4);
@@ -86,8 +86,8 @@ static void scan_filter_match(struct bt_scan_device_info *device_info,
 
 	LOG_INF("Filters matched. Address: %s connectable: %d\n", log_strdup(addr), connectable);
 
-	// if(!strncmp(addr, "06:09:16:57:01:FD", 17)){
-	if(!strncmp(addr, "06:09:16:47:05:93", 17)){
+	if(!strncmp(addr, "06:09:16:57:01:FD", 17)){
+	// if(!strncmp(addr, "06:09:16:47:05:93", 17)){
 		uint8_t adv_data_type = net_buf_simple_pull_u8(device_info->adv_data);
 
 		/* Don't update weight value if the advertised data is a scan response */
@@ -155,8 +155,8 @@ static void scan_connecting(struct bt_scan_device_info *device_info,
 
 	bt_addr_le_to_str(device_info->recv_info->addr, addr, sizeof(addr));
 
-	// if(!strncmp(addr, "06:09:16:57:01:FD", 17)){
-	if(!strncmp(addr, "06:09:16:47:05:93", 17)){
+	if(!strncmp(addr, "06:09:16:57:01:FD", 17)){
+	// if(!strncmp(addr, "06:09:16:47:05:93", 17)){
 		LOG_INF("Weight connecting\n");
 		// LOG_INF("Temperature connecting.\n");
 		return;
