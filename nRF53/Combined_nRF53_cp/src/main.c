@@ -19,6 +19,9 @@
 #include "events/thingy_event.h"
 #include "events/bm_w_event.h"
 
+#if defined(CONFIG_WATCHDOG_APPLICATION)
+#include "watchdog.h"
+#endif
 
 LOG_MODULE_REGISTER(MODULE, CONFIG_APPLICATION_MODULE_LOG_LEVEL);
 
@@ -109,13 +112,23 @@ void main(void)
 	// 	LOG_ERR("Could not initialize leds, err code: %d\n", err);
 	// 	return err;
 	// }
-
+	int err;
 	if(event_manager_init()){
 		LOG_INF("Well this sucks");
 	}
 	else{
 		LOG_INF("All good");
 	}
+
+	// #if defined(CONFIG_WATCHDOG_APPLICATION)
+	err = watchdog_init_and_start();
+	if (err) {
+		LOG_INF("watchdog_init_and_start, error: %d", err);
+		// SEND_ERROR(app, APP_EVT_ERROR, err);
+	}
+	LOG_INF("watchdog_init_and_start successful.");
+	// #endif	
+	
 	// struct ble_event *test;
 	// /*char test_string[17] ="Testing.........";
 	// test->address=test_string;*/

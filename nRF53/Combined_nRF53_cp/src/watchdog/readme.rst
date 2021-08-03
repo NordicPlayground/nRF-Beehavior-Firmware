@@ -1,0 +1,2 @@
+This watchdog is copied from asset tracker v2 and is based on the project using system workqueues, something that we do not do (?). Thus this folder is only here for inspiration 
+in case we want change the structure from Helt-Texas-format to a workqueue structure.
