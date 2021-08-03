@@ -1,0 +1,25 @@
+#
+# Copyright (c) 2021 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+menu "BLE_TO_CLOUD"
+
+config BLE_TO_CLOUD_APP_VERSION
+	string "Bluetooth to cloud application firmware version"
+	default "0.0.0-development"
+
+config BLE_TO_CLOUD_APP_VERSION_MAX_LEN
+	int "Maximum length of application firmware version"
+	default 150
+
+endmenu
+
+menu "Zephyr Kernel"
+source "Kconfig.zephyr"
+endmenu
+
+module = APPLICATION_MODULE
+module-str = Application module
+source "subsys/logging/Kconfig.template.log_config"
