@@ -33,6 +33,8 @@
 
 #include <settings/settings.h>
 
+#include <dk_buttons_and_leds.h>
+
 #include <drivers/uart.h>
 
 #include <logging/log.h>
@@ -40,6 +42,7 @@
 #include "events/ble_event.h"
 #include "events/thingy_event.h"
 #include "events/bm_w_event.h"
+#include "led/led.h"
 
 #include <drivers/uart.h>
 
@@ -56,6 +59,16 @@ LOG_MODULE_REGISTER(MODULE);
 #define DEVICE_NAME_LEN	(sizeof(DEVICE_NAME) - 1)
 
 char id;
+uint16_t T52_Counter = 0;
+uint16_t BM_Counter = 0;
+
+// Used for thingy_event
+union tagname{
+	int a;
+	unsigned char s[4];
+};
+
+union tagname object;
 
 static K_SEM_DEFINE(ble_init_ok, 0, 1);
 
@@ -109,10 +122,6 @@ void peripheral_module_thread_fn(void)
 
     int err;
 
-	// if (IS_ENABLED(CONFIG_SETTINGS)) {
-	// 	settings_load();
-	// }
-
 	err = bt_nus_init(&nus_cb);
 	if (err) {
 		LOG_ERR("Failed to initialize UART service (err: %d)\n", err);
@@ -123,37 +132,105 @@ void peripheral_module_thread_fn(void)
 			      ARRAY_SIZE(sd));
 	if (err) {
 		LOG_ERR("Advertising failed to start (err %d)\n", err);
+		// LOG_INF("Toggling LED 4 off. \n");
+		// dk_set_led_off(LED_4);
 	}
+	// LOG_INF("Advertising data from 53? Setting LED 4.\n");
+	// dk_set_led_on(LED_4);
+	struct ble_event *peripheral_ready = new_ble_event();
 
+	peripheral_ready->type = HUB_CONNECTED;
+
+	EVENT_SUBMIT(peripheral_ready);
 }
+
 
 static bool event_handler(const struct event_header *eh)
 {
 	if (is_ble_event(eh)) {
         LOG_INF("BLE event is being handled\n");
 		struct ble_event *event = cast_ble_event(eh);
-		if(event->type==BM_W_READ){
-			LOG_INF("BM-W ready\n");
+		if(event->type==THINGY_READY){
+			LOG_INF("Thingy ready\n");
 			k_sem_give(&ble_init_ok);
 			return false;
 		}
 		return false;
 	}
 
+	/* The comments in this part of the code is only for debugging and implementation. Functional code is in ble_module.c in nrf91*/
     if (is_thingy_event(eh)) {
         LOG_INF("Thingy event is being handled\n");
+		LOG_INF("Toggling LED 4 while Thingy event is handled.\n");
+		dk_set_led_on(LED_4);
 		struct thingy_event *event = cast_thingy_event(eh);
 		LOG_INF("Temperature [C]: %i,%i, Humidity [%%]: %i, Air pressure [hPa]: %d,%i ID: %i\n", event->data_array[0], \
 				event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, id-(uint8_t)'0');
 
+		LOG_INF("Hex-version: Temperature [C]: %x,%x, Humidity [%%]: %x, Air pressure [hPa]: %x,%x ID: %x\n", event->data_array[0], \
+				event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, id-(uint8_t)'0');
+		
 
-        uint8_t thingy_data[11] = { (uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2],\
+		object.a = event->pressure_int;
+		/*LOG_INF("Object.a = %d, %x \n", object.a, object.a);
+		printf("%d\n",sizeof(object));
+		printf("%X\n",object.a);
+		printf("%X\n", object.s);*/
+
+        uint8_t thingy_data[11] = { (uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2]};//,\
 									event->pressure_int, event->pressure_float};
+
+		// printf("Individual bytes: \n");
+		for(char i=0;  i<=3; i++){
+			// printf("index of data_array: %i\n", 8-i);
+			// printf("%02X \n",object.s[i]);
+			// printf("Test %X \n",object.s[i]);
+			thingy_data[8-i] = object.s[i];
+		}
+		// printf("\n");
+		// printf("%d\n",sizeof(thingy_data));
+		thingy_data[9] = event->pressure_float;
+
+		// LOG_INF("Checking Thingy_data element 4,5,6,7, 8: %d,%d,%d,%d,%d\n", thingy_data[5], thingy_data[6], thingy_data[7], thingy_data[8],thingy_data[9]);
+		// LOG_INF("HEX VERSION Checking Thingy_data element 4,5,6,7, 8: %x,%x,%x,%x,%x \n", thingy_data[5], thingy_data[6], thingy_data[7], thingy_data[8],thingy_data[9]);
+
+		// char temp[4];
+		// for (uint8_t i = 5; i <= 8; i++){
+		// 	temp[i-5] = thingy_data[i];
+		// 	/*printf("index of temp: %i\n", i-5);
+		// 	printf("Address of this element: %pn \n",&temp[i-5]);
+		// 	printf("Value of element: %X\n", temp[i-5]);*/
+
+		// }
+		// printf("\n"); 
+		// int32_t tempvar;//= (int32_t)temp;
+		// int32_t tempvar2;
+
+		// memcpy(&tempvar, temp, sizeof(tempvar));
+		// printf("The number is %X,%i \n",tempvar,tempvar);
+
+		// char reverse_temp[4];
+		// for (uint8_t i = 0; i <=3; i++){
+		// 	reverse_temp[i] = temp[3-i];
+		// 	printf("Index of reverse temp %i \n", i);
+		// 	printf("temp[i] after reversing: %X\n", reverse_temp[i]);
+		// }
+
+		// memcpy(&tempvar2, reverse_temp, sizeof(tempvar2));
+		
+    	// printf("The number after reversing is %X,%i \n",tempvar2,tempvar2);
+
+		// printf("From int to array to int %i, %X \n", tempvar, tempvar);
+		// printf("From int to array to int %i, %X \n", tempvar2, tempvar2);
+
         if(hub_conn){
             LOG_INF("Hub is connected\n");
             int err = bt_nus_send(hub_conn, thingy_data, 11);
         }
+		LOG_INF("Toggling LED 4 off after finishing Thingy Event.\n");
+		dk_set_led_off(LED_4);
 		return false;
+		
 	}
 	
 	if (is_bm_w_event(eh)) {
@@ -169,7 +246,7 @@ static bool event_handler(const struct event_header *eh)
             int err = bt_nus_send(hub_conn, bm_w_data, 10);
         }
 		else{
-			//Save untill reconnected TO DO
+			//Save untill reconnected to nrf91 TO DO
 		}
 		return false;
 	}
