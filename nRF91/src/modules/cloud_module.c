@@ -474,12 +474,12 @@ static bool event_handler(const struct event_header *eh)
 					}
 					return false;
 				}
-				if(event->dyndata.size == 9){
+				if(event->dyndata.size == 8){
 					LOG_INF("Got to process the data");
 
 					char message[100]; 
 
-					LOG_INF("WeightR: %i,%i, WeightL: %i,%i, RealTimeWeight: %i,%i, Temperature: %i,%i, received from %s, ID: %i", \
+					// LOG_INF("WeightR: %i,%i, WeightL: %i,%i, RealTimeWeight: %i,%i, Temperature: %i,%i, received from %s, ID: %i", \
 			// 		(uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint8_t)data[5], (uint8_t)data[6], (uint8_t)data[7],\
 			// 		(uint8_t)data[8], (uint8_t)data[9], log_strdup(addr), (uint8_t)data[1]);
 
