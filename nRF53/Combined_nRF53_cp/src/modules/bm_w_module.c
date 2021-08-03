@@ -27,13 +27,17 @@
 #include <logging/log.h>
 #include <zephyr.h>
 
+#include <dk_buttons_and_leds.h>
+
 #include "events/ble_event.h"
 // #include "events/thingy_event.h"
-// #include "events/bm_w_event.h"
+#include "events/bm_w_event.h"
+#include "led/led.h"
 
 static K_SEM_DEFINE(thingy_ready, 0, 1);
 
 static struct k_work_delayable weight_interval;
+static struct k_work_delayable temperature_interval;
 
 #define LOG_MODULE_NAME bm_w_module
 LOG_MODULE_REGISTER(LOG_MODULE_NAME, 4);
@@ -41,26 +45,41 @@ LOG_MODULE_REGISTER(LOG_MODULE_NAME, 4);
 #define REAL_TIME_WEIGHT 0x16
 #define BROODMINDER_ADDR ((bt_addr_le_t[]) { { 0, \
 			 { { 0xFD, 0x01, 0x57, 0x16, 0x09, 0x06 } } } })
+#define BROODMINDER_ADDR_TEMPERATURE ((bt_addr_le_t[]) { { 0, \
+			 { { 0x93, 0x05, 0x47, 0x16, 0x09, 0x06 } } } })
 
-
+// #define USE_BMW;
+// #define USE_TEMPERATURE;
 static int scan_init(bool first);
 static bool data_cb(struct bt_data *data, void *user_data);
 static float lbs_to_kg(float weight);
 
 static void ble_scan_start_fn(struct k_work *work)
 {
-	LOG_INF("Scanning for bm_w starting");
+	LOG_INF("Scanning for bm_w starting.");
+	LOG_INF("LED 3 toggled while scanning. \n");
+	dk_set_led_on(LED_3);
+
 	int err = scan_init(false);
 	if(err){
 		LOG_INF("Scanning for bm_w failed to initialize");
+		LOG_INF("LED 3 toggled off.\n");
+		dk_set_led_off(LED_3);
 		// return;
 	}
 
 	err = bt_scan_start(BT_SCAN_TYPE_SCAN_ACTIVE);
 	if (err) {
 		LOG_INF("Scanning for bm_w failed to start (err %d)", err);
+		LOG_INF("LED 3 toggled off.\n");
+		dk_set_led_off(LED_3);
 		// return;
 	}
+	// struct ble_event *bm_w_read = new_ble_event();
+
+	// bm_w_read->type = BM_W_READ;
+
+	// EVENT_SUBMIT(bm_w_read);
 	k_work_reschedule(&weight_interval ,K_MINUTES(1));
 }
 
@@ -151,7 +170,7 @@ static int scan_init(bool first){
 		.connect_if_match = 0,
 	};
 
-    LOG_INF("Changing filters\n");
+    LOG_INF("Changing filters. \n");
 	if(first){
 		err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_ADDR, BROODMINDER_ADDR);
 		if (err){
@@ -159,6 +178,14 @@ static int scan_init(bool first){
 			return err;
 		}
 	}
+
+	// if(first){
+	// 	err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_ADDR, BROODMINDER_ADDR_TEMPERATURE);
+	// 	if (err){
+	// 		LOG_INF("Filters cannot be set (err %d)\n", err);
+	// 		return err;
+	// 	}
+	// }
 
     LOG_INF("Checkpoint 1");
 
@@ -199,10 +226,14 @@ void module_thread_fn(void)
 	err = bt_scan_start(BT_SCAN_TYPE_SCAN_ACTIVE);
 	if (err) {
 		LOG_INF("Scanning for bm_w failed to start (err %d)\n", err);
+		LOG_INF("LED 3 toggled off.\n");
+		dk_set_led_off(LED_3);
 		return;
 	}
 
 	LOG_INF("Scanning for bm_w succesfully started\n");
+	LOG_INF("LED 3 toggled while scanning for BM_Weight. \n");
+	dk_set_led_on(LED_3);
 	
 	k_work_init_delayable(&weight_interval, ble_scan_start_fn);
 
@@ -215,7 +246,7 @@ static bool event_handler(const struct event_header *eh)
 	if (is_ble_event(eh)) {
 
 		struct ble_event *event = cast_ble_event(eh);
-		if(event->type==THINGY_READY){
+		if(event->type==HUB_CONNECTED){
 			LOG_INF("Thingy connected\n");
 			k_sem_give(&thingy_ready);
 			return false;

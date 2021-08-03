@@ -11,4 +11,6 @@ struct thingy_event {
         uint8_t pressure_float; /*Decimal part of the air pressure */
 };
 
+
+
 EVENT_TYPE_DECLARE(thingy_event);
