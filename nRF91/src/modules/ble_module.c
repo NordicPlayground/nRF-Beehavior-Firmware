@@ -197,7 +197,7 @@ static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
 
 			strcpy(addr, address_array[(uint8_t)data[1]]);
 
-			memcpy(ble_event->dyndata.data, data_array, 9);
+			memcpy(ble_event->dyndata.data, data_array, 8);
 
 			memcpy(ble_event->address, log_strdup(addr), 17);
 
@@ -209,7 +209,7 @@ static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
 			ble_event->type = BLE_RECEIVED;
 
 			uint8_t data_array[9];
-			for(int i=0; i<8; i++){
+			for(int i=0; i<9; i++){
 				data_array[i] = (uint8_t)data[i+2];
 				LOG_INF("%.02x", data_array[i]);
 			}
@@ -552,8 +552,8 @@ static int scan_init(void)
 	bt_scan_init(&scan_init);
 	bt_scan_cb_register(&scan_cb);
 
-	char *name = "Andreas53Test";
-	// char *name = "TeppanTest";
+	// char *name = "Andreas53Test";
+	char *name = "TeppanTest";
 	// err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_UUID, BT_UUID_BEEHAVIOUR_MONITORING_SERVICE);
 	err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, name);
 	if (err) {
