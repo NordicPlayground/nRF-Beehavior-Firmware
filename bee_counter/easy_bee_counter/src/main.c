@@ -27,8 +27,11 @@ static const struct bt_data ad[] = {
 	BT_DATA(BT_DATA_NAME_COMPLETE, DEVICE_NAME, DEVICE_NAME_LEN),
 };
 
+#define BT_UUID_BEE_VAL \
+	BT_UUID_128_ENCODE(0x6e400002, 0xb5a1, 0xf493, 0xe1a9, 0xe52e24dcca9e)
+
 static const struct bt_data sd[] = {
-	BT_DATA_BYTES(BT_DATA_UUID128_ALL, BT_UUID_NUS_VAL),
+	BT_DATA_BYTES(BT_DATA_UUID128_ALL, BT_UUID_BEE_VAL),
 };
 
 #define LED0 6
@@ -127,9 +130,9 @@ static void connected(struct bt_conn *conn, uint8_t err)
 
 	printk("Sending test data\n");
 
-	char msg[20];
-	uint8_t length = snprintf(msg, 20, "%i,%i\n", outTotal, inTotal);
-	bt_nus_send(current_conn, msg, length);
+	// char msg[20];
+	// uint8_t length = snprintf(msg, 20, "%i,%i\n", outTotal, inTotal);
+	// bt_nus_send(current_conn, msg, length);
 }
 
 static void disconnected(struct bt_conn *conn, uint8_t reason)
@@ -169,7 +172,46 @@ static struct bt_nus_cb nus_cb = {
 	.received = bt_receive_cb,
 };
 
+void sendData() {
+    printk("Total out: ");
+    printk("%i", outTotal);
+    printk("\n");
+    printk("Total in: %i\n", inTotal); 
+    if(current_conn){
+		uint16_t msg[2] = {outTotal, inTotal};
+		bt_nus_send(current_conn, msg, sizeof(msg));
+	}
+}
+
 void main(void){
+	
+	bt_conn_cb_register(&conn_callbacks);
+
+	int err = bt_enable(NULL);
+	if (err) {
+		printk("BLE not enabled, %i\n", err);
+	}
+
+	printk("Bluetooth initialized");
+
+	if (IS_ENABLED(CONFIG_SETTINGS)) {
+		settings_load();
+	}
+
+	err = bt_nus_init(&nus_cb);
+	if (err) {
+		printk("Failed to initialize UART service (err: %d)\n", err);
+		return;
+	}
+
+	err = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), sd,
+			      ARRAY_SIZE(sd));
+	if (err) {
+		printk("Advertising failed to start (err %d)", err);
+	}
+
+	printk("Starting Nordic UART service example\n");
+
 	const struct device *spi_dev = device_get_binding("SPI_1");
 	const struct device * dev = device_get_binding("GPIO_0");
 	if (spi_dev == NULL) {
@@ -403,16 +445,5 @@ void main(void){
 			outTotal = 0; 
  	 	}
 		
-	}
-}
-
-void sendData() {
-    printk("Total out: ");
-    printk("%i", outTotal);
-    printk("\n");
-    printk("Total in: %i\n", inTotal); 
-    if(current_conn){
-		uint16_t msg[2] = {283, 354};
-		bt_nus_send(current_conn, msg, sizeof(msg));
 	}
 }
