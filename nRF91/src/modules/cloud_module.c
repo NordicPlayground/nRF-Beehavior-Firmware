@@ -441,7 +441,7 @@ static bool event_handler(const struct event_header *eh)
 				nrf_cloud_process();
 				LOG_INF("Size: %i", event->dyndata.size);
 				if(event->dyndata.size == 9){
-					LOG_INF("Got to process the data");
+					LOG_INF("Got to process the Thingy data");
 
 
 					char pressure_arr[4];
@@ -476,10 +476,11 @@ static bool event_handler(const struct event_header *eh)
 					int64_t divide = 1000;
 					int64_t ts = unix_time_ms / divide;
 
+					LOG_INF("Time: %d", ts);
 
-					err = snprintf(message, 100, "{\"appID\":\"Thingy\"\"TEMP\":\"%i,%i\"\"HUMID\":\"%i\"\"AIR\":\"%d,%i\"\"TIME\":\"%d\"}" \
+					err = snprintk(message, 100, "{\"appID\":\"Thingy\"\"TEMP\":\"%i.%i\"\"HUMID\":\"%i\"\"AIR\":\"%d.%i\"\"TIME\":\"%lld\"}" \
 						, event->dyndata.data[0], event->dyndata.data[1], event->dyndata.data[2], pressure_little_endian, event->dyndata.data[7], ts);
-					LOG_INF("Message formatted: %s", message);
+					LOG_INF("Message formatted: %s, length: %i", message, err);
 				
 					struct cloud_msg msg = {
 						.qos = CLOUD_QOS_AT_MOST_ONCE,
@@ -505,18 +506,23 @@ static bool event_handler(const struct event_header *eh)
 					return false;
 				}
 				if(event->dyndata.size == 8){
-					LOG_INF("Got to process the data");
+					LOG_INF("Got to process the BM data");
 
 					char message[100]; 
 
-					// LOG_INF("WeightR: %i,%i, WeightL: %i,%i, RealTimeWeight: %i,%i, Temperature: %i,%i, received from %s, ID: %i", \
-			// 		(uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint8_t)data[5], (uint8_t)data[6], (uint8_t)data[7],\
-			// 		(uint8_t)data[8], (uint8_t)data[9], log_strdup(addr), (uint8_t)data[1]);
+					int64_t unix_time_ms = k_uptime_get();
+					err = date_time_now(&unix_time_ms);
+					int64_t divide = 1000;
+					int64_t ts = (int64_t)(unix_time_ms / divide);
 
+					// LOG_INF("Time: %lld", ts);
+					// LOG_INF("Time: %d", ts);
 
-					err = snprintf(message, 100, "{\"appID\":\"BM-W\"\"WEIGHTR\":\"%i,%i\"\"WEIGHTL\":\"%i,%i\"\"RTT\":\"%i,%i\"\"TEMP\":\"%i,%i\"}" \
-						, event->dyndata.data[0], event->dyndata.data[1], event->dyndata.data[2], event->dyndata.data[3], event->dyndata.data[4], event->dyndata.data[5], event->dyndata.data[6], event->dyndata.data[7]);
-					LOG_INF("Message formatted: %s", message);
+					err = snprintk(message, 100, "{\"appID\":\"BM-W\"\"WEIGHTR\":\"%i.%i\"\"WEIGHTL\":\"%i.%i\"\"RTT\":\"%i.%i\"\"TEMP\":\"%i.%i\"\"TIME\":\"%lld\"}" \
+						, event->dyndata.data[0], event->dyndata.data[1], event->dyndata.data[2], event->dyndata.data[3], event->dyndata.data[4], event->dyndata.data[5] \
+						, event->dyndata.data[6], event->dyndata.data[7], ts);
+					// err = snprintk(message, 100, "{\"TIME\":\"%lld\"}", ts);
+					LOG_INF("Message formatted: %s, length: %i", message, err);
 				
 					struct cloud_msg msg = {
 						.qos = CLOUD_QOS_AT_MOST_ONCE,
@@ -524,11 +530,11 @@ static bool event_handler(const struct event_header *eh)
 						.len = strlen(message)
 					};
 					
-					/* When using the nRF Cloud backend data is sent to the message topic.
-					* This is in order to visualize the data in the web UI terminal.
-					* For Azure IoT Hub and AWS IoT, messages are addressed directly to the
-					* device twin (Azure) or device shadow (AWS).
-					*/
+					// /* When using the nRF Cloud backend data is sent to the message topic.
+					// * This is in order to visualize the data in the web UI terminal.
+					// * For Azure IoT Hub and AWS IoT, messages are addressed directly to the
+					// * device twin (Azure) or device shadow (AWS).
+					// */
 					msg.endpoint.type = CLOUD_EP_MSG; //For nRF Cloud
 					
 					//msg.endpoint.type = CLOUD_EP_STATE; //For the inferior Clouds
