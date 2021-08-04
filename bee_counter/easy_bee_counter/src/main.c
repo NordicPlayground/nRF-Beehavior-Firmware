@@ -47,7 +47,7 @@ static const struct bt_data sd[] = {
 #define outputDelay 10000
 
 unsigned long lastOutput = 0;
-unsigned long current_time;
+unsigned long long current_time;
 
 bool inSensorReading[numberOfGates];
 bool outSensorReading[numberOfGates];
@@ -57,6 +57,8 @@ bool lastOutSensorReading[numberOfGates];
 
 bool checkStateIn[numberOfGates];
 bool checkStateOut[numberOfGates];
+
+static bool FLAG = 0;
 
 int inCount[numberOfGates];
 int outCount[numberOfGates];
@@ -72,6 +74,7 @@ unsigned long lastOutFinishedTime[numberOfGates];
   
 unsigned long inReadingTimeHigh[numberOfGates];
 unsigned long outReadingTimeHigh[numberOfGates];
+
 
 /*
 unsigned long lastInTime[numberOfGates];
@@ -91,18 +94,8 @@ int firstTestOutVariable[numberOfGates];
 int inTotal;
 int outTotal;
 
-static uint8_t switchBank1;
-static uint8_t switchBank2;
-static uint8_t switchBank3;
-static uint8_t switchBank4;
-static uint8_t switchBank5;
-static uint8_t switchBank6;
-static uint8_t oldSwitchBank1; 
-static uint8_t oldSwitchBank2; 
-static uint8_t oldSwitchBank3; 
-static uint8_t oldSwitchBank4; 
-static uint8_t oldSwitchBank5; 
-static uint8_t oldSwitchBank6; 
+static uint8_t switchBank[6];
+static uint8_t oldSwitchBank[6];
 
 int n = 0;
 
@@ -212,7 +205,7 @@ void main(void){
 		printk("Advertising failed to start (err %d)", err);
 	}
 
-	printk("Starting Nordic UART service example\n");
+	//printk("Starting Nordic UART service example\n");
 
 	const struct device *spi_dev = device_get_binding("SPI_1");
 	const struct device * dev = device_get_binding("GPIO_0");
@@ -226,7 +219,7 @@ void main(void){
 	}
 	while(1){
 		current_time = k_uptime_get();
-		static uint8_t rx_buffer[6]; //6 shift regisers requires an array with length 6
+		static uint8_t rx_buffer[6]; //6 shift registers requires an array with length 6
 
 		struct spi_buf rx_buf = {
 			.buf = rx_buffer,
@@ -264,90 +257,89 @@ void main(void){
 				printk("SPI error: %d\n", err);
 			}
 			else{
-				switchBank1 = rx_buffer[0];
-				switchBank2 = rx_buffer[1];
-				switchBank3 = rx_buffer[2];
-				switchBank4 = rx_buffer[3];
-				switchBank5 = rx_buffer[4];
-				switchBank6 = rx_buffer[5];
-			}
 
-		if (switchBank1 != oldSwitchBank1 || switchBank2 != oldSwitchBank2 || switchBank3 != oldSwitchBank3 || switchBank4 != oldSwitchBank4 || switchBank5 != oldSwitchBank5 || switchBank6 != oldSwitchBank6)
+				for (int i = 0; i < 6; i++){
+					switchBank[i] = rx_buffer[i];
+					if (switchBank[i] != oldSwitchBank[i]){
+						FLAG = 1;
+					}
+				}
+			}
+		
+		if (FLAG)
 		{
 			//Converting bytes to get values
 			int gate = 0;
 			for (int i = 0; i < 8; i++)
 			{
-				if ((switchBank1 >> i) & 1)
+				if ((switchBank[0] >> i) & 1)
 					outSensorReading[gate] = true;
 				else outSensorReading[gate] = false;
 				i++;
-				if ((switchBank1 >> i) & 1)
+				if ((switchBank[0] >> i) & 1)
 					inSensorReading[gate] = true;
 				else inSensorReading[gate] = false;
 				gate++;
 			}
 			for(int i = 0; i < 8; i++)
 		 	{
-		  		if((switchBank2 >> i) & 1)
+		  		if((switchBank[1] >> i) & 1)
 		     		outSensorReading[gate] = true;
 		   		else outSensorReading[gate] = false;
 		  		i++;
-		   		if((switchBank2 >> i) & 1)
+		   		if((switchBank[1] >> i) & 1)
 		       		inSensorReading[gate] = true;
 		   		else inSensorReading[gate] = false;      
 		   		gate++;  
 		 	}
 		 	for(int i = 0; i < 8; i++)
 		 	{
-		 		if((switchBank3 >> i) & 1)
+		 		if((switchBank[2] >> i) & 1)
 		     		outSensorReading[gate] = true;
 		 		else outSensorReading[gate] = false;
 		 		i++;
-		   		if((switchBank3 >> i) & 1)
+		   		if((switchBank[2] >> i) & 1)
 		     		inSensorReading[gate] = true;
 		   		else inSensorReading[gate] = false;       
 		   		gate++;  
 		 	}
 		 	for(int i = 0; i < 8; i++)
 		 	{
-		 		if((switchBank4 >> i) & 1)
+		 		if((switchBank[3] >> i) & 1)
 		     		outSensorReading[gate] = true;
 		   		else outSensorReading[gate] = false;
 		   		i++;
-		   		if((switchBank4 >> i) & 1)
+		   		if((switchBank[3] >> i) & 1)
 		       		inSensorReading[gate] = true;
 		   		else inSensorReading[gate] = false;       
 		   		gate++;  
 		 	}
 		 	for(int i = 0; i < 8; i++)
 		 	{
-		   		if((switchBank5 >> i) & 1)
+		   		if((switchBank[4] >> i) & 1)
 		       		outSensorReading[gate] = true;
 		   		else outSensorReading[gate] = false;
 		   		i++;
-		   		if((switchBank5 >> i) & 1)
+		   		if((switchBank[4] >> i) & 1)
 		       		inSensorReading[gate] = true;
 		   		else inSensorReading[gate] = false;       
 		   		gate++;  
 		 	}
 		 	for(int i = 0; i < 8; i++)
 		 	{
-		   		if((switchBank6 >> i) & 1)
+		   		if((switchBank[5] >> i) & 1)
 		       		outSensorReading[gate] = true;
 		   		else outSensorReading[gate] = false;
 		   		i++;
-		   		if((switchBank6 >> i) & 1)
+		   		if((switchBank[5] >> i) & 1)
 		       		inSensorReading[gate] = true;
 		   		else inSensorReading[gate] = false;      
 		   		gate++;  
 		 	}  
-		 oldSwitchBank1 = switchBank1;
-		 oldSwitchBank2 = switchBank2;
-		 oldSwitchBank3 = switchBank3;
-		 oldSwitchBank4 = switchBank4;
-		 oldSwitchBank5 = switchBank5;
-		 oldSwitchBank6 = switchBank6;
+		for (int i = 0; i < 6; i++){
+			oldSwitchBank[i]=switchBank[i];
+			FLAG = 0;
+			}
 		}
 
 		for (int i = startGate; i < endGate; i++) 
@@ -392,14 +384,14 @@ void main(void){
 		     	if(outReadingTimeHigh[i] < 650 && inReadingTimeHigh[i] < 650){ //should be less than 650ms
 		       		if((current_time - lastOutFinishedTime[i]) < 200){ //the sensors are pretty cose together so the time it takes to trigger on and then the other should be small.. ~200ms
 		        		inTotal++;
-		        		printk("%ld", current_time);
+		        		printk("%lld", current_time);
 		        		printk(",");
 		        		printk("1\n");
 		       	 	}else{
-		         		printk("%ld\n", current_time); 
+		         		printk("%lld\n", current_time); 
 		        	}
 		     	}else{
-		      		printk("%ld\n", current_time); 
+		      		printk("%lld\n", current_time); 
 		     	}
 		   	}           
 		 }
@@ -421,16 +413,16 @@ void main(void){
 		     if((outReadingTimeHigh[i] < 600) && (inReadingTimeHigh[i] < 600)){ //should be less than 600ms
 		       if((current_time - lastInFinishedTime[i]) < 200){ //the sensors are pretty cose together so this time should be small
 		         	outTotal++;
-		     		printk("%ld\n", current_time);
+		     		printk("%lld\n", current_time);
 		         	printk(",");
 		        	printk("1\n"); 
 		       }
 			   else{
-		         printk("%ld\n", current_time); 
+		         printk("%lld\n", current_time); 
 		       		}
 		     	}
 				else{
-		     	printk("%ld\n", current_time); 
+		     	printk("%lld\n", current_time); 
 		     	}
 		    }          
 		}        
@@ -451,13 +443,3 @@ void main(void){
 }
 
 
-
-      
-
-void sendData() {
-  printk("Total out: ");
-  printk("%i", outTotal);
-  printk("\n");
-  printk("Total in: %i\n", inTotal); 
-//Innsett bluetooth til nrf53 her
-}
