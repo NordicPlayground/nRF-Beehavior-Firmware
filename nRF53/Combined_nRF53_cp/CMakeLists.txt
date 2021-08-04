@@ -19,5 +19,6 @@ target_include_directories(app PRIVATE src)
 add_subdirectory(src/events)
 add_subdirectory(src/modules)
 add_subdirectory(src/led)
-add_subdirectory(src/watchdog)
+# add_subdirectory(src/watchdog)
 
+# add_subdirectory_ifdef(CONFIG_WATCHDOG_APPLICATION src/watchdog)
