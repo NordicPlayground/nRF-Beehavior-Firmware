@@ -270,72 +270,20 @@ void main(void){
 		{
 			//Converting bytes to get values
 			int gate = 0;
-			for (int i = 0; i < 8; i++)
+			for (int d = 0; d < sizeof(switchBank); d++)
 			{
-				if ((switchBank[0] >> i) & 1)
-					outSensorReading[gate] = true;
-				else outSensorReading[gate] = false;
-				i++;
-				if ((switchBank[0] >> i) & 1)
-					inSensorReading[gate] = true;
-				else inSensorReading[gate] = false;
-				gate++;
+				for (int i = 0; i < 8; i++)
+				{
+					if ((switchBank[d] >> i) & 1)
+						outSensorReading[gate] = true;
+					else outSensorReading[gate] = false;
+					i++;
+					if ((switchBank[d] >> i) & 1)
+						inSensorReading[gate] = true;
+					else inSensorReading[gate] = false;
+					gate++;
+				}
 			}
-			for(int i = 0; i < 8; i++)
-		 	{
-		  		if((switchBank[1] >> i) & 1)
-		     		outSensorReading[gate] = true;
-		   		else outSensorReading[gate] = false;
-		  		i++;
-		   		if((switchBank[1] >> i) & 1)
-		       		inSensorReading[gate] = true;
-		   		else inSensorReading[gate] = false;      
-		   		gate++;  
-		 	}
-		 	for(int i = 0; i < 8; i++)
-		 	{
-		 		if((switchBank[2] >> i) & 1)
-		     		outSensorReading[gate] = true;
-		 		else outSensorReading[gate] = false;
-		 		i++;
-		   		if((switchBank[2] >> i) & 1)
-		     		inSensorReading[gate] = true;
-		   		else inSensorReading[gate] = false;       
-		   		gate++;  
-		 	}
-		 	for(int i = 0; i < 8; i++)
-		 	{
-		 		if((switchBank[3] >> i) & 1)
-		     		outSensorReading[gate] = true;
-		   		else outSensorReading[gate] = false;
-		   		i++;
-		   		if((switchBank[3] >> i) & 1)
-		       		inSensorReading[gate] = true;
-		   		else inSensorReading[gate] = false;       
-		   		gate++;  
-		 	}
-		 	for(int i = 0; i < 8; i++)
-		 	{
-		   		if((switchBank[4] >> i) & 1)
-		       		outSensorReading[gate] = true;
-		   		else outSensorReading[gate] = false;
-		   		i++;
-		   		if((switchBank[4] >> i) & 1)
-		       		inSensorReading[gate] = true;
-		   		else inSensorReading[gate] = false;       
-		   		gate++;  
-		 	}
-		 	for(int i = 0; i < 8; i++)
-		 	{
-		   		if((switchBank[5] >> i) & 1)
-		       		outSensorReading[gate] = true;
-		   		else outSensorReading[gate] = false;
-		   		i++;
-		   		if((switchBank[5] >> i) & 1)
-		       		inSensorReading[gate] = true;
-		   		else inSensorReading[gate] = false;      
-		   		gate++;  
-		 	}  
 		for (int i = 0; i < 6; i++){
 			oldSwitchBank[i]=switchBank[i];
 			FLAG = 0;
