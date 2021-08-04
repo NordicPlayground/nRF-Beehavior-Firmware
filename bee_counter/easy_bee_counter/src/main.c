@@ -73,6 +73,7 @@ unsigned long lastOutFinishedTime[numberOfGates];
 unsigned long inReadingTimeHigh[numberOfGates];
 unsigned long outReadingTimeHigh[numberOfGates];
 
+/*
 unsigned long lastInTime[numberOfGates];
 unsigned long lastOutTime[numberOfGates];
 
@@ -85,6 +86,7 @@ int totalTimeTravelGoingIn[numberOfGates];
 int firstTestInVariable[numberOfGates];
 
 int firstTestOutVariable[numberOfGates];
+*/
 
 int inTotal;
 int outTotal;
@@ -446,4 +448,16 @@ void main(void){
  	 	}
 		
 	}
+}
+
+
+
+      
+
+void sendData() {
+  printk("Total out: ");
+  printk("%i", outTotal);
+  printk("\n");
+  printk("Total in: %i\n", inTotal); 
+//Innsett bluetooth til nrf53 her
 }
