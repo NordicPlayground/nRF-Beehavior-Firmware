@@ -305,7 +305,7 @@ void main(void){
 		   	{
 				startInReadingTime[i] = current_time;
 		   	}
-		   	if(inSensorReading[i] == false)  //a bee just exits the sensor; that is, it was 1, now it is LOW (empty)
+		   	if(inSensorReading[i] == false)  //a bee just exits the sensor; that is, it was 1, now it is 0 (empty)
 		   	{  
 				lastInFinishedTime[i] = current_time;            
 		     	inReadingTimeHigh[i] = current_time - startInReadingTime[i]; //this variable is how long the bee was present for
