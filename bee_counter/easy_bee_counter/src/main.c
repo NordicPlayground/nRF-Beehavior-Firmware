@@ -37,8 +37,8 @@ static const struct bt_data sd[] = {
 #define LED0 6
 #define LATCH 3 //A5 on the itsybitsy, used to pulse and load the shift registers
 
-#define powerGate1 5 //10 on the itsybitsy
-#define powerGate2 26 //11 on the itsybitsy
+#define powerGate1 5 //Arduino 10 on the itsybitsy
+#define powerGate2 26 //Arduino 11 on the itsybitsy
 
 #define numberOfGates 24
 #define startGate 0
@@ -75,22 +75,6 @@ unsigned long lastOutFinishedTime[numberOfGates];
 unsigned long inReadingTimeHigh[numberOfGates];
 unsigned long outReadingTimeHigh[numberOfGates];
 
-
-/*
-unsigned long lastInTime[numberOfGates];
-unsigned long lastOutTime[numberOfGates];
-
-unsigned long lastInReadingTimeHigh[numberOfGates];
-unsigned long lastOutReadingTimeHigh[numberOfGates];
-
-int totalTimeTravelGoingOut[numberOfGates];
-int totalTimeTravelGoingIn[numberOfGates];
-
-int firstTestInVariable[numberOfGates];
-
-int firstTestOutVariable[numberOfGates];
-*/
-
 int inTotal;
 int outTotal;
 
@@ -101,7 +85,7 @@ int n = 0;
 
 static const struct spi_config spi_cfg = {
 	.operation = SPI_OP_MODE_MASTER | SPI_WORD_SET(8) | SPI_TRANSFER_MSB |
-		     SPI_MODE_CPOL, //Setting SPI mode 2 (hopefully)
+		     SPI_MODE_CPOL, //Setting SPI mode 2 
 	.frequency = 3000000,
 	.slave = 0,
 };
@@ -230,7 +214,7 @@ void main(void){
 			.count = 1
 		};
 
-		gpio_pin_configure(dev, LATCH, GPIO_OUTPUT_ACTIVE); 
+		gpio_pin_configure(dev, LATCH, GPIO_OUTPUT_ACTIVE); //We need to pulse these shift registers to read them
 		gpio_pin_configure(dev, powerGate1, GPIO_OUTPUT_INACTIVE);
 		gpio_pin_configure(dev, powerGate2, GPIO_OUTPUT_INACTIVE);
 		gpio_pin_configure(dev, LED0, GPIO_OUTPUT); //LED pin is 6, one could use aliases here
@@ -258,7 +242,7 @@ void main(void){
 			}
 			else{
 
-				for (int i = 0; i < 6; i++){
+				for (int i = 0; i < sizeof(switchBank); i++){
 					switchBank[i] = rx_buffer[i];
 					if (switchBank[i] != oldSwitchBank[i]){
 						FLAG = 1;
@@ -284,7 +268,7 @@ void main(void){
 					gate++;
 				}
 			}
-		for (int i = 0; i < 6; i++){
+		for (int i = 0; i < sizeof(switchBank); i++){
 			oldSwitchBank[i]=switchBank[i];
 			FLAG = 0;
 			}
@@ -292,7 +276,7 @@ void main(void){
 
 		for (int i = startGate; i < endGate; i++) 
 		{ 
-			if(inSensorReading[i] == true || outSensorReading[i] == true) 
+			if(inSensorReading[i] == true || outSensorReading[i] == true) //Turns on LED when a sensor is activated
 			{
 		  		gpio_pin_set(dev, LED0, 1);
 		   		break;
@@ -373,8 +357,8 @@ void main(void){
 		     	printk("%lld\n", current_time); 
 		     	}
 		    }          
-		}        
-	}
+		 }        
+		}
 
 		k_busy_wait(15);   // debounce
 
