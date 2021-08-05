@@ -162,7 +162,6 @@ static void ble_data_sent(uint8_t err, const uint8_t *const data, uint16_t len)
 static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
 {
 	LOG_INF("ble_data_received");
-	char data_string[100];
 	// char data_received[len];
 	char addr[BT_ADDR_LE_STR_LEN];
 
@@ -174,17 +173,28 @@ static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
 
 		strcpy(addr, address_array[(uint8_t)data[1]]);
 		
-		
-		if(len==10){	
-			// LOG_INF("WeightR: %i,%i, WeightL: %i,%i, RealTimeWeight: %i,%i, Temperature: %i,%i, received from %s, ID: %i", \
-			// 		(uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint8_t)data[5], (uint8_t)data[6], (uint8_t)data[7],\
-			// 		(uint8_t)data[8], (uint8_t)data[9], log_strdup(addr), (uint8_t)data[1]);
+		if(len==6){	
+			
+			struct ble_event *ble_event = new_ble_event(4);
 
-			// int err = snprintf(data_string, 100, "WeightR: %i,%i, WeightL: %i,%i, RealTimeWeight: %i,%i, Temperature: %i,%i, ID: %i", \
-			// 		 (uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint8_t)data[5], (uint8_t)data[6], (uint8_t)data[7], \
-			// 		 (uint8_t)data[8], (uint8_t)data[9], (uint8_t)data[1]);
-			// LOG_INF("Did it work? %i", err);
-		
+			ble_event->type = BLE_RECEIVED;
+
+			uint8_t data_array[4];
+			for(int i=0; i<4; i++){
+				data_array[i] = (uint8_t)data[i+2];
+				LOG_INF("%.02x", data_array[i]);
+			}
+
+			strcpy(addr, address_array[(uint8_t)data[1]]);
+
+			memcpy(ble_event->dyndata.data, data_array, 4);
+
+			memcpy(ble_event->address, log_strdup(addr), 17);
+
+			EVENT_SUBMIT(ble_event);
+		}
+		if(len==10){	
+			
 			struct ble_event *ble_event = new_ble_event(8);
 
 			ble_event->type = BLE_RECEIVED;
@@ -221,38 +231,7 @@ static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
 			memcpy(ble_event->address, log_strdup(addr), 17);
 
 			EVENT_SUBMIT(ble_event);
-			// char pressure_arr[4];
-			// for (uint8_t i = 5; i <= 8; i++){
-			// 	pressure_arr[i-5] = data[i];
-			// 	// printf("index of temp: %i\n", i-5);
-			// 	// printf("Address of this element: %pn \n",&pressure_arr[i-5]);
-			// 	// printf("Value of element: %X\n", pressure_arr[i-5]);
-
-			// }
-			// // printf("\n"); 
-			// // int32_t pressure_big_endian;//= (int32_t)temp;
-			// int32_t pressure_little_endian;
-
-			// // memcpy(&pressure_big_endian, pressure_arr, sizeof(pressure_big_endian));
-			// // printf("The number is %X,%i \n",pressure_big_endian,pressure_big_endian);
-
-			// char reverse_press_arr[4];
-			// for (uint8_t i = 0; i <=3; i++){
-			// 	reverse_press_arr[i] = pressure_arr[3-i];
-			// 	// printf("Index of reverse temp %i \n", i);
-			// 	// printf("temp[i] after reversing: %X\n", reverse_press_arr[i]);
-			// }
-
-			// memcpy(&pressure_little_endian, reverse_press_arr, sizeof(pressure_little_endian));
 			
-    		// printf("The number after reversing is %X,%i \n",pressure_little_endian,pressure_little_endian);
-
-			// LOG_INF("Temperature [C]: %i,%i, Humidity [%%]: %i, Air Pressure [hPa]: %i,%i, received from %s, ID: %i", \
-			// 			(uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint32_t)pressure_little_endian, (uint8_t)data[9], log_strdup(addr), (uint8_t)data[1]);
-
-			// int err = snprintf(data_string, 100, "Temperature [C]: %i,%i, Humidity [%%]: %i, Air Pressure [hPa]: %i,%i, ID: %i", \
-			// 			(uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4],(uint32_t)pressure_little_endian, (uint8_t)data[9], (uint8_t)data[1]);
-			// LOG_INF("Did it work? %i", err);
 		}
 	}
 	// LOG_INF("Received: %s", log_strdup(data_received));
