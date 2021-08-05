@@ -1,5 +1,10 @@
-/* 
-Dank code for the dank people @ nordicsemi
+/*
+ * WARNING: this code turns LEDs on for a long time (1 second). 
+ * This is fine if the resistors are installed and the jumpers are NOT made 
+ * Checkout datasheet for IR LEDs for more information 
+ * 
+ * 
+ * 
 */
 
 #include <zephyr.h>
