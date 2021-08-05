@@ -20,9 +20,18 @@ config BROODMINDER_WEIGHT_ENABLE
 	bool "Enable if you want the device to scan for the Broodminder Weight"
 	default y
 
+config THINGY_ENABLE
+	bool "Enable if you want the device to connect to a Thingy:52"
+	default y
+
 config THINGY_CONNECTIONS
 	int "Number of Thingy:52 in the hive"
+	default 0 if !THINGY_ENABLE
 	default 1
+
+config THINGY_NAME
+	string "Name of your thingy"
+	default "Thingy"
 
 config BLE_TO_CLOUD_APP_VERSION
 	string "Bluetooth to cloud application firmware version"

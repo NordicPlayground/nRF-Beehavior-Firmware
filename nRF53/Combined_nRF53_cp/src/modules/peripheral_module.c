@@ -70,7 +70,6 @@ union tagname{
 };
 
 union tagname object;
-union tagname object16;
 
 union tagname16{
 	uint16_t a;

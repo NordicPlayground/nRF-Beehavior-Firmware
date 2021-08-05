@@ -440,6 +440,58 @@ static bool event_handler(const struct event_header *eh)
 			if(strcmp(event->address, "Placeholder")){
 				nrf_cloud_process();
 				LOG_INF("Size: %i", event->dyndata.size);
+				if(event->dyndata.size == 4){
+					LOG_INF("Got to process the Bee Counter data");
+
+
+					char out_arr[2];
+					char in_arr[2];
+					for (uint8_t i = 0; i < 2; i++){
+						out_arr[i] = event->dyndata.data[1-i];
+						in_arr[i] = event->dyndata.data[3-i];	
+					}
+					uint16_t totalOut;
+					uint16_t totalIn;
+
+					memcpy(&totalOut, out_arr, sizeof(totalOut));
+					memcpy(&totalIn, in_arr, sizeof(totalIn));
+
+					char message[100]; 
+
+					int64_t unix_time_ms = k_uptime_get();
+					err = date_time_now(&unix_time_ms);
+					int64_t divide = 1000;
+					int64_t ts = unix_time_ms / divide;
+
+					LOG_INF("Time: %d", ts);
+
+					err = snprintk(message, 100, "{\"appID\":\"BEE-CNT\"\"OUT\":\"%i\"\"IN\":\"%i\"\"TIME\":\"%lld\"}" \
+						, totalOut, totalIn, ts);
+					LOG_INF("Message formatted: %s, length: %i", message, err);
+				
+					struct cloud_msg msg = {
+						.qos = CLOUD_QOS_AT_MOST_ONCE,
+						.buf = message,
+						.len = strlen(message)
+					};
+					
+					/* When using the nRF Cloud backend data is sent to the message topic.
+					* This is in order to visualize the data in the web UI terminal.
+					* For Azure IoT Hub and AWS IoT, messages are addressed directly to the
+					* device twin (Azure) or device shadow (AWS).
+					*/
+					msg.endpoint.type = CLOUD_EP_MSG; //For nRF Cloud
+					
+					//msg.endpoint.type = CLOUD_EP_STATE; //For the inferior Clouds
+
+					err = cloud_send(cloud_backend, &msg);
+					LOG_INF("Published message with code: %i", err);
+
+					if (err) {
+						LOG_ERR("cloud_send failed, error: %d", err);
+					}
+					return false;
+				}
 				if(event->dyndata.size == 9){
 					LOG_INF("Got to process the Thingy data");
 
