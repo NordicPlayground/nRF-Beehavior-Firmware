@@ -79,6 +79,8 @@ static struct bt_conn *thingy_conn;
 #endif
 
 #if defined(CONFIG_BEE_COUNTER_ENABLE)
+#define BEE_COUNTER CONFIG_BEE_COUNTER_NAME
+
 static struct bt_conn *bee_conn;
 
 static struct bt_nus_client nus_client; //Handles communication for the bee_conn
@@ -87,6 +89,7 @@ static struct bt_nus_client nus_client; //Handles communication for the bee_conn
 // K_SEM_DEFINE(service_ready, 0, 1)
 
 #if defined(CONFIG_THINGY_ENABLE)
+#define THINGY CONFIG_THINGY_NAME
 /* Thinghy advertisement UUID */
 #define BT_UUID_THINGY                                                         \
 	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
@@ -227,9 +230,7 @@ static void gatt_discover(struct bt_conn *conn)
 
 static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
 {
-	LOG_INF("ble_data_received");
-
-	LOG_INF("%.*s", len, data);
+	LOG_INF("Received data from the Bee Counter");
 	
 	char out_arr[2];
 	char in_arr[2];
@@ -359,6 +360,7 @@ static struct bt_conn_cb conn_callbacks = {
 };
 
 #if defined(CONFIG_BROODMINDER_WEIGHT_ENABLE)
+#define BROODMINDER CONFIG_BROODMINDER_NAME
 /* ----------------------- BM_W Initialization and declarations  -------------------------*/
 
 static struct k_work_delayable weight_interval;
@@ -1157,7 +1159,7 @@ else: enable the filter.
 	int err;
 	if(first){
 		LOG_INF("scan_init(): Inside 'first' condition. \n");
-		err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, "Desk131");
+		err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, THINGY);
 		if (err) {
 			LOG_ERR("scan_init(): Scanning filters cannot be set (err %d). \n", err);
 			return err;
@@ -1179,6 +1181,14 @@ static int scan_init_bm(bool first){
 	int err = 0;
 
     LOG_INF("Changing filters. \n");
+	// if(first){
+	// 	err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, "47:05:93");
+	// 	if (err){
+	// 		LOG_INF("Filters cannot be set (err %d)\n", err);
+	// 		return err;
+	// 	}
+	// }
+
 	if(first){
 		err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_ADDR, BROODMINDER_ADDR);
 		if (err){
@@ -1187,21 +1197,19 @@ static int scan_init_bm(bool first){
 		}
 	}
 
-	// if(first){
-	// 	err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_ADDR, BROODMINDER_ADDR_TEMPERATURE);
-	// 	if (err){
-	// 		LOG_INF("Filters cannot be set (err %d)\n", err);
-	// 		return err;
-	// 	}
-	// }
-
     LOG_INF("Checkpoint 1");
-
+	
 	err = bt_scan_filter_enable(BT_SCAN_ADDR_FILTER, false);
     if (err) {
         LOG_INF("Filters cannot be turned on (err %d)\n", err);
         return err;
 	}
+
+	// err = bt_scan_filter_enable(BT_SCAN_NAME_FILTER, false);
+    // if (err) {
+    //     LOG_INF("Filters cannot be turned on (err %d)\n", err);
+    //     return err;
+	// }
 
 	//LOG_INF("Scan module initialized\n");
     return err;
@@ -1214,7 +1222,7 @@ static int bee_scan_init(bool first)
 	int err;
 	if(first){
 		// err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, "T52And2");
-		err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, "ItsyBitsy");
+		err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, BEE_COUNTER);
 		if (err) {
 			LOG_ERR("Scanning filters cannot be set (err %d)\n", err);
 			return err;
@@ -1343,7 +1351,7 @@ void central_module_thread_fn(void)
 	}
 
 	LOG_INF("thingy_module_thread_fn(): Scanning successfully started. \n");
-	LOG_INF("thingy_module_thread_fn(): Scanning for Thingy:52 with name Hive1: \n", BT_SCAN_FILTER_TYPE_NAME);
+	LOG_INF("thingy_module_thread_fn(): Scanning for Thingy:52 with name %.*s: \n", strlen(THINGY), THINGY);
     // bm module thread fn sketch
 	LOG_INF("Waiting for thingy_done semaphore.");
 	#else
@@ -1397,7 +1405,7 @@ void central_module_thread_fn(void)
 		return;
 	}
 
-	LOG_INF("Scanning for bm_w succesfully started\n");
+	LOG_INF("Scanning for %.*s succesfully started\n", strlen(BROODMINDER), BROODMINDER);
 	LOG_INF("LED 3 toggled while scanning for BM_Weight. \n");
 	dk_set_led_on(LED_3);
 	
