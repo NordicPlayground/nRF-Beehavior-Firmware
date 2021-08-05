@@ -69,6 +69,7 @@ union tagname{
 };
 
 union tagname object;
+union tagname object16;
 
 static K_SEM_DEFINE(ble_init_ok, 0, 1);
 
