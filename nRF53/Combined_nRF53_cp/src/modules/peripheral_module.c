@@ -42,6 +42,7 @@
 #include "events/ble_event.h"
 #include "events/thingy_event.h"
 #include "events/bm_w_event.h"
+#include "events/bee_count_event.h"
 #include "led/led.h"
 
 #include <drivers/uart.h>
@@ -69,6 +70,13 @@ union tagname{
 };
 
 union tagname object;
+
+union tagname16{
+	uint16_t a;
+	unsigned char s[2];
+};
+
+union tagname16 object16;
 
 static K_SEM_DEFINE(ble_init_ok, 0, 1);
 
@@ -298,3 +306,4 @@ EVENT_LISTENER(MODULE, event_handler);
 EVENT_SUBSCRIBE(MODULE, ble_event);
 EVENT_SUBSCRIBE(MODULE, thingy_event);
 EVENT_SUBSCRIBE(MODULE, bm_w_event);
+EVENT_SUBSCRIBE(MODULE, bee_count_event);
