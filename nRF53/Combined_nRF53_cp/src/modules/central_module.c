@@ -39,19 +39,21 @@
 
 #include "events/ble_event.h"
 #include "events/thingy_event.h"
+#include "events/bee_count_event.h"
+#include "events/bm_w_event.h"
+
 #include "led/led.h"
-// #include "ble_module.c"
-// #include "events/bm_w_event.h"
 
-// #include "ble.h"
+/* ----------------------- Thingy declaration and initialization -------------------------
+This could probably be put in a central_module.h
 
-
-
-
+*/
 static K_SEM_DEFINE(ble_ready, 0, 1);
 static K_SEM_DEFINE(temperature_received, 0, 1);
 static K_SEM_DEFINE(humidity_received, 0, 1);
 static K_SEM_DEFINE(air_pressure_received, 0, 1);
+static K_SEM_DEFINE(peripheral_done, 0, 1);
+static K_SEM_DEFINE(bee_count_done, 0, 1);
 
 bool configured = false;
 
@@ -60,10 +62,14 @@ uint8_t data_array[3];
 int32_t pressure_int;
 uint8_t pressure_float;
 
-#define MODULE thingy_module
+#define MODULE central_module
 LOG_MODULE_REGISTER(MODULE, 4);
 
 static struct bt_conn *thingy_conn;
+
+static struct bt_conn *bee_conn;
+
+static struct bt_nus_client nus_client; //Handles communication for the bee_conn
 
 K_SEM_DEFINE(service_ready, 0, 1)
 
@@ -142,6 +148,117 @@ struct ble_tes_config_t
 };
 
 bool first = false;
+
+bool thingy_scan = true;
+
+static void bee_discovery_complete(struct bt_gatt_dm *dm,
+			       void *context)
+{
+	struct bt_nus_client *nus = context;
+	LOG_INF("Service discovery completed");
+
+	bt_gatt_dm_data_print(dm);
+
+	bt_nus_handles_assign(dm, nus);
+	bt_nus_subscribe_receive(nus);
+
+	bt_gatt_dm_data_release(dm);
+
+	k_sem_give(&bee_count_done);
+
+	struct ble_event *bc_ready = new_ble_event();
+
+	bc_ready->type = BEE_COUNTER_READY;
+
+	EVENT_SUBMIT(bc_ready);
+}
+
+static void bee_discovery_service_not_found(struct bt_conn *conn,
+					void *context)
+{
+	LOG_INF("Service not found");
+}
+
+static void bee_discovery_error(struct bt_conn *conn,
+			    int err,
+			    void *context)
+{
+	LOG_WRN("Error while discovering GATT database: (%d)", err);
+}
+
+struct bt_gatt_dm_cb bee_discovery_cb = {
+	.completed         = bee_discovery_complete,
+	.service_not_found = bee_discovery_service_not_found,
+	.error_found       = bee_discovery_error,
+};
+
+/* -------------- Gatt discover for the Bee Counter -------------------- */
+static void gatt_discover(struct bt_conn *conn)
+{
+	int err;
+
+	if (conn != bee_conn) {
+		return;
+	}
+
+	err = bt_gatt_dm_start(conn,
+			       BT_UUID_NUS_SERVICE,
+			       &bee_discovery_cb,
+			       &nus_client);
+	if (err) {
+		LOG_ERR("could not start the discovery procedure, error "
+			"code: %d", err);
+	}
+}
+
+static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
+{
+	LOG_INF("ble_data_received");
+
+	LOG_INF("%.*s", len, data);
+	
+	char out_arr[2];
+	char in_arr[2];
+	for (uint8_t i = 0; i < 4; i++){
+		out_arr[i] = data[i];
+		in_arr[i] = data[i+2];	
+	}
+	uint16_t totalOut;
+	uint16_t totalIn;
+
+	memcpy(&totalOut, out_arr, sizeof(totalOut));
+	memcpy(&totalIn, in_arr, sizeof(totalIn));
+
+	LOG_INF("Total out: %d, Total in: %d", totalOut, totalIn);
+
+	struct bee_count_event *bc_send = new_bee_count_event();
+
+	bc_send->out = totalOut;
+	bc_send->in = totalIn;
+	
+	EVENT_SUBMIT(bc_send);
+
+	return BT_GATT_ITER_CONTINUE;
+}
+
+static int nus_client_init(void)
+{
+	int err;
+	struct bt_nus_client_init_param init = {
+		.cb = {
+			.received = ble_data_received,
+		}
+	};
+
+	err = bt_nus_client_init(&nus_client, &init);
+	if (err) {
+		LOG_ERR("NUS Client initialization failed (err %d)", err);
+		return err;
+	}
+
+	LOG_INF("NUS Client module initialized");
+	return err;
+}
 
 /* -------------- Temperature headers and cb -------------------- */
 static void discovery_temperature_completed(struct bt_gatt_dm *disc, void *ctx);
@@ -222,6 +339,25 @@ static struct bt_conn_cb conn_callbacks = {
 	.security_changed = security_changed
 };
 
+/* ----------------------- BM_W Initialization and declarations  -------------------------*/
+
+static struct k_work_delayable weight_interval;
+static struct k_work_delayable temperature_interval;
+
+// #define LOG_MODULE_NAME bm_w_module
+// LOG_MODULE_REGISTER(LOG_MODULE_NAME, 4);
+
+#define REAL_TIME_WEIGHT 0x16
+#define BROODMINDER_ADDR ((bt_addr_le_t[]) { { 0, \
+			 { { 0xFD, 0x01, 0x57, 0x16, 0x09, 0x06 } } } })
+#define BROODMINDER_ADDR_TEMPERATURE ((bt_addr_le_t[]) { { 0, \
+			 { { 0x93, 0x05, 0x47, 0x16, 0x09, 0x06 } } } })
+
+// // #define USE_BMW;
+// // #define USE_TEMPERATURE;
+static int scan_init(bool first);
+static int scan_init_bm(bool first);
+static int bee_scan_init(bool first);
 /* ------------------------- on received notifications ---------------------------------*/
 static uint8_t on_received_temperature(struct bt_conn *conn,
 			struct bt_gatt_subscribe_params *params,
@@ -290,19 +426,6 @@ static uint8_t on_received_orientation(struct bt_conn *conn,
 	return BT_GATT_ITER_CONTINUE;
 }
 
-// static uint8_t on_received_battery(struct bt_conn *conn,
-// 			struct bt_gatt_subscribe_params *params,
-// 			const void *data, uint16_t length)
-// {
-// 	if (length > 0) {
-// 		LOG_INF("Battery: %x %%\n", ((uint8_t *)data)[0]);
-
-// 	} else {
-// 		LOG_INF("Battery notification with 0 length\n");
-// 	}
-// 	return BT_GATT_ITER_CONTINUE;
-// }
-
 void write_to_led_cb (struct bt_conn *conn, uint8_t err, struct bt_gatt_write_params *params){
 	LOG_INF("Write callback started, %i, length: %i, offset: %i, handle: %i", err, params->length, params->offset, params->handle);
 
@@ -313,8 +436,6 @@ void write_to_led_cb (struct bt_conn *conn, uint8_t err, struct bt_gatt_write_pa
 	thingy_ready->type = THINGY_READY;
 
 	EVENT_SUBMIT(thingy_ready);
-	// char *test = params->data;
-	// LOG_INF("%.12s", log_strdup(test));
 }
 
 static void discovery_write_to_led_completed(struct bt_gatt_dm *disc, void *ctx){
@@ -495,11 +616,10 @@ static void discovery_temperature_completed(struct bt_gatt_dm *disc, void *ctx)
 
 	param.ccc_handle = desc->handle;
 
-	// if(!resubscribe){
-		err = bt_gatt_subscribe(bt_gatt_dm_conn_get(disc), &param);
-		if (err) {
-			LOG_INF("Subscribe to temperature service failed (err %d)\n", err);
-		}
+	err = bt_gatt_subscribe(bt_gatt_dm_conn_get(disc), &param);
+	if (err) {
+		LOG_INF("Subscribe to temperature service failed (err %d)\n", err);
+	}
 
 	LOG_INF("Temperature discovery completed\n");
 
@@ -686,20 +806,12 @@ static void discovery_orientation_completed(struct bt_gatt_dm *disc, void *ctx)
 
 	param.ccc_handle = desc->handle;
 
-	// if(!resubscribe){
-		err = bt_gatt_subscribe(bt_gatt_dm_conn_get(disc), &param);
-		if (err) {
-			LOG_INF("Subscribe to orientation service failed (err %d)\n", err);
-		}
-		// resubscribe = true;
-	// }
-	// else{
-	// 	err = bt_gatt_resubscribe(0, bt_gatt_dm_conn_get(disc), &param);
-	// 	if (err) {
-	// 		LOG_INF("Resubscribe to orientation service failed (err %d)\n", err);
-	// 	}
-	// }
-
+	
+	err = bt_gatt_subscribe(bt_gatt_dm_conn_get(disc), &param);
+	if (err) {
+		LOG_INF("Subscribe to orientation service failed (err %d)\n", err);
+	}
+	
 	LOG_INF("Orientation discovery completed\n");
 
 release:
@@ -851,22 +963,34 @@ static void discover_orientation_gattp(struct bt_conn *conn)
 // 	}
 // 	LOG_INF("Gatt battery DM started with code: %i\n", err);
 // }
+
+static void exchange_func(struct bt_conn *conn, uint8_t err, struct bt_gatt_exchange_params *params)
+{
+	if (!err) {
+		LOG_INF("MTU exchange done");
+	} else {
+		LOG_WRN("MTU exchange failed (err %" PRIu8 ")", err);
+	}
+}
+
 /*------------------------- Connectivity, scanning and pairing functions -------------------------- */
 static void connected(struct bt_conn *conn, uint8_t conn_err)
 {
+	int err;
+
 	char addr[BT_ADDR_LE_STR_LEN];
 	
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
 	if(!strncmp(addr, "06:09:16:57:01:FD", 17)){
-		LOG_INF("NO! Not for you!");
+		LOG_INF("connected(): Weight manually stopped from connecting");
 		int err = bt_conn_disconnect(conn, BT_HCI_ERR_REMOTE_USER_TERM_CONN);
-		LOG_INF("Bluetooth disconnected with error code: %i", err);
+		LOG_INF("connected(): Bluetooth disconnected with error code: %i", err);
 		return;
 	}
 
 	if (conn_err) {
-		LOG_INF("Failed to connect to %s (%u)\n", addr, conn_err);
+		LOG_INF("connected(): Failed to connect to %s (%u). \n", addr, conn_err);
 		return;
 	}
 
@@ -874,27 +998,44 @@ static void connected(struct bt_conn *conn, uint8_t conn_err)
 	
 	bt_conn_get_info(conn, &conn_info);
 
-	LOG_INF("Type: %i, Role: %i, Id: %i", conn_info.type, conn_info.role, conn_info.id);
+	LOG_INF("connected(): Type: %i, Role: %i, Id: %i. \n", conn_info.type, conn_info.role, conn_info.id);
+		
+	LOG_INF("connected(): Connected: %.17s", log_strdup(addr));
 
-	if(!conn_info.role){
-		LOG_INF("Thingy:52 Connected");
-		thingy_conn = bt_conn_ref(conn);
+	if(conn_info.type){
+		if(thingy_scan){
+			LOG_INF("connected(): Thingy:52	Connected.");
+			thingy_scan = false;
+			thingy_conn = bt_conn_ref(conn);
+			LOG_INF("Setting LED 1 Status for successful connection with T:52. \n");
+			dk_set_led_on(LED_1);
+			LOG_INF("connected(): Starting Thingy:52 service discovery chain. \n");
+			LOG_INF("connected(): Discovering temperature service: "); /* Starts the service discovery chain*/
+			discover_temperature_gattp(conn);
+		}
+		else{
+			LOG_INF("connected(): Bee Counter Connected.");
+	
+			static struct bt_gatt_exchange_params exchange_params;
+
+			// exchange_params.func = exchange_func;
+			// err = bt_gatt_exchange_mtu(conn, &exchange_params);
+			// if (err) {
+			// 	LOG_WRN("MTU exchange failed (err %d)", err);
+			// }
+
+			bee_conn = bt_conn_ref(conn);
+			gatt_discover(conn);
+		}
 	}
 	else{
-		LOG_INF("Connected to central hub (91).\n");
-		LOG_INF("Setting LED 2 for successful connection with 91.");
+		LOG_INF("connected(): Connected to central hub (91). \n");
+		LOG_INF("Setting LED 2 for successful connection with 91. \n");
 		dk_set_led_on(LED_2);
-
 	}
-	LOG_INF("Setting LED 1 Status for successful connection with T:52\n");
-	dk_set_led_on(LED_1);
-	LOG_INF("Connected: %.17s", log_strdup(addr));
-	LOG_INF("Starting Thingy:52 service discovery chain. \n");
-	LOG_INF("Discovering temperature service:"); /* Starts the service discovery chain*/
-	discover_temperature_gattp(conn);
 }
 
-static int scan_init(bool first);
+// static int scan_init(bool first); Decleared at the top
 
 static void disconnected(struct bt_conn *conn, uint8_t reason)
 {
@@ -913,39 +1054,36 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 		return;
 	}
 
-	LOG_INF("Bluetooth disconnection occured: %s (reason %u)\n", log_strdup(addr),	reason);
+	LOG_INF("disconnected(): Bluetooth disconnection occured: %s (reason %u)\n", log_strdup(addr),	reason);
 	struct bt_conn_info conn_info;
 	
 	bt_conn_get_info(conn, &conn_info);
 	// if(!strncmp(addr, "DF:91:24:65:5F:88", 17)){ // This must be change to not be hard coded
 	if(!conn_info.role){
-		// LOG_INF("Thingy:52 Connected");
-		LOG_INF("LED 1 toggled off. Thingy:52  disconnected. \n");
-		dk_set_led_off(LED_1);
+		if(conn==thingy_conn){
+			LOG_INF("LED 1 toggled off. Thingy:52  disconnected. \n");
+			dk_set_led_off(LED_1);
+			bt_conn_unref(thingy_conn);
+			thingy_conn = NULL;
+			err = bt_gatt_disconnected(conn);
+			LOG_INF("disconnected(): Gatt cleared: %i. \n", err);
+			scan_init(false);
+			//Start scan
+		}
+		if(conn==bee_conn){
+			LOG_INF("Bee Counter disconnected.");
+			bt_conn_unref(bee_conn);
+			bee_conn = NULL;
+			err = bt_gatt_disconnected(conn);
+			LOG_INF("disconnected(): Gatt cleared: %i. \n", err);
+			bee_scan_init(false);
+			//Start scan
+		}
 	}
-	// else{
-	// 	LOG_INF("LED 2 toggled off. 91 disconnected. \n");
-	// 	dk_set_led_off(LED_2);
-	// };
-	
-	
-
-	if (thingy_conn != conn) {
-		LOG_INF("Central hub disconnected");
-		LOG_INF("LED 2 toggled off. Disconnected from 91.");
-		dk_set_led_off(LED_2);
-		return;
+	else{
+		LOG_INF("Hub/nRF91 disconnected.");
+		//Start adv
 	}
-
-	err = bt_gatt_disconnected(conn);
-	LOG_INF("Gatt cleared: %i", err);
-
-	scan_init(false);
-
-	bt_scan_start(BT_SCAN_TYPE_SCAN_ACTIVE);
-
-	bt_conn_unref(thingy_conn);
-	thingy_conn = NULL;
 }
 static void security_changed(struct bt_conn *conn, bt_security_t level,
 			     enum bt_security_err err)
@@ -964,11 +1102,69 @@ static void security_changed(struct bt_conn *conn, bt_security_t level,
 }
 
 static int scan_init(bool first)
+/* 
+Scan init (bool first); 
+If its the first time the machine is running: Add the scan type through bt_scan_filter_add,
+else: enable the filter.
+ */
+{
+	int err;
+	if(first){
+		LOG_INF("scan_init(): Inside 'first' condition. \n");
+		err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, "Desk131");
+		if (err) {
+			LOG_ERR("scan_init(): Scanning filters cannot be set (err %d). \n", err);
+			return err;
+		}
+	}
+	err = bt_scan_filter_enable(BT_SCAN_NAME_FILTER, false);
+	if (err) {
+		LOG_ERR("scan_init(): Filters cannot be turned on (err %d). \n", err);
+		return err;
+	}
+
+	LOG_INF("scan_init(): Scan module initialized. \n");
+	return err;
+}
+
+static int scan_init_bm(bool first){
+	int err = 0;
+
+    LOG_INF("Changing filters. \n");
+	if(first){
+		err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_ADDR, BROODMINDER_ADDR);
+		if (err){
+			LOG_INF("Filters cannot be set (err %d)\n", err);
+			return err;
+		}
+	}
+
+	// if(first){
+	// 	err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_ADDR, BROODMINDER_ADDR_TEMPERATURE);
+	// 	if (err){
+	// 		LOG_INF("Filters cannot be set (err %d)\n", err);
+	// 		return err;
+	// 	}
+	// }
+
+    LOG_INF("Checkpoint 1");
+
+	err = bt_scan_filter_enable(BT_SCAN_ADDR_FILTER, false);
+    if (err) {
+        LOG_INF("Filters cannot be turned on (err %d)\n", err);
+        return err;
+	}
+
+	//LOG_INF("Scan module initialized\n");
+    return err;
+}
+
+static int bee_scan_init(bool first)
 {
 	int err;
 	if(first){
 		// err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, "T52And2");
-		err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, "Hive1");
+		err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, "Nordic_UART_Service");
 		if (err) {
 			LOG_ERR("Scanning filters cannot be set (err %d)\n", err);
 			return err;
@@ -1036,18 +1232,47 @@ static struct bt_conn_auth_cb conn_auth_callbacks = {
 	.pairing_failed = pairing_failed
 };
 
+static void ble_scan_start_fn(struct k_work *work)
+{
+	LOG_INF("Scanning for bm_w starting.");
+	LOG_INF("LED 3 toggled while scanning. \n");
+	dk_set_led_on(LED_3);
+
+	int err = scan_init_bm(false);
+	if(err){
+		LOG_INF("Scanning for bm_w failed to initialize");
+		LOG_INF("LED 3 toggled off.\n");
+		dk_set_led_off(LED_3);
+		// return;
+	}
+
+	err = bt_scan_start(BT_SCAN_TYPE_SCAN_ACTIVE);
+	if (err) {
+		LOG_INF("Scanning for bm_w failed to start (err %d)", err);
+		LOG_INF("LED 3 toggled off.\n");
+		dk_set_led_off(LED_3);
+		// return;
+	}
+	// struct ble_event *bm_w_read = new_ble_event();
+
+	// bm_w_read->type = BM_W_READ;
+
+	// EVENT_SUBMIT(bm_w_read);
+	k_work_reschedule(&weight_interval ,K_MINUTES(1));
+}
+
 /* ------------------------ main() -----------------------*/
 void thingy_module_thread_fn(void)
 {
 	int err;
 	
-	LOG_INF("STOP!... (Wait for BLE to be ready)\n");
+	LOG_INF("thingy_module_thread_fn(): Waiting for sem ble_ready, K_FOREVER. \n");
     k_sem_take(&ble_ready, K_FOREVER);
-    LOG_INF("HAMMERTIME! (BLE ready.\n");
+    LOG_INF("thingy_module_thread_fn(): ble_ready. \n");
 	
 	err = bt_conn_auth_cb_register(&conn_auth_callbacks);
 	if (err) {
-		LOG_ERR("Failed to register authorization callbacks.");
+		LOG_ERR("thingy_module_thread_fn(): Failed to register authorization callbacks. \n");
 		return;
 	}
 
@@ -1055,8 +1280,31 @@ void thingy_module_thread_fn(void)
 
 	err = scan_init(true);
 	if(err){
-		LOG_INF("Failed to initialize scan: %i", err);
+		LOG_INF("thingy_module_thread_fn(): Failed to initialize scan: %i.  \n", err);
 	}
+
+	err = bt_scan_start(BT_SCAN_TYPE_SCAN_ACTIVE);
+	if (err) {
+		LOG_ERR("thingy_module_thread_fn(): Scanning failed to start (err %d). \n", err);
+		return;
+	}
+
+	LOG_INF("thingy_module_thread_fn(): Scanning successfully started. \n");
+	LOG_INF("thingy_module_thread_fn(): Scanning for Thingy:52 with name Hive1: \n", BT_SCAN_FILTER_TYPE_NAME);
+    // bm module thread fn sketch
+	LOG_INF("Waiting for thingy_done semaphore.");
+	k_sem_take(&peripheral_done, K_SECONDS(120));
+
+	LOG_INF("Starting scan for BeeCounter");
+	err = bee_scan_init(true);
+	if(err){
+		LOG_INF("Failed to initialize bee_scan: %i", err);
+	}
+
+	nus_client_init();
+
+	// bt_scan_stop();
+
 
 	err = bt_scan_start(BT_SCAN_TYPE_SCAN_ACTIVE);
 	if (err) {
@@ -1064,8 +1312,34 @@ void thingy_module_thread_fn(void)
 		return;
 	}
 
-	LOG_INF("Scanning successfully started");
-	LOG_INF("Scanning for Thingy:52 with name T52Andre: %d", BT_SCAN_FILTER_TYPE_NAME);
+	LOG_INF("STOP!... (Wait for peripheral_done semaphore)\n");
+    k_sem_take(&bee_count_done, K_SECONDS(120));
+    LOG_INF("HAMMERTIME! (Thingy is ready) \n");
+
+	err = scan_init_bm(true);
+	if(err){
+		LOG_INF("Scanning failed to initialize\n");
+		return;
+	}
+	
+    LOG_INF("Checkpoint 2 \n");
+
+	err = bt_scan_start(BT_SCAN_TYPE_SCAN_ACTIVE);
+	if (err) {
+		LOG_INF("Scanning for bm_w failed to start (err %d)\n", err);
+		LOG_INF("LED 3 toggled off.\n");
+		dk_set_led_off(LED_3);
+		return;
+	}
+
+	LOG_INF("Scanning for bm_w succesfully started\n");
+	LOG_INF("LED 3 toggled while scanning for BM_Weight. \n");
+	dk_set_led_on(LED_3);
+	
+	k_work_init_delayable(&weight_interval, ble_scan_start_fn);
+
+	k_work_reschedule(&weight_interval ,K_MINUTES(1));
+
 
 	for(;;){
 		k_sem_take(&temperature_received, K_FOREVER);
@@ -1081,6 +1355,8 @@ void thingy_module_thread_fn(void)
 		thingy_send->pressure_float = pressure_float;
 
 		EVENT_SUBMIT(thingy_send);
+		LOG_INF("thingy_module_thread_fn(): thingy_send event submitted. \n");
+
 	}
 }
 
@@ -1090,8 +1366,14 @@ static bool event_handler(const struct event_header *eh)
 
 		struct ble_event *event = cast_ble_event(eh);
 		if(event->type==BLE_READY){
-			LOG_INF("BLE ready");
+			LOG_INF("event_handler(): BLE ready");
 			k_sem_give(&ble_ready);
+			return false;
+		}
+
+		if(event->type==HUB_CONNECTED){
+			LOG_INF("event_handler(): Thingy connected\n");
+			k_sem_give(&peripheral_done);
 			return false;
 		}
 		return false;

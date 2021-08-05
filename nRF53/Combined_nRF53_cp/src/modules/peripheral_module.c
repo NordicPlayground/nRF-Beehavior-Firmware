@@ -82,7 +82,7 @@ static const struct bt_data ad[] = {
 	BT_UUID_128_ENCODE(0x6e400001, 0xb5b3, 0xf393, 0xe1a9, 0xe50e14dcea9e)
 
 static const struct bt_data sd[] = {
-	BT_DATA_BYTES(BT_DATA_UUID128_ALL, BT_UUID_BEEHAVIOUR_MONITORING_VAL),
+	BT_DATA_BYTES(BT_DATA_UUID128_ALL, BT_UUID_NUS_VAL) //BT_UUID_BEEHAVIOUR_MONITORING_VAL),
 };
 
 static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
@@ -105,6 +105,12 @@ static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
 		id=data_received[1];
 		LOG_INF("New ID is: %c\n", id);
         hub_conn = conn;
+
+		struct ble_event *peripheral_ready = new_ble_event();
+
+		peripheral_ready->type = HUB_CONNECTED;
+
+		EVENT_SUBMIT(peripheral_ready);
 	}
 
 }
@@ -116,42 +122,45 @@ static struct bt_nus_cb nus_cb = {
 void peripheral_module_thread_fn(void)
 {
     /* Don't go any further until BLE is initialized */
-    LOG_INF("What it do! (Wait for BLE to be initialized) \n");
-	k_sem_take(&ble_init_ok, K_FOREVER);
-    LOG_INF("What it is! (BLE is initialized) \n");
+    LOG_INF("peripheral_module_thread_fn(): Waiting for sem ble_init_ok, K_SECONDS(30). \n");
+	k_sem_take(&ble_init_ok, K_SECONDS(60));
+    LOG_INF("peripheral_module_thread_fn(): BLE is initialized. \n");
 
     int err;
 
+	bt_le_scan_stop();
+
+	LOG_INF("peripheral_module_thread_fn(): Attempting to initialise bt_nus. \n");
 	err = bt_nus_init(&nus_cb);
 	if (err) {
-		LOG_ERR("Failed to initialize UART service (err: %d)\n", err);
+		LOG_ERR("peripheral_module_thread_fn(): Failed to initialize UART service (err: %d) .\n", err);
 		return;
 	}
 
+	LOG_INF("peripheral_module_thread_fn(): Attempting to run bt_le_adv_start(). \n");
 	err = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), sd,
 			      ARRAY_SIZE(sd));
 	if (err) {
-		LOG_ERR("Advertising failed to start (err %d)\n", err);
-		// LOG_INF("Toggling LED 4 off. \n");
-		// dk_set_led_off(LED_4);
+		LOG_ERR("peripheral_module_thread_fn(): Advertising failed to start (err %d) \n", err);
+		return;
 	}
-	// LOG_INF("Advertising data from 53? Setting LED 4.\n");
-	// dk_set_led_on(LED_4);
-	struct ble_event *peripheral_ready = new_ble_event();
+	LOG_INF("peripheral_module_thread_fn(): bt_nus_init and bt_le_adv_start completed. \n");
+	// struct ble_event *peripheral_ready = new_ble_event();
 
-	peripheral_ready->type = HUB_CONNECTED;
+	// peripheral_ready->type = HUB_CONNECTED;
 
-	EVENT_SUBMIT(peripheral_ready);
+	// EVENT_SUBMIT(peripheral_ready);
+	// LOG_INF("peripheral_module_thread_fn(): Peripheral_ready event submitted. \n");
 }
 
 
 static bool event_handler(const struct event_header *eh)
 {
 	if (is_ble_event(eh)) {
-        LOG_INF("BLE event is being handled\n");
+        LOG_INF("event_handler(): BLE event is being handled. \n");
 		struct ble_event *event = cast_ble_event(eh);
 		if(event->type==THINGY_READY){
-			LOG_INF("Thingy ready\n");
+			LOG_INF("event_handler(): Thingy ready, giving sem 'ble_init_ok'. \n");
 			k_sem_give(&ble_init_ok);
 			return false;
 		}
@@ -160,17 +169,16 @@ static bool event_handler(const struct event_header *eh)
 
 	/* The comments in this part of the code is only for debugging and implementation. Functional code is in ble_module.c in nrf91*/
     if (is_thingy_event(eh)) {
-        LOG_INF("Thingy event is being handled\n");
-		LOG_INF("Toggling LED 4 while Thingy event is handled.\n");
-		dk_set_led_on(LED_4);
+        LOG_INF("event_handler(): Thingy event is being handled. \n");
+		// LOG_INF("Toggling LED 4 while Thingy event is handled.\n");
+		// dk_set_led_on(LED_4);
 		struct thingy_event *event = cast_thingy_event(eh);
-		LOG_INF("Temperature [C]: %i,%i, Humidity [%%]: %i, Air pressure [hPa]: %d,%i ID: %i\n", event->data_array[0], \
+		LOG_INF("Temperature [C]: %i,%i, Humidity [%%]: %i, Air pressure [hPa]: %d,%i ID: %i.\n", event->data_array[0], \
 				event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, id-(uint8_t)'0');
 
-		LOG_INF("Hex-version: Temperature [C]: %x,%x, Humidity [%%]: %x, Air pressure [hPa]: %x,%x ID: %x\n", event->data_array[0], \
-				event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, id-(uint8_t)'0');
+		// LOG_INF("Hex-version: Temperature [C]: %x,%x, Humidity [%%]: %x, Air pressure [hPa]: %x,%x ID: %x\n", event->data_array[0], \
+		// 		event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, id-(uint8_t)'0');
 		
-
 		object.a = event->pressure_int;
 		/*LOG_INF("Object.a = %d, %x \n", object.a, object.a);
 		printf("%d\n",sizeof(object));
@@ -224,25 +232,52 @@ static bool event_handler(const struct event_header *eh)
 		// printf("From int to array to int %i, %X \n", tempvar2, tempvar2);
 
         if(hub_conn){
-            LOG_INF("Hub is connected\n");
+            LOG_INF("event_handler(): Hub is connected, sending thingy_data over nus. \n");
             int err = bt_nus_send(hub_conn, thingy_data, 11);
         }
-		LOG_INF("Toggling LED 4 off after finishing Thingy Event.\n");
-		dk_set_led_off(LED_4);
+		// LOG_INF("Toggling LED 4 off after finishing Thingy Event.\n");
+		// dk_set_led_off(LED_4);
 		return false;
 		
 	}
 	
+	if(is_bee_count_event(eh)){
+		LOG_INF("Bee Counter event is being handled\n");
+		struct bee_count_event *event = cast_bee_count_event(eh);
+		uint8_t bee_count_data[6] = { (uint8_t)'*', id-(uint8_t)'0'};
+
+		object16.a = event->out;
+		
+		for(char i=0;  i<2; i++){
+			bee_count_data[3-i] = object16.s[i];
+		}
+
+		object16.a = event->in;
+		
+		for(char i=0;  i<2; i++){
+			bee_count_data[5-i] = object16.s[i];
+		}
+		
+        if(hub_conn){
+            LOG_INF("Hub is connected\n");
+            int err = bt_nus_send(hub_conn, bee_count_data, 6);
+        }
+		else{
+			//Save untill reconnected to nrf91 TO DO
+		}
+		return false;
+	}
+
 	if (is_bm_w_event(eh)) {
-        LOG_INF("BM_W event is being handled\n");
+        LOG_INF("event_handler(): BM_W event is being handled. \n");
 		struct bm_w_event *event = cast_bm_w_event(eh);
-		LOG_INF("WeightR: %.2f, WeightL: %.2f, RTWeight: %.2f, Temperature: %.2f, ID: %i\n", event->weightR, event->weightL, event->realTimeWeight, event->temperature, id-(uint8_t)'0');
+		LOG_INF("WeightR: %.2f, WeightL: %.2f, RTWeight: %.2f, Temperature: %.2f, ID: %i .\n", event->weightR, event->weightL, event->realTimeWeight, event->temperature, id-(uint8_t)'0');
         uint8_t bm_w_data[10] = { (uint8_t)'*', id-(uint8_t)'0', (uint8_t)event->weightR, (uint8_t)((event->weightR - (uint8_t)event->weightR) * 100)
 			, (uint8_t)event->weightL, (uint8_t)((event->weightL - (uint8_t)event->weightL) * 100)
 			, (uint8_t)event->realTimeWeight, (uint8_t)((event->realTimeWeight - (uint8_t)event->realTimeWeight) * 100) 
 			, (uint8_t)event->temperature, (uint8_t)((event->temperature - (uint8_t)event->temperature) * 100) };
         if(hub_conn){
-            LOG_INF("Hub is connected\n");
+            LOG_INF("event_handler(): Hub is connected, sending bm_w_data over nus. ");
             int err = bt_nus_send(hub_conn, bm_w_data, 10);
         }
 		else{

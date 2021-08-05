@@ -83,7 +83,7 @@ static void scan_filter_match(struct bt_scan_device_info *device_info,
 
 	bt_addr_le_to_str(device_info->recv_info->addr, addr, sizeof(addr));
 
-	LOG_INF("Filters matched. Address: %s connectable: %d\n", log_strdup(addr), connectable);
+	LOG_INF("scan_filter_match(): Filters matched. Address: %s connectable: %d\n", log_strdup(addr), connectable);
 
 	if(!strncmp(addr, "06:09:16:57:01:FD", 17)){
 	// if(!strncmp(addr, "06:09:16:47:05:93", 17)){
@@ -178,23 +178,23 @@ void ble_module_thread_fn(void)
 
 	err = dk_leds_init();
 	if (err) {
-		LOG_ERR("Cannot init LEDs (err: %d)", err);
+		LOG_ERR("ble_module_thread_fn(): Cannot init LEDs (err: %d)", err);
 	}
 	else{
-		LOG_INF("Leds initialized and set to LED1 = 53 Connected to T52, LED2 = 53 Connected to T91, LED3 = 53 Scanning for BM_Weight.\n");
+		LOG_INF("ble_module_thread_fn(): Leds initialized and set to LED1 = 53 Connected to T52, LED2 = 53 Connected to T91, LED3 = 53 Scanning for BM_Weight.\n");
 	}
 
 
-	LOG_INF("Starting BLE\n");
+	LOG_INF("ble_module_thread_fn(): Enabling BLE\n");
 	err = bt_enable(NULL);
 	if (err) {
 		LOG_ERR("Bluetooth init failed (err %d)\n", err);
 		return;
 	}
-	LOG_INF("Bluetooth initialized\n");
+	LOG_INF("ble_module_thread_fn(): Bluetooth initialized\n");
 
 	if (IS_ENABLED(CONFIG_SETTINGS)) {
-		LOG_INF("Loading settings\n");
+		LOG_INF("ble_module_thread_fn(): Loading settings\n");
 		settings_load();
 	}
 
@@ -210,6 +210,7 @@ void ble_module_thread_fn(void)
 	ble_ready->type = BLE_READY;
 
 	EVENT_SUBMIT(ble_ready);
+	LOG_INF("ble_module_thread_fn(): ble_ready event submitted. \n");
 }
 
 static bool event_handler(const struct event_header *eh)

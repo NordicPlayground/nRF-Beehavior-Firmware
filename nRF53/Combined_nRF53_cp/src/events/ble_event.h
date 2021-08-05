@@ -7,6 +7,7 @@ enum ble_event_type {
 	THINGY_DISCONNECTED,
 	BM_W_SCANNING,
         BM_W_READ,
+        BEE_COUNTER_READY,
         HUB_SCANNING,
         HUB_CONNECTED,
         HUB_DISCONNECTED,

@@ -5,6 +5,24 @@
 #
 
 menu "HIVE_HUB"
+	
+config BEE_COUNTER_NAME
+	string "Name of your Bee Counter Device"
+	default "ItsyBitsy"
+
+config BEE_COUNTER_ENABLE
+	bool "Enable if you want the device to connect to the Bee Counter"
+	default y
+
+#Add Broodminder address, if we figure out how to add an address
+
+config BROODMINDER_WEIGHT_ENABLE
+	bool "Enable if you want the device to scan for the Broodminder Weight"
+	default y
+
+config THINGY_CONNECTIONS
+	int "Number of Thingy:52 in the hive"
+	default 1
 
 config BLE_TO_CLOUD_APP_VERSION
 	string "Bluetooth to cloud application firmware version"
