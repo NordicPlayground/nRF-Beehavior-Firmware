@@ -1,8 +1,0 @@
-# Adafruit Itsybitsy nRF52840 Express board configuration
-
-# Copyright (c) 2021 Nordic Semiconductor ASA
-# SPDX-License-Identifier: Apache-2.0
-
-config BOARD_ADAFRUIT_ITSYBITSY_NRF52840
-	bool "Adafruit Itsybitsy nRF52840 Express"
-	depends on SOC_NRF52840_QIAA
