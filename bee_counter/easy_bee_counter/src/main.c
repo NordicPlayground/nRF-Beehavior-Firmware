@@ -309,63 +309,74 @@ void main(void){
 		   		{  
 					lastInFinishedTime[i] = current_time;            
 		   	  		inReadingTimeHigh[i] = current_time - startInReadingTime[i]; //this variable is how long the bee was present for
+					/*
 		   	  		printk("%i", i);
 		   	  		printk(", IT ,");
 		   	  		printk("%ld", inReadingTimeHigh[i]);
-		   	  		printk(", ");    
+		   	  		printk(", ");
+					*/    
 		   	  		if(outReadingTimeHigh[i] < 650 && inReadingTimeHigh[i] < 650)
 					{ //should be less than 650ms
 		   	    		if((current_time - lastOutFinishedTime[i]) < 200){ //the sensors are pretty cose together so the time it takes to trigger on and then the other should be small.. ~200ms
 		   	     			inTotal++;
+							/*
 		   	     			printk("%lld", current_time);
 		   	     			printk(",");
 		   	     			printk("1\n");
+							*/
 		   	    	 	}else{
-		   	      		printk("%lld\n", current_time); 
+		   	      		//printk("%lld\n", current_time);
+						break; 
 		   	     		}
 		   	  		}else{
-		   	   		printk("%lld\n", current_time); 
+		   	   		//printk("%lld\n", current_time);
+					break; 
 		   	  		}
 		   		}           
 			}
-		 if((current_time - outSensorTime[i]) > debeebounce && checkStateOut[i] == 0)  //debounce OUT sensor
-		 {
-		   checkStateOut[i] = 1; //passed debounce         
-		   if(outSensorReading[i] == 1) //a bee just entered the sensor
-		   {
-		    	startOutReadingTime[i] = current_time;
-		   }
-		   if(outSensorReading[i] == 0)  //a bee just exits the sensor; that is, it was HIGH, now it is LOW (empty)
-		   {  
-		   		 lastOutFinishedTime[i] = current_time;
-		   		 outReadingTimeHigh[i] = (current_time- startOutReadingTime[i]); //this variable is how long the bee was present for
-		   		 printk("%i", i);
-		   		 printk(", OT ,");
-		   		 printk("%ld", outReadingTimeHigh[i]);
-		   		 printk(", ");        
-		   		 if((outReadingTimeHigh[i] < 600) && (inReadingTimeHigh[i] < 600)){ //should be less than 600ms
-		   		   	if((current_time - lastInFinishedTime[i]) < 200){ //the sensors are pretty cose together so this time should be small
-		   		     	outTotal++;
-		   		 		printk("%lld\n", current_time);
-		   		     	printk(",");
-		   		    	printk("1\n"); 
-		   		    }
+			if((current_time - outSensorTime[i]) > debeebounce && checkStateOut[i] == 0)  //debounce OUT sensor
+			{
+			  checkStateOut[i] = 1; //passed debounce         
+			  if(outSensorReading[i] == 1) //a bee just entered the sensor
+			  {
+			   	startOutReadingTime[i] = current_time;
+			  }
+			  if(outSensorReading[i] == 0)  //a bee just exits the sensor; that is, it was HIGH, now it is LOW (empty)
+			  {  
+			  		lastOutFinishedTime[i] = current_time;
+			  		outReadingTimeHigh[i] = (current_time- startOutReadingTime[i]); //this variable is how long the bee was present for
+				/*
+			  		printk("%i", i);
+			  		printk(", OT ,");
+			  		printk("%ld", outReadingTimeHigh[i]);
+			  		printk(", ");
+				*/        
+			  		if((outReadingTimeHigh[i] < 600) && (inReadingTimeHigh[i] < 600)) //should be less than 600ms
+				{ 
+			  		   	if((current_time - lastInFinishedTime[i]) < 200){ //the sensors are pretty cose together so this time should be small
+			  		     	outTotal++;
+						/*
+			  		 		printk("%lld\n", current_time);
+			  		     	printk(",");
+			  		    	printk("1\n");
+						*/ 
+			  			}
 					else{
-		   		    printk("%lld\n", current_time); 
-		   		   	}
-		   		}
-			else{
-		   	 	printk("%lld\n", current_time); 
-		   	}
-		    }          
-		 }        
+			  		    //printk("%lld\n", current_time);
+					break; 
+			  		   	}
+			  		}else{
+					printk("%lld\n", current_time); 
+			  		}
+			   }          
+			}        
 		}
 
 		k_busy_wait(15);   // debounce
 
 		if ((current_time - lastOutput) > outputDelay) 
 		{
-			printk("sending data\n");
+			//printk("sending data\n");
 			sendData(); 
 			lastOutput = current_time; 
 			inTotal = 0;
