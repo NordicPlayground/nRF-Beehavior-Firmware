@@ -10,9 +10,9 @@ The itsybitsy does not come with an onboard debugger, which is why a [nRF52840 D
 
 The underside of the adafruit itsybitsy nRF52840 includes **SWCLK** & **SWDIO** debug-interface pins, which needs to be soldered with wires and connected to the DK as shown [here](https://devzone.nordicsemi.com/f/nordic-q-a/14058/external-programming-using-nrf52-dk)
 
-_**NOTE**_ The SCK pinout on the PCB divides the voltage between the pinout for the itsybitsy and for the feather. To solve this issue, solder a wire between these holes as shown in the picture below.
+**NOTE** The SCK pinout on the PCB divides the voltage between the pinout for the itsybitsy and for the feather. To solve this issue, solder a wire between these holes as shown in the picture below.
 
-![Solder example](/pics/solder.png)
+![Solder example](https://github.com/NordicPlayground/nRF-Beehavior-Firmware/blob/master/bee_counter/pics/solder.jpg)
 
 
 ## How to build and flash
