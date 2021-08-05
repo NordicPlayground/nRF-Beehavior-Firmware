@@ -38,22 +38,35 @@
 #include <logging/log.h>
 
 #include "events/ble_event.h"
+#if defined(CONFIG_THINGY_ENABLE)
 #include "events/thingy_event.h"
+#endif
+#if defined(CONFIG_BEE_COUNTER_ENABLE)
 #include "events/bee_count_event.h"
+#endif
+#if defined(CONFIG_BROODMINDER_WEIGHT_ENABLE)
 #include "events/bm_w_event.h"
+#endif
 
 #include "led/led.h"
+
+
+#define MODULE central_module
+LOG_MODULE_REGISTER(MODULE, 4);
 
 /* ----------------------- Thingy declaration and initialization -------------------------
 This could probably be put in a central_module.h
 
 */
 static K_SEM_DEFINE(ble_ready, 0, 1);
+static K_SEM_DEFINE(peripheral_done, 0, 1);
+#if defined(CONFIG_BEE_COUNTER_ENABLE)
+static K_SEM_DEFINE(bee_count_done, 0, 1);
+#endif
+#if defined(CONFIG_THINGY_ENABLE)
 static K_SEM_DEFINE(temperature_received, 0, 1);
 static K_SEM_DEFINE(humidity_received, 0, 1);
 static K_SEM_DEFINE(air_pressure_received, 0, 1);
-static K_SEM_DEFINE(peripheral_done, 0, 1);
-static K_SEM_DEFINE(bee_count_done, 0, 1);
 
 bool configured = false;
 
@@ -62,17 +75,18 @@ uint8_t data_array[3];
 int32_t pressure_int;
 uint8_t pressure_float;
 
-#define MODULE central_module
-LOG_MODULE_REGISTER(MODULE, 4);
-
 static struct bt_conn *thingy_conn;
+#endif
 
+#if defined(CONFIG_BEE_COUNTER_ENABLE)
 static struct bt_conn *bee_conn;
 
 static struct bt_nus_client nus_client; //Handles communication for the bee_conn
+#endif
 
-K_SEM_DEFINE(service_ready, 0, 1)
+// K_SEM_DEFINE(service_ready, 0, 1)
 
+#if defined(CONFIG_THINGY_ENABLE)
 /* Thinghy advertisement UUID */
 #define BT_UUID_THINGY                                                         \
 	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
@@ -147,10 +161,10 @@ struct ble_tes_config_t
     struct ble_tes_color_config_t  color_config;
 };
 
-bool first = false;
-
 bool thingy_scan = true;
+#endif
 
+#if defined(CONFIG_BEE_COUNTER_ENABLE)
 static void bee_discovery_complete(struct bt_gatt_dm *dm,
 			       void *context)
 {
@@ -259,7 +273,9 @@ static int nus_client_init(void)
 	LOG_INF("NUS Client module initialized");
 	return err;
 }
+#endif
 
+#if defined(CONFIG_THINGY_ENABLE)
 /* -------------- Temperature headers and cb -------------------- */
 static void discovery_temperature_completed(struct bt_gatt_dm *disc, void *ctx);
 static void discovery_temperature_service_not_found(struct bt_conn *conn, void *ctx);
@@ -322,15 +338,18 @@ static struct bt_gatt_dm_cb discovery_orientation_cb = {
 // };
 
 /* ------------------------ Declaration of connection and gattp functions ----------------------*/
-static void connected(struct bt_conn *conn, uint8_t conn_err);
-static void disconnected(struct bt_conn *conn, uint8_t reason);
-static void security_changed(struct bt_conn *conn, bt_security_t level, enum bt_security_err err);
-
 static void discover_temperature_gattp(struct bt_conn *conn);
 static void discover_humidity_gattp(struct bt_conn *conn);
 static void discover_air_pressure_gattp(struct bt_conn *conn);
 static void discover_orientation_gattp(struct bt_conn *conn);
 // static void discover_battery_gattp(struct bt_conn *conn);
+#endif
+
+static void connected(struct bt_conn *conn, uint8_t conn_err);
+static void disconnected(struct bt_conn *conn, uint8_t reason);
+static void security_changed(struct bt_conn *conn, bt_security_t level, enum bt_security_err err);
+
+
 
 // ------------------ Connected struct
 static struct bt_conn_cb conn_callbacks = {
@@ -339,6 +358,7 @@ static struct bt_conn_cb conn_callbacks = {
 	.security_changed = security_changed
 };
 
+#if defined(CONFIG_BROODMINDER_WEIGHT_ENABLE)
 /* ----------------------- BM_W Initialization and declarations  -------------------------*/
 
 static struct k_work_delayable weight_interval;
@@ -353,11 +373,21 @@ static struct k_work_delayable temperature_interval;
 #define BROODMINDER_ADDR_TEMPERATURE ((bt_addr_le_t[]) { { 0, \
 			 { { 0x93, 0x05, 0x47, 0x16, 0x09, 0x06 } } } })
 
+#endif
 // // #define USE_BMW;
 // // #define USE_TEMPERATURE;
+
+#if defined(CONFIG_THINGY_ENABLE)
 static int scan_init(bool first);
+#endif
+#if defined(CONFIG_BROODMINDER_WEIGHT_ENABLE)
 static int scan_init_bm(bool first);
+#endif
+#if defined(CONFIG_BEE_COUNTER_ENABLE)
 static int bee_scan_init(bool first);
+#endif
+
+#if defined(CONFIG_THINGY_ENABLE)
 /* ------------------------- on received notifications ---------------------------------*/
 static uint8_t on_received_temperature(struct bt_conn *conn,
 			struct bt_gatt_subscribe_params *params,
@@ -963,6 +993,7 @@ static void discover_orientation_gattp(struct bt_conn *conn)
 // 	}
 // 	LOG_INF("Gatt battery DM started with code: %i\n", err);
 // }
+#endif
 
 static void exchange_func(struct bt_conn *conn, uint8_t err, struct bt_gatt_exchange_params *params)
 {
@@ -982,12 +1013,14 @@ static void connected(struct bt_conn *conn, uint8_t conn_err)
 	
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
+	#if defined(CONFIG_BROODMINDER_WEIGHT_ENABLE)
 	if(!strncmp(addr, "06:09:16:57:01:FD", 17)){
 		LOG_INF("connected(): Weight manually stopped from connecting");
 		int err = bt_conn_disconnect(conn, BT_HCI_ERR_REMOTE_USER_TERM_CONN);
 		LOG_INF("connected(): Bluetooth disconnected with error code: %i", err);
 		return;
 	}
+	#endif
 
 	if (conn_err) {
 		LOG_INF("connected(): Failed to connect to %s (%u). \n", addr, conn_err);
@@ -1003,6 +1036,7 @@ static void connected(struct bt_conn *conn, uint8_t conn_err)
 	LOG_INF("connected(): Connected: %.17s", log_strdup(addr));
 
 	if(conn_info.type){
+		#if defined(CONFIG_THINGY_ENABLE)
 		if(thingy_scan){
 			LOG_INF("connected(): Thingy:52	Connected.");
 			thingy_scan = false;
@@ -1014,6 +1048,8 @@ static void connected(struct bt_conn *conn, uint8_t conn_err)
 			discover_temperature_gattp(conn);
 		}
 		else{
+		#endif
+		#if defined(CONFIG_BEE_COUNTER_ENABLE)
 			LOG_INF("connected(): Bee Counter Connected.");
 	
 			static struct bt_gatt_exchange_params exchange_params;
@@ -1026,7 +1062,10 @@ static void connected(struct bt_conn *conn, uint8_t conn_err)
 
 			bee_conn = bt_conn_ref(conn);
 			gatt_discover(conn);
+		#endif
+		#if defined(CONFIG_THINGY_ENABLE)
 		}
+		#endif
 	}
 	else{
 		LOG_INF("connected(): Connected to central hub (91). \n");
@@ -1044,6 +1083,7 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
+	#if defined(CONFIG_BROODMINDER_WEIGHT_ENABLE)
 	if(!strncmp(addr, "06:09:16:57:01:FD", 17)){
 		
 		struct ble_event *bm_w_read = new_ble_event();
@@ -1053,6 +1093,7 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 		EVENT_SUBMIT(bm_w_read);
 		return;
 	}
+	#endif
 
 	LOG_INF("disconnected(): Bluetooth disconnection occured: %s (reason %u)\n", log_strdup(addr),	reason);
 	struct bt_conn_info conn_info;
@@ -1060,6 +1101,7 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 	bt_conn_get_info(conn, &conn_info);
 	// if(!strncmp(addr, "DF:91:24:65:5F:88", 17)){ // This must be change to not be hard coded
 	if(!conn_info.role){
+		#if defined(CONFIG_THINGY_ENABLE)
 		if(conn==thingy_conn){
 			LOG_INF("LED 1 toggled off. Thingy:52  disconnected. \n");
 			dk_set_led_off(LED_1);
@@ -1070,6 +1112,8 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 			scan_init(false);
 			//Start scan
 		}
+		#endif
+		#if defined(CONFIG_BEE_COUNTER_ENABLE)
 		if(conn==bee_conn){
 			LOG_INF("Bee Counter disconnected.");
 			bt_conn_unref(bee_conn);
@@ -1079,6 +1123,7 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 			bee_scan_init(false);
 			//Start scan
 		}
+		#endif
 	}
 	else{
 		LOG_INF("Hub/nRF91 disconnected.");
@@ -1101,6 +1146,7 @@ static void security_changed(struct bt_conn *conn, bt_security_t level,
 	}
 }
 
+#if defined(CONFIG_THINGY_ENABLE)
 static int scan_init(bool first)
 /* 
 Scan init (bool first); 
@@ -1126,7 +1172,9 @@ else: enable the filter.
 	LOG_INF("scan_init(): Scan module initialized. \n");
 	return err;
 }
+#endif
 
+#if defined(CONFIG_BROODMINDER_WEIGHT_ENABLE)
 static int scan_init_bm(bool first){
 	int err = 0;
 
@@ -1158,7 +1206,9 @@ static int scan_init_bm(bool first){
 	//LOG_INF("Scan module initialized\n");
     return err;
 }
+#endif
 
+#if defined(CONFIG_BEE_COUNTER_ENABLE)
 static int bee_scan_init(bool first)
 {
 	int err;
@@ -1180,7 +1230,7 @@ static int bee_scan_init(bool first)
 	LOG_INF("Scan module initialized.\n");
 	return err;
 }
-
+#endif
 
 static void auth_cancel(struct bt_conn *conn)
 {
@@ -1232,6 +1282,7 @@ static struct bt_conn_auth_cb conn_auth_callbacks = {
 	.pairing_failed = pairing_failed
 };
 
+#if defined(CONFIG_BROODMINDER_WEIGHT_ENABLE)
 static void ble_scan_start_fn(struct k_work *work)
 {
 	LOG_INF("Scanning for bm_w starting.");
@@ -1260,9 +1311,10 @@ static void ble_scan_start_fn(struct k_work *work)
 	// EVENT_SUBMIT(bm_w_read);
 	k_work_reschedule(&weight_interval ,K_MINUTES(1));
 }
+#endif
 
 /* ------------------------ main() -----------------------*/
-void thingy_module_thread_fn(void)
+void central_module_thread_fn(void)
 {
 	int err;
 	
@@ -1277,7 +1329,8 @@ void thingy_module_thread_fn(void)
 	}
 
 	bt_conn_cb_register(&conn_callbacks);
-
+	
+	#if defined(CONFIG_THINGY_ENABLE)
 	err = scan_init(true);
 	if(err){
 		LOG_INF("thingy_module_thread_fn(): Failed to initialize scan: %i.  \n", err);
@@ -1293,8 +1346,17 @@ void thingy_module_thread_fn(void)
 	LOG_INF("thingy_module_thread_fn(): Scanning for Thingy:52 with name Hive1: \n", BT_SCAN_FILTER_TYPE_NAME);
     // bm module thread fn sketch
 	LOG_INF("Waiting for thingy_done semaphore.");
-	k_sem_take(&peripheral_done, K_SECONDS(120));
+	#else
+	struct ble_event *thingy_ready = new_ble_event();
 
+	thingy_ready->type = THINGY_READY;
+
+	EVENT_SUBMIT(thingy_ready);
+	#endif
+
+	k_sem_take(&peripheral_done, K_SECONDS(120));
+		
+	#if defined(CONFIG_BEE_COUNTER_ENABLE)
 	LOG_INF("Starting scan for BeeCounter");
 	err = bee_scan_init(true);
 	if(err){
@@ -1314,7 +1376,10 @@ void thingy_module_thread_fn(void)
 
 	LOG_INF("STOP!... (Wait for peripheral_done semaphore)\n");
     k_sem_take(&bee_count_done, K_SECONDS(120));
-    LOG_INF("HAMMERTIME! (Thingy is ready) \n");
+	#endif
+	
+	#if defined(CONFIG_BROODMINDER_WEIGHT_ENABLE)
+    LOG_INF("HAMMERTIME! (Bee counter is ready) \n");
 
 	err = scan_init_bm(true);
 	if(err){
@@ -1339,8 +1404,10 @@ void thingy_module_thread_fn(void)
 	k_work_init_delayable(&weight_interval, ble_scan_start_fn);
 
 	k_work_reschedule(&weight_interval ,K_MINUTES(1));
+	#endif
 
-
+	
+	#if defined(CONFIG_THINGY_ENABLE)
 	for(;;){
 		k_sem_take(&temperature_received, K_FOREVER);
 		k_sem_take(&humidity_received, K_FOREVER);
@@ -1358,6 +1425,7 @@ void thingy_module_thread_fn(void)
 		LOG_INF("thingy_module_thread_fn(): thingy_send event submitted. \n");
 
 	}
+	#endif
 }
 
 static bool event_handler(const struct event_header *eh)
@@ -1382,8 +1450,8 @@ static bool event_handler(const struct event_header *eh)
 	return false;
 }
 
-K_THREAD_DEFINE(thingy_module_thread, 1024,
-		thingy_module_thread_fn, NULL, NULL, NULL,
+K_THREAD_DEFINE(central_module_thread, 1024,
+		central_module_thread_fn, NULL, NULL, NULL,
 		K_LOWEST_APPLICATION_THREAD_PRIO, 0, 0);
 
 
