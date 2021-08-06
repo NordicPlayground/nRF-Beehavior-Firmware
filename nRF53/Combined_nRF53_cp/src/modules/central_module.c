@@ -360,7 +360,6 @@ static struct bt_conn_cb conn_callbacks = {
 };
 
 #if defined(CONFIG_BROODMINDER_WEIGHT_ENABLE)
-#define BROODMINDER CONFIG_BROODMINDER_NAME
 /* ----------------------- BM_W Initialization and declarations  -------------------------*/
 
 static struct k_work_delayable weight_interval;
@@ -1351,7 +1350,7 @@ void central_module_thread_fn(void)
 	}
 
 	LOG_INF("thingy_module_thread_fn(): Scanning successfully started. \n");
-	LOG_INF("thingy_module_thread_fn(): Scanning for Thingy:52 with name %.*s: \n", strlen(THINGY), THINGY);
+	LOG_INF("thingy_module_thread_fn(): Scanning for Thingy:52: \n", strlen(THINGY), THINGY);
     // bm module thread fn sketch
 	LOG_INF("Waiting for thingy_done semaphore.");
 	#else
@@ -1405,7 +1404,7 @@ void central_module_thread_fn(void)
 		return;
 	}
 
-	LOG_INF("Scanning for %.*s succesfully started\n", strlen(BROODMINDER), BROODMINDER);
+	LOG_INF("Scanning for Broodminder succesfully started\n");
 	LOG_INF("LED 3 toggled while scanning for BM_Weight. \n");
 	dk_set_led_on(LED_3);
 	
