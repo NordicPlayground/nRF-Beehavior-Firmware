@@ -366,7 +366,8 @@ void main(void){
 					break; 
 			  		   	}
 			  		}else{
-					printk("%lld\n", current_time); 
+					//printk("%lld\n", current_time);
+					break;
 			  		}
 			   }          
 			}        
