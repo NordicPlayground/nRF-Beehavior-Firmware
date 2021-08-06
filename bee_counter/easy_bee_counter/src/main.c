@@ -352,7 +352,7 @@ void main(void){
 			  		printk(", ");
 				*/        
 			  		if((outReadingTimeHigh[i] < 600) && (inReadingTimeHigh[i] < 600)) //should be less than 600ms
-				{ 
+					{ 
 			  		   	if((current_time - lastInFinishedTime[i]) < 200){ //the sensors are pretty cose together so this time should be small
 			  		     	outTotal++;
 						/*
@@ -360,10 +360,9 @@ void main(void){
 			  		     	printk(",");
 			  		    	printk("1\n");
 						*/ 
-			  			}
-					else{
+			  			}else{
 			  		    //printk("%lld\n", current_time);
-					break; 
+						break; 
 			  		   	}
 			  		}else{
 					//printk("%lld\n", current_time);
