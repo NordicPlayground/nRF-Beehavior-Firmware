@@ -37,3 +37,4 @@ To build and flash using the Zephyr RTOS, make sure to have to necessary devicet
     > **Note:** Remember to test the IR LEDs **before** soldering the jumpers and the test registers **before** installing the headers for the gates. 
 
 
+

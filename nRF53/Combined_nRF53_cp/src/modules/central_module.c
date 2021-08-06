@@ -38,6 +38,8 @@
 #include <logging/log.h>
 
 #include "events/ble_event.h"
+#include "central_module.h"
+#include "led/led.h"
 #if defined(CONFIG_THINGY_ENABLE)
 #include "events/thingy_event.h"
 #endif
@@ -48,124 +50,124 @@
 #include "events/bm_w_event.h"
 #endif
 
-#include "led/led.h"
 
 
-#define MODULE central_module
-LOG_MODULE_REGISTER(MODULE, 4);
 
-/* ----------------------- Thingy declaration and initialization -------------------------
-This could probably be put in a central_module.h
+// #define MODULE central_module
+// LOG_MODULE_REGISTER(MODULE, 4);
 
-*/
-static K_SEM_DEFINE(ble_ready, 0, 1);
-static K_SEM_DEFINE(peripheral_done, 0, 1);
-#if defined(CONFIG_BEE_COUNTER_ENABLE)
-static K_SEM_DEFINE(bee_count_done, 0, 1);
-#endif
-#if defined(CONFIG_THINGY_ENABLE)
-static K_SEM_DEFINE(temperature_received, 0, 1);
-static K_SEM_DEFINE(humidity_received, 0, 1);
-static K_SEM_DEFINE(air_pressure_received, 0, 1);
+// /* ----------------------- Thingy declaration and initialization -------------------------
+// This could probably be put in a central_module.h
 
-bool configured = false;
+// */
+// static K_SEM_DEFINE(ble_ready, 0, 1);
+// static K_SEM_DEFINE(peripheral_done, 0, 1);
+// #if defined(CONFIG_BEE_COUNTER_ENABLE)
+// static K_SEM_DEFINE(bee_count_done, 0, 1);
+// #endif
+// #if defined(CONFIG_THINGY_ENABLE)
+// static K_SEM_DEFINE(temperature_received, 0, 1);
+// static K_SEM_DEFINE(humidity_received, 0, 1);
+// static K_SEM_DEFINE(air_pressure_received, 0, 1);
 
-uint8_t data_array[3];
+// bool configured = false;
 
-int32_t pressure_int;
-uint8_t pressure_float;
+// uint8_t data_array[3];
 
-static struct bt_conn *thingy_conn;
-#endif
+// int32_t pressure_int;
+// uint8_t pressure_float;
 
-#if defined(CONFIG_BEE_COUNTER_ENABLE)
-#define BEE_COUNTER CONFIG_BEE_COUNTER_NAME
+// static struct bt_conn *thingy_conn;
+// #endif
 
-static struct bt_conn *bee_conn;
+// #if defined(CONFIG_BEE_COUNTER_ENABLE)
+// #define BEE_COUNTER CONFIG_BEE_COUNTER_NAME
 
-static struct bt_nus_client nus_client; //Handles communication for the bee_conn
-#endif
+// static struct bt_conn *bee_conn;
+
+// static struct bt_nus_client nus_client; //Handles communication for the bee_conn
+// #endif
 
 // K_SEM_DEFINE(service_ready, 0, 1)
 
-#if defined(CONFIG_THINGY_ENABLE)
-#define THINGY CONFIG_THINGY_NAME
-/* Thinghy advertisement UUID */
-#define BT_UUID_THINGY                                                         \
-	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
-			    0x33, 0x49, 0x35, 0x9B, 0x00, 0x01, 0x68, 0xEF)
+// #if defined(CONFIG_THINGY_ENABLE)
+// #define THINGY CONFIG_THINGY_NAME
+// /* Thinghy advertisement UUID */
+// #define BT_UUID_THINGY                                                         \
+// 	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
+// 			    0x33, 0x49, 0x35, 0x9B, 0x00, 0x01, 0x68, 0xEF)
 
-/* Thingy Motion service UUID */
-#define BT_UUID_TMS                                                            \
-	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
-			    0x33, 0x49, 0x35, 0x9B, 0x00, 0x04, 0x68, 0xEF)
+// /* Thingy Motion service UUID */
+// #define BT_UUID_TMS                                                            \
+// 	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
+// 			    0x33, 0x49, 0x35, 0x9B, 0x00, 0x04, 0x68, 0xEF)
 
-/* Thingy Orientation characteristic UUID */
-#define BT_UUID_TOC                                                            \
-	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
-			    0x33, 0x49, 0x35, 0x9B, 0x03, 0x04, 0x68, 0xEF)
+// /* Thingy Orientation characteristic UUID */
+// #define BT_UUID_TOC                                                            \
+// 	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
+// 			    0x33, 0x49, 0x35, 0x9B, 0x03, 0x04, 0x68, 0xEF)
 
-// Thingy environment service - EF68xxxx-9B35-4933-9B10-52FFA9740042
-					/* Thingy Environment service UUID */
-#define BT_UUID_TES                                                            \
-	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
-			    0x33, 0x49, 0x35, 0x9B, 0x00, 0x02, 0x68, 0xEF)
+// /* Thingy environment service - EF68xxxx-9B35-4933-9B10-52FFA9740042 */
+// 					/* Thingy Environment service UUID */
+// #define BT_UUID_TES                                                            \
+// 	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
+// 			    0x33, 0x49, 0x35, 0x9B, 0x00, 0x02, 0x68, 0xEF)
 
-				// Thingy Temperature characteristic UUID
-#define BT_UUID_TTC                                                            \
-	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
-			    0x33, 0x49, 0x35, 0x9B, 0x01, 0x02, 0x68, 0xEF)
-
-
-				// Thingy Pressure characteristic UUID - 12 bytes
-#define BT_UUID_TPC                                                            \
-	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
-			    0x33, 0x49, 0x35, 0x9B, 0x02, 0x02, 0x68, 0xEF)
-
-				// Thingy Humidity characteristic UUID
-#define BT_UUID_THC                                                            \
-	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
-			    0x33, 0x49, 0x35, 0x9B, 0x03, 0x02, 0x68, 0xEF)
+// /*				Thingy Temperature characteristic UUID		*/
+// #define BT_UUID_TTC                                                            \
+// 	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
+// 			    0x33, 0x49, 0x35, 0x9B, 0x01, 0x02, 0x68, 0xEF)
 
 
-				// Thingy Environment Configuration characteristic UUID - 12 bytes
-#define BT_UUID_TECC                                                            \
-	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
-			    0x33, 0x49, 0x35, 0x9B, 0x06, 0x02, 0x68, 0xEF)
+// /*				Thingy Pressure characteristic UUID - 12 bytes			*/
+// #define BT_UUID_TPC                                                            \
+// 	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
+// 			    0x33, 0x49, 0x35, 0x9B, 0x02, 0x02, 0x68, 0xEF)
 
-				/* Thingy Environment User Interface UUID */
-#define BT_UUID_UIS                                                            \
-	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
-			    0x33, 0x49, 0x35, 0x9B, 0x00, 0x03, 0x68, 0xEF)
+// 		/*		Thingy Humidity characteristic UUID		*/
+// #define BT_UUID_THC                                                            \
+// 	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
+// 			    0x33, 0x49, 0x35, 0x9B, 0x03, 0x02, 0x68, 0xEF)
 
-				/* Thingy Environment LED UUID */
-#define BT_UUID_LED                                                            \
-	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
-			    0x33, 0x49, 0x35, 0x9B, 0x01, 0x03, 0x68, 0xEF)
 
-#define BT_UUID_BTRY                                                            \
-	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
-			    0x33, 0x49, 0x35, 0x9B, 0x0F, 0x18, 0x68, 0xEF)
+// 		/*		Thingy Environment Configuration characteristic UUID - 12 bytes */
+// #define BT_UUID_TECC                                                            \
+// 	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
+// 			    0x33, 0x49, 0x35, 0x9B, 0x06, 0x02, 0x68, 0xEF)
 
-struct ble_tes_color_config_t
-{
-    uint8_t  led_red;
-    uint8_t  led_green;
-    uint8_t  led_blue;
-};
+// 				/* Thingy Environment User Interface UUID */
+// #define BT_UUID_UIS                                                            \
+// 	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
+// 			    0x33, 0x49, 0x35, 0x9B, 0x00, 0x03, 0x68, 0xEF)
 
-struct ble_tes_config_t
-{
-    uint16_t                temperature_interval_ms;
-    uint16_t                pressure_interval_ms;
-    uint16_t                humidity_interval_ms;
-    uint16_t                color_interval_ms;
-    uint8_t                 gas_interval_mode;
-    struct ble_tes_color_config_t  color_config;
-};
+// 				/* Thingy Environment LED UUID */
+// #define BT_UUID_LED                                                            \
+// 	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
+// 			    0x33, 0x49, 0x35, 0x9B, 0x01, 0x03, 0x68, 0xEF)
 
-bool thingy_scan = true;
-#endif
+// #define BT_UUID_BTRY                                                            \
+// 	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
+// 			    0x33, 0x49, 0x35, 0x9B, 0x0F, 0x18, 0x68, 0xEF)
+
+// struct ble_tes_color_config_t
+// {
+//     uint8_t  led_red;
+//     uint8_t  led_green;
+//     uint8_t  led_blue;
+// };
+
+// struct ble_tes_config_t
+// {
+//     uint16_t                temperature_interval_ms;
+//     uint16_t                pressure_interval_ms;
+//     uint16_t                humidity_interval_ms;
+//     uint16_t                color_interval_ms;
+//     uint8_t                 gas_interval_mode;
+//     struct ble_tes_color_config_t  color_config;
+// };
+
+// bool thingy_scan = true;
+// #endif
 
 #if defined(CONFIG_BEE_COUNTER_ENABLE)
 static void bee_discovery_complete(struct bt_gatt_dm *dm,
@@ -203,11 +205,11 @@ static void bee_discovery_error(struct bt_conn *conn,
 	LOG_WRN("Error while discovering GATT database: (%d)", err);
 }
 
-struct bt_gatt_dm_cb bee_discovery_cb = {
-	.completed         = bee_discovery_complete,
-	.service_not_found = bee_discovery_service_not_found,
-	.error_found       = bee_discovery_error,
-};
+// struct bt_gatt_dm_cb bee_discovery_cb = {
+// 	.completed         = bee_discovery_complete,
+// 	.service_not_found = bee_discovery_service_not_found,
+// 	.error_found       = bee_discovery_error,
+// };
 
 /* -------------- Gatt discover for the Bee Counter -------------------- */
 static void gatt_discover(struct bt_conn *conn)
@@ -276,118 +278,103 @@ static int nus_client_init(void)
 }
 #endif
 
-#if defined(CONFIG_THINGY_ENABLE)
-/* -------------- Temperature headers and cb -------------------- */
-static void discovery_temperature_completed(struct bt_gatt_dm *disc, void *ctx);
-static void discovery_temperature_service_not_found(struct bt_conn *conn, void *ctx);
-static void discovery_temperature_error_found(struct bt_conn *conn, int err, void *ctx);
+// #if defined(CONFIG_THINGY_ENABLE)
+// /* -------------- Temperature headers and cb -------------------- */
+// static void discovery_temperature_completed(struct bt_gatt_dm *disc, void *ctx);
+// static void discovery_temperature_service_not_found(struct bt_conn *conn, void *ctx);
+// static void discovery_temperature_error_found(struct bt_conn *conn, int err, void *ctx);
 
-static struct bt_gatt_dm_cb discovery_temperature_cb = {
-	.completed = discovery_temperature_completed,
-	.service_not_found = discovery_temperature_service_not_found,
-	.error_found = discovery_temperature_error_found,
-};
-
-/* -------------- Humidity headers and cb -------------------- */
-static void discovery_humidity_completed(struct bt_gatt_dm *disc, void *ctx);
-static void discovery_humidity_service_not_found(struct bt_conn *conn, void *ctx);
-static void discovery_humidity_error_found(struct bt_conn *conn, int err, void *ctx);
-
-static struct bt_gatt_dm_cb discovery_humidity_cb = {
-	.completed = discovery_humidity_completed,
-	.service_not_found = discovery_humidity_service_not_found,
-	.error_found = discovery_humidity_error_found,
-};
-
-/* -------------- Air pressure discovery headers and cb --------------------*/
-static void discovery_air_pressure_completed(struct bt_gatt_dm *disc, void *ctx);
-static void discovery_air_pressure_service_not_found(struct bt_conn *conn, void *ctx);
-static void discovery_air_pressure_error_found(struct bt_conn *conn, int err, void *ctx);
-
-static struct bt_gatt_dm_cb discovery_air_pressure_cb = {
-	.completed = discovery_air_pressure_completed,
-	.service_not_found = discovery_air_pressure_service_not_found,
-	.error_found = discovery_air_pressure_error_found,
-};
-
-/* ------------------ Orientation headers and cb --------------------
-	This can be left out or used for alarm purposes, i.e "Notify when sensor is moving and trigger "hive has been
-	toppled"- alarm.
-
-*/
-static void discovery_orientation_completed(struct bt_gatt_dm *disc, void *ctx);
-static void discovery_orientation_service_not_found(struct bt_conn *conn, void *ctx);
-static void discovery_orientation_error_found(struct bt_conn *conn, int err, void *ctx);
-
-static struct bt_gatt_dm_cb discovery_orientation_cb = {
-	.completed = discovery_orientation_completed,
-	.service_not_found = discovery_orientation_service_not_found,
-	.error_found = discovery_orientation_error_found,
-};
-
-/* ------------------ Battery headers and cb --------------------
-	This can be left out or used for alarm purposes, i.e "Notify when battery level is low and trigger alarm"
-// */
-// static void discovery_battery_completed(struct bt_gatt_dm *disc, void *ctx);
-// static void discovery_battery_service_not_found(struct bt_conn *conn, void *ctx);
-// static void discovery_battery_error_found(struct bt_conn *conn, int err, void *ctx);
-
-// static struct bt_gatt_dm_cb discovery_battery_cb = {
-// 	.completed = discovery_battery_completed,
-// 	.service_not_found = discovery_battery_service_not_found,
-// 	.error_found = discovery_battery_error_found,
+// static struct bt_gatt_dm_cb discovery_temperature_cb = {
+// 	.completed = discovery_temperature_completed,
+// 	.service_not_found = discovery_temperature_service_not_found,
+// 	.error_found = discovery_temperature_error_found,
 // };
 
-/* ------------------------ Declaration of connection and gattp functions ----------------------*/
-static void discover_temperature_gattp(struct bt_conn *conn);
-static void discover_humidity_gattp(struct bt_conn *conn);
-static void discover_air_pressure_gattp(struct bt_conn *conn);
-static void discover_orientation_gattp(struct bt_conn *conn);
-// static void discover_battery_gattp(struct bt_conn *conn);
-#endif
+// /* -------------- Humidity headers and cb -------------------- */
+// static void discovery_humidity_completed(struct bt_gatt_dm *disc, void *ctx);
+// static void discovery_humidity_service_not_found(struct bt_conn *conn, void *ctx);
+// static void discovery_humidity_error_found(struct bt_conn *conn, int err, void *ctx);
 
-static void connected(struct bt_conn *conn, uint8_t conn_err);
-static void disconnected(struct bt_conn *conn, uint8_t reason);
-static void security_changed(struct bt_conn *conn, bt_security_t level, enum bt_security_err err);
+// static struct bt_gatt_dm_cb discovery_humidity_cb = {
+// 	.completed = discovery_humidity_completed,
+// 	.service_not_found = discovery_humidity_service_not_found,
+// 	.error_found = discovery_humidity_error_found,
+// };
+
+// /* -------------- Air pressure discovery headers and cb --------------------*/
+// static void discovery_air_pressure_completed(struct bt_gatt_dm *disc, void *ctx);
+// static void discovery_air_pressure_service_not_found(struct bt_conn *conn, void *ctx);
+// static void discovery_air_pressure_error_found(struct bt_conn *conn, int err, void *ctx);
+
+// static struct bt_gatt_dm_cb discovery_air_pressure_cb = {
+// 	.completed = discovery_air_pressure_completed,
+// 	.service_not_found = discovery_air_pressure_service_not_found,
+// 	.error_found = discovery_air_pressure_error_found,
+// };
+
+// /* ------------------ Orientation headers and cb --------------------
+// 	This can be left out or used for alarm purposes, i.e "Notify when sensor is moving and trigger "hive has been
+// 	toppled"- alarm.
+
+// */
+// static void discovery_orientation_completed(struct bt_gatt_dm *disc, void *ctx);
+// static void discovery_orientation_service_not_found(struct bt_conn *conn, void *ctx);
+// static void discovery_orientation_error_found(struct bt_conn *conn, int err, void *ctx);
+
+// static struct bt_gatt_dm_cb discovery_orientation_cb = {
+// 	.completed = discovery_orientation_completed,
+// 	.service_not_found = discovery_orientation_service_not_found,
+// 	.error_found = discovery_orientation_error_found,
+// };
+
+// /* ------------------------ Declaration of connection and gattp functions ----------------------*/
+// static void discover_temperature_gattp(struct bt_conn *conn);
+// static void discover_humidity_gattp(struct bt_conn *conn);
+// static void discover_air_pressure_gattp(struct bt_conn *conn);
+// static void discover_orientation_gattp(struct bt_conn *conn);
+// // static void discover_battery_gattp(struct bt_conn *conn);
+// #endif
+
+// static void connected(struct bt_conn *conn, uint8_t conn_err);
+// static void disconnected(struct bt_conn *conn, uint8_t reason);
+// static void security_changed(struct bt_conn *conn, bt_security_t level, enum bt_security_err err);
 
 
+// // ------------------ Connected struct
+// static struct bt_conn_cb conn_callbacks = {
+// 	.connected = connected,
+// 	.disconnected = disconnected,
+// 	.security_changed = security_changed
+// };
 
-// ------------------ Connected struct
-static struct bt_conn_cb conn_callbacks = {
-	.connected = connected,
-	.disconnected = disconnected,
-	.security_changed = security_changed
-};
+// #if defined(CONFIG_BROODMINDER_WEIGHT_ENABLE)
+// /* ----------------------- BM_W Initialization and declarations  -------------------------*/
 
-#if defined(CONFIG_BROODMINDER_WEIGHT_ENABLE)
-#define BROODMINDER CONFIG_BROODMINDER_NAME
-/* ----------------------- BM_W Initialization and declarations  -------------------------*/
+// static struct k_work_delayable weight_interval;
+// static struct k_work_delayable temperature_interval;
 
-static struct k_work_delayable weight_interval;
-static struct k_work_delayable temperature_interval;
+// // #define LOG_MODULE_NAME bm_w_module
+// // LOG_MODULE_REGISTER(LOG_MODULE_NAME, 4);
 
-// #define LOG_MODULE_NAME bm_w_module
-// LOG_MODULE_REGISTER(LOG_MODULE_NAME, 4);
+// #define REAL_TIME_WEIGHT 0x16
+// #define BROODMINDER_ADDR ((bt_addr_le_t[]) { { 0, \
+// 			 { { 0xFD, 0x01, 0x57, 0x16, 0x09, 0x06 } } } })
+// #define BROODMINDER_ADDR_TEMPERATURE ((bt_addr_le_t[]) { { 0, \
+// 			 { { 0x93, 0x05, 0x47, 0x16, 0x09, 0x06 } } } })
 
-#define REAL_TIME_WEIGHT 0x16
-#define BROODMINDER_ADDR ((bt_addr_le_t[]) { { 0, \
-			 { { 0xFD, 0x01, 0x57, 0x16, 0x09, 0x06 } } } })
-#define BROODMINDER_ADDR_TEMPERATURE ((bt_addr_le_t[]) { { 0, \
-			 { { 0x93, 0x05, 0x47, 0x16, 0x09, 0x06 } } } })
+// #endif
+// // // #define USE_BMW;
+// // // #define USE_TEMPERATURE;
 
-#endif
-// // #define USE_BMW;
-// // #define USE_TEMPERATURE;
-
-#if defined(CONFIG_THINGY_ENABLE)
-static int scan_init(bool first);
-#endif
-#if defined(CONFIG_BROODMINDER_WEIGHT_ENABLE)
-static int scan_init_bm(bool first);
-#endif
-#if defined(CONFIG_BEE_COUNTER_ENABLE)
-static int bee_scan_init(bool first);
-#endif
+// #if defined(CONFIG_THINGY_ENABLE)
+// static int scan_init(bool first);
+// #endif
+// #if defined(CONFIG_BROODMINDER_WEIGHT_ENABLE)
+// static int scan_init_bm(bool first);
+// #endif
+// #if defined(CONFIG_BEE_COUNTER_ENABLE)
+// static int bee_scan_init(bool first);
+// #endif
 
 #if defined(CONFIG_THINGY_ENABLE)
 /* ------------------------- on received notifications ---------------------------------*/
@@ -868,71 +855,6 @@ static void discovery_orientation_error_found(struct bt_conn *conn, int err, voi
 }
 
 
-// /* -------------------- Battery discovery functions ---------------------*/
-// static void discovery_battery_completed(struct bt_gatt_dm *disc, void *ctx)
-// {
-// 	int err;
-
-// 	/* Must be statically allocated */
-// 	static struct bt_gatt_subscribe_params param = {
-// 		.notify = on_received_battery,
-// 	};
-// 	param.value = BT_GATT_CCC_NOTIFY;
-
-// 	const struct bt_gatt_dm_attr *chrc;
-// 	const struct bt_gatt_dm_attr *desc;
-
-// 	chrc = bt_gatt_dm_char_by_uuid(disc, BT_UUID_BTRY);
-// 	if (!chrc) {
-// 		LOG_INF("Missing Thingy battery characteristic\n");
-// 		goto release;
-// 	}
-
-// 	desc = bt_gatt_dm_desc_by_uuid(disc, chrc, BT_UUID_BTRY);
-// 	if (!desc) {
-// 		LOG_INF("Missing Thingy battery char value descriptor\n");
-// 		goto release;
-// 	}
-
-// 	param.value_handle = desc->handle,
-
-// 	desc = bt_gatt_dm_desc_by_uuid(disc, chrc, BT_UUID_GATT_CCC);
-// 	if (!desc) {
-// 		LOG_INF("Missing Thingy battery char CCC descriptor\n");
-// 		goto release;
-// 	}
-
-// 	param.ccc_handle = desc->handle;
-
-// 	// if(!resubscribe){
-// 		err = bt_gatt_subscribe(bt_gatt_dm_conn_get(disc), &param);
-// 		if (err) {
-// 			LOG_INF("Subscribe to battery service failed (err %d)\n", err);
-// 		}
-
-// 	LOG_INF("Battery discovery completed\n");
-
-// release:
-// 	LOG_INF("Releasing battery discovery\n");
-// 	err = bt_gatt_dm_data_release(disc);
-// 	if (err) {
-// 		LOG_INF("Could not release battery discovery data, err: %d\n", err);
-// 	}
-	
-
-// }
-
-
-// static void discovery_battery_service_not_found(struct bt_conn *conn, void *ctx)
-// {
-// 	LOG_INF("Thingy battery service not found!\n");
-// }
-
-// static void discovery_battery_error_found(struct bt_conn *conn, int err, void *ctx)
-// {
-// 	LOG_INF("The battery discovery procedure failed, err %d\n", err);
-// }
-
 /* ----------------------- gattp functions ------------------------*/ 
 static void discover_temperature_gattp(struct bt_conn *conn)
 {
@@ -983,18 +905,6 @@ static void discover_orientation_gattp(struct bt_conn *conn)
 	LOG_INF("Gatt motion DM started with code: %i\n", err);
 }
 
-// static void discover_battery_gattp(struct bt_conn *conn)
-// {
-
-// 	int err;
-
-//     LOG_INF("Entering BTRY service bt_gatt_dm_start;\n");
-// 	err = bt_gatt_dm_start(conn, BT_UUID_BTRY, &discovery_battery_cb, NULL);
-// 	if (err) {
-// 		LOG_INF("Could not start battery service discovery, err %d\n", err);
-// 	}
-// 	LOG_INF("Gatt battery DM started with code: %i\n", err);
-// }
 #endif
 
 static void exchange_func(struct bt_conn *conn, uint8_t err, struct bt_gatt_exchange_params *params)
@@ -1181,13 +1091,6 @@ static int scan_init_bm(bool first){
 	int err = 0;
 
     LOG_INF("Changing filters. \n");
-	// if(first){
-	// 	err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, "47:05:93");
-	// 	if (err){
-	// 		LOG_INF("Filters cannot be set (err %d)\n", err);
-	// 		return err;
-	// 	}
-	// }
 
 	if(first){
 		err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_ADDR, BROODMINDER_ADDR);
@@ -1204,12 +1107,6 @@ static int scan_init_bm(bool first){
         LOG_INF("Filters cannot be turned on (err %d)\n", err);
         return err;
 	}
-
-	// err = bt_scan_filter_enable(BT_SCAN_NAME_FILTER, false);
-    // if (err) {
-    //     LOG_INF("Filters cannot be turned on (err %d)\n", err);
-    //     return err;
-	// }
 
 	//LOG_INF("Scan module initialized\n");
     return err;
@@ -1283,12 +1180,12 @@ static void pairing_failed(struct bt_conn *conn, enum bt_security_err reason)
 		reason);
 }
 
-static struct bt_conn_auth_cb conn_auth_callbacks = {
-	.cancel = auth_cancel,
-	.pairing_confirm = pairing_confirm,
-	.pairing_complete = pairing_complete,
-	.pairing_failed = pairing_failed
-};
+// static struct bt_conn_auth_cb conn_auth_callbacks = {
+// 	.cancel = auth_cancel,
+// 	.pairing_confirm = pairing_confirm,
+// 	.pairing_complete = pairing_complete,
+// 	.pairing_failed = pairing_failed
+// };
 
 #if defined(CONFIG_BROODMINDER_WEIGHT_ENABLE)
 static void ble_scan_start_fn(struct k_work *work)
@@ -1351,7 +1248,7 @@ void central_module_thread_fn(void)
 	}
 
 	LOG_INF("thingy_module_thread_fn(): Scanning successfully started. \n");
-	LOG_INF("thingy_module_thread_fn(): Scanning for Thingy:52 with name %.*s: \n", strlen(THINGY), THINGY);
+	LOG_INF("thingy_module_thread_fn(): Scanning for Thingy:52: \n", strlen(THINGY), THINGY);
     // bm module thread fn sketch
 	LOG_INF("Waiting for thingy_done semaphore.");
 	#else
@@ -1405,7 +1302,7 @@ void central_module_thread_fn(void)
 		return;
 	}
 
-	LOG_INF("Scanning for %.*s succesfully started\n", strlen(BROODMINDER), BROODMINDER);
+	LOG_INF("Scanning for Broodminder succesfully started\n");
 	LOG_INF("LED 3 toggled while scanning for BM_Weight. \n");
 	dk_set_led_on(LED_3);
 	
