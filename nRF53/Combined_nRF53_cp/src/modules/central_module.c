@@ -53,42 +53,42 @@
 
 
 
-#define MODULE central_module
-LOG_MODULE_REGISTER(MODULE, 4);
+// #define MODULE central_module
+// LOG_MODULE_REGISTER(MODULE, 4);
 
-/* ----------------------- Thingy declaration and initialization -------------------------
-This could probably be put in a central_module.h
+// /* ----------------------- Thingy declaration and initialization -------------------------
+// This could probably be put in a central_module.h
 
-*/
-static K_SEM_DEFINE(ble_ready, 0, 1);
-static K_SEM_DEFINE(peripheral_done, 0, 1);
-#if defined(CONFIG_BEE_COUNTER_ENABLE)
-static K_SEM_DEFINE(bee_count_done, 0, 1);
-#endif
-#if defined(CONFIG_THINGY_ENABLE)
-static K_SEM_DEFINE(temperature_received, 0, 1);
-static K_SEM_DEFINE(humidity_received, 0, 1);
-static K_SEM_DEFINE(air_pressure_received, 0, 1);
+// */
+// static K_SEM_DEFINE(ble_ready, 0, 1);
+// static K_SEM_DEFINE(peripheral_done, 0, 1);
+// #if defined(CONFIG_BEE_COUNTER_ENABLE)
+// static K_SEM_DEFINE(bee_count_done, 0, 1);
+// #endif
+// #if defined(CONFIG_THINGY_ENABLE)
+// static K_SEM_DEFINE(temperature_received, 0, 1);
+// static K_SEM_DEFINE(humidity_received, 0, 1);
+// static K_SEM_DEFINE(air_pressure_received, 0, 1);
 
-bool configured = false;
+// bool configured = false;
 
-uint8_t data_array[3];
+// uint8_t data_array[3];
 
-int32_t pressure_int;
-uint8_t pressure_float;
+// int32_t pressure_int;
+// uint8_t pressure_float;
 
-static struct bt_conn *thingy_conn;
-#endif
+// static struct bt_conn *thingy_conn;
+// #endif
 
-#if defined(CONFIG_BEE_COUNTER_ENABLE)
-#define BEE_COUNTER CONFIG_BEE_COUNTER_NAME
+// #if defined(CONFIG_BEE_COUNTER_ENABLE)
+// #define BEE_COUNTER CONFIG_BEE_COUNTER_NAME
 
-static struct bt_conn *bee_conn;
+// static struct bt_conn *bee_conn;
 
-static struct bt_nus_client nus_client; //Handles communication for the bee_conn
-#endif
+// static struct bt_nus_client nus_client; //Handles communication for the bee_conn
+// #endif
 
-K_SEM_DEFINE(service_ready, 0, 1)
+// K_SEM_DEFINE(service_ready, 0, 1)
 
 // #if defined(CONFIG_THINGY_ENABLE)
 // #define THINGY CONFIG_THINGY_NAME
@@ -205,11 +205,11 @@ static void bee_discovery_error(struct bt_conn *conn,
 	LOG_WRN("Error while discovering GATT database: (%d)", err);
 }
 
-struct bt_gatt_dm_cb bee_discovery_cb = {
-	.completed         = bee_discovery_complete,
-	.service_not_found = bee_discovery_service_not_found,
-	.error_found       = bee_discovery_error,
-};
+// struct bt_gatt_dm_cb bee_discovery_cb = {
+// 	.completed         = bee_discovery_complete,
+// 	.service_not_found = bee_discovery_service_not_found,
+// 	.error_found       = bee_discovery_error,
+// };
 
 /* -------------- Gatt discover for the Bee Counter -------------------- */
 static void gatt_discover(struct bt_conn *conn)
@@ -1180,12 +1180,12 @@ static void pairing_failed(struct bt_conn *conn, enum bt_security_err reason)
 		reason);
 }
 
-static struct bt_conn_auth_cb conn_auth_callbacks = {
-	.cancel = auth_cancel,
-	.pairing_confirm = pairing_confirm,
-	.pairing_complete = pairing_complete,
-	.pairing_failed = pairing_failed
-};
+// static struct bt_conn_auth_cb conn_auth_callbacks = {
+// 	.cancel = auth_cancel,
+// 	.pairing_confirm = pairing_confirm,
+// 	.pairing_complete = pairing_complete,
+// 	.pairing_failed = pairing_failed
+// };
 
 #if defined(CONFIG_BROODMINDER_WEIGHT_ENABLE)
 static void ble_scan_start_fn(struct k_work *work)
