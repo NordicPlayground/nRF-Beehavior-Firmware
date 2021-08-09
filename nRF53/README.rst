@@ -1,8 +1,3 @@
-.. _bluetooth-hci-lpuart-sample:
-
-Bluetooth: HCI low power UART
-#############################.. _asset_tracker_v2:
-
 nRF5340dk: Beehavior Monitoring
 #########################
 
@@ -22,8 +17,7 @@ This application introduces a set of new features, which are not present in the 
 * Batching of data - WIP! Data can be batched to reduce the number of messages transmitted, and to be able to retain collected data while the device is offline.
 * Configurable at run time - The application behavior (for example, accelerometer sensitivity or GPS timeout) can be configured at run time. This improves the development experience with individual devices or when debugging the device behavior in specific areas and situations. It also reduces the cost for transmitting data to the devices by reducing the frequency of sending firmware updates to the devices.
 
-Implementation of the above features required a rework of the existing samples.
-Hence, this application is not backward compatible to the :ref:`asset_tracker` application.
+Implementation of the above features required a rework of existing nrf samples and applications. Most noteworthy are the peripheral_uart and central_uart samples.
 
 .. note::
     The code is currently a work in progress and is not fully optimized yet. It will undergo changes and improvements in the future.
@@ -32,7 +26,7 @@ Overview
 ********
 
 The application initializes BLE and scan modules before scanning and connecting to up to 19 other devices.
-For now, the module scans for a Thingy:52 over UUID and connects with it and subscribes to the Thingy:52 environmental and motion services. 
+For now, the module scans for a Thingy:52 over NAME and connects with it and subscribes to the Thingy:52 environmental and motion services. 
 When connected, the nRF5340dk writes to the Thingy:52 to change the sample time and to toggle the lights off to reduce light pollution inside the hive.
 The nRF5340dk also scans for advertisements from a BroodMinder Weight, and reads weight measurements form the data message advertised. 
 This module can easily be scaled to include other BroodMinder products.
@@ -56,8 +50,8 @@ The application supports the following data types:
 
 +---------------+-------------------------------------------+-----------------------------------------------+
 | Data type     | Description                               | Identifiers                                   |
-+===============+============================+==============================================================+
-| Environmental | Temperature, humidity, air pressure       | APP_DATA_ENVIRONMENTAL (not yet identifiers)  |
++===============+===========================================+===============================================+
+| Environmental | Temperature, humidity and air pressure    | APP_DATA_ENVIRONMENTAL (not yet identifiers)  |
 +---------------+-------------------------------------------+-----------------------------------------------+
 | Movement      | Orientation                               | APP_DATA_MOVEMENT (not yet identifiers)       |
 +---------------+-------------------------------------------+-----------------------------------------------+
@@ -158,6 +152,7 @@ To set up the nrf5340dk part of the Beehavior Monitoring application to work, se
 
 Configuration options
 =====================
+Needs filling.
 
 
 Mandatory library configuration
@@ -168,6 +163,7 @@ You can set the mandatory library-specific Kconfig options in the :file:`prj.con
 
 Optional library configurations
 ===============================
+Needs filling?
 
 You can add the following optional configurations to configure the heap or to provide additional information such as APN to the modem for registering with an LTE network:
 
@@ -201,6 +197,7 @@ Building and running
 ********************
 
 Before building and running the firmware ensure that the Thingy:52 is set up and configured to a name recognized by the code used in the 53-unit.
+In the configuration used this summer the name is set to "Hive1". If this name is to be reused, change the name of the Thingy:52 in the Thingy-app to "Hive1".
 
 Building with overlays
 ======================
@@ -218,10 +215,10 @@ Testing
 After programming the application and all the prerequisites to your development kit, test the application by performing the following steps:
 
 1. |connect_kit|
-#. Connect to the kit with a terminal emulator (for example, LTE Link Monitor or Termite). See :ref:`lte_connect` for more information.
+#. Connect to the kit with a terminal emulator (for example, LTE Link Monitor or Termite).
 #. Reset the development kit.
 #. Observe in the terminal window that the development kit starts up in the Secure Partition Manager and that the application starts.
-   This is indicated by the following output::
+   This is indicated by several <inf> module_name: function_name(): "placeholder text" outputs, similar to the following example from asset_tracker_v2.
 
       *** Booting Zephyr OS build v2.4.0-ncs1-2616-g3420cde0e37b  ***
       <inf> event_manager: APP_EVT_START
@@ -253,12 +250,20 @@ After programming the application and all the prerequisites to your development 
     <wrn> data_module: No batch data to encode, ringbuffers empty
     <inf> event_manager: CLOUD_EVT_DATA_ACK
 
+The order should be something like:
+* Initialize BLE and scan.
+* Scan for Thingy:52 and connect (LED1 ON).
+* Discover services from Thingy:52.
+* Subscribe to notifications for a set of services.
+* Scan for Thingy:91 and connect either when notification is given OR 91 requests connection through scanning (LED2 ON).
+* Scan for BroodMinder Weight advertisements and read data message (LED3 ON/OFF while doing/not doing this).
+* Loop.
+
 Known issues and limitations
 ****************************
 
-There are probably mane issues and limitations, but this will take some time to write. The following text is kept as a template for writing this one.
+There are probably mane issues and limitations, but this will take some time to write. The following text is kept as a template for writing this one. Sample text for asset_tracker_v2 is kept as example.
 
-Enabling full support for nRF Cloud is currently a work in progress.
 Following are the current limitations in the nRF Cloud implementation of the Asset Tracker v2:
 
 * Data that is sampled by the device must ideally be addressed to the cloud-side device state and published in a single packet for regular device updates.
@@ -297,28 +302,10 @@ WIP TODO! Must be customized to fit this unit
 This application uses the following |NCS| libraries and drivers:
 
 * :ref:`event_manager`
-* :ref:`lib_aws_iot`
-* :ref:`lib_aws_fota`
-* :ref:`lib_azure_iot_hub`
-* :ref:`lib_azure_fota`
-* :ref:`lib_nrf_cloud`
-* :ref:`lib_nrf_cloud_fota`
-* :ref:`lib_nrf_cloud_agps`
-* :ref:`lib_date_time`
-* :ref:`lte_lc_readme`
-* :ref:`modem_info_readme`
-* :ref:`lib_download_client`
-* :ref:`lib_fota_download`
-
-It uses the following `sdk-nrfxlib`_ library:
-
-* :ref:`nrfxlib:nrf_modem`
 
 In addition, it uses the following sample:
 
 * :ref:`secure_partition_manager`
-
-.. _asset_tracker_v2_internal_modules:
 
 
 Thread usage
@@ -398,52 +385,3 @@ You can configure the heap memory by using the :option:`CONFIG_HEAP_MEM_POOL_SIZ
 The data management module that encodes data destined for cloud is the biggest consumer of heap memory.
 Therefore, when adjusting buffer sizes in the data management module, you must also adjust the heap accordingly.
 This avoids the problem of running out of heap memory in worst-case scenarios.
-
-
-.. contents::
-   :local:
-   :depth: 2
-
-The HCI low power UART sample is based on the :ref:`zephyr:bluetooth-hci-uart-sample` but is using the :ref:`uart_nrf_sw_lpuart` for HCI UART communication.
-
-Requirements
-************
-
-The sample supports the following development kit:
-
-.. table-from-rows:: /includes/sample_board_rows.txt
-   :header: heading
-   :rows: nrf9160dk_nrf52840
-
-Overview
-********
-
-The sample implements the Bluetooth HCI controller using the :ref:`uart_nrf_sw_lpuart` for UART communication.
-
-Building and running
-********************
-
-.. |sample path| replace:: :file:`samples/bluetooth/hci_lpuart`
-
-.. include:: /includes/build_and_run.txt
-
-Programming the sample
-======================
-
-To program the nRF9160 development kit with the sample:
-
-1. Set the **SW10** switch, marked as debug/prog, in the **NRF52** position.
-   In nRF9160 DK v0.9.0 and earlier, the switch is called **SW5**
-#. Build the :ref:`bluetooth-hci-lpuart-sample` sample for the nrf9160dk_nrf52840 build target and program the development kit with it.
-
-Testing
-=======
-
-The methodology to use to test this sample depends on the host application.
-
-Dependencies
-************
-
-This sample uses the following |NCS| driver:
-
-* :ref:`uart_nrf_sw_lpuart`
