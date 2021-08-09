@@ -387,6 +387,7 @@ static uint8_t on_received_temperature(struct bt_conn *conn,
 			data_array[0] = ((uint8_t *)data)[0];
 			data_array[1] = ((uint8_t *)data)[1];
 			k_sem_give(&temperature_received);
+			LOG_INF("K give temperature");
 		}
 		LOG_INF("Temperature [Celsius]: %d,%d, \n", ((uint8_t *)data)[0], ((uint8_t *)data)[1]);
 
@@ -404,6 +405,7 @@ static uint8_t on_received_humidity(struct bt_conn *conn,
 		if(configured){
 			data_array[2] = ((uint8_t *)data)[0];
 			k_sem_give(&humidity_received);
+			LOG_INF("K give humidity");
 		}
 		LOG_INF("Relative humidity [%%]: %d \n", ((uint8_t *)data)[0]);
 
@@ -422,6 +424,7 @@ static uint8_t on_received_air_pressure(struct bt_conn *conn,
 			pressure_int = ((int32_t *)data)[0];
 			pressure_float = ((uint8_t *)data)[1];
 			k_sem_give(&air_pressure_received);
+			LOG_INF("K give air");
 		}
 		LOG_INF("Air Pressure [hPa]: %d,%d \n", ((int32_t *)data)[0], ((uint8_t *)data)[1]);
 		// LOG_INF("Air Pressure [hPa]: %d,%d \n", pressure_int, pressure_float);
@@ -1279,8 +1282,8 @@ void central_module_thread_fn(void)
 		return;
 	}
 
-	LOG_INF("STOP!... (Wait for peripheral_done semaphore)\n");
-    k_sem_take(&bee_count_done, K_SECONDS(120));
+	LOG_INF("STOP!... (Wait for bee_count_done semaphore)\n");
+    k_sem_take(&bee_count_done, K_SECONDS(30));
 	#endif
 	
 	#if defined(CONFIG_BROODMINDER_WEIGHT_ENABLE)
@@ -1299,7 +1302,6 @@ void central_module_thread_fn(void)
 		LOG_INF("Scanning for bm_w failed to start (err %d)\n", err);
 		LOG_INF("LED 3 toggled off.\n");
 		dk_set_led_off(LED_3);
-		return;
 	}
 
 	LOG_INF("Scanning for Broodminder succesfully started\n");
@@ -1314,6 +1316,7 @@ void central_module_thread_fn(void)
 	
 	#if defined(CONFIG_THINGY_ENABLE)
 	for(;;){
+		LOG_INF("Waiting for k_sem_take Thingy measurments");
 		k_sem_take(&temperature_received, K_FOREVER);
 		k_sem_take(&humidity_received, K_FOREVER);
 		k_sem_take(&air_pressure_received, K_FOREVER);
