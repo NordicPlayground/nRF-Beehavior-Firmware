@@ -143,92 +143,28 @@ These options can be used to enable and disable modules and modify their behavio
 
 Setup
 =====
-
+Config
+------
 Maybe write something here? 
 
 Setting up the 5340dk part of Beehavior Monitoring
-------------------------------------------
+--------------------------------------------------
 
-To set up the application to work, see the following documentation:
+To set up the nrf5340dk part of the Beehavior Monitoring application to work, see the following steps:
+* Enable the peripheral sensors available for your setup
+* Change the name in the Thingy mobile application and set the same name in Kconfig as a scan parameter.
+* Set the name of the nRF5340dk to the same as the name the 91 unit scans for in prj.conf
 
-* nRF Cloud - `Creating an nRF Cloud account`_ and `Connecting your device to nRF Cloud`_.
-* AWS IoT Core - `Getting started guide for nRF Asset Tracker for AWS`_
-* Azure IoT Hub - `Getting started guide for nRF Asset Tracker for Azure`_
-
-For every cloud service that is supported by this application, you must configure the corresponding *cloud library* by setting certain mandatory Kconfig options that are specific to the cloud library.
-For more information, see :ref:`Cloud-specific mandatory Kconfig options <mandatory_config>`.
 
 Configuration options
 =====================
 
-Check and configure the following configuration options for the application:
-
-.. option:: CONFIG_ASSET_TRACKER_V2_APP_VERSION - Configuration for providing the application version
-
-   The application publishes its version number as a part of the static device data. The default value for the application version is ``0.0.0-development``. To configure the application version, set :option:`CONFIG_ASSET_TRACKER_V2_APP_VERSION` to the desired ``app-version``.
-
-.. option:: CONFIG_CLOUD_CLIENT_ID_USE_CUSTOM - Configuration for enabling the use of custom cloud client ID
-
-   This application configuration is used to enable the use of custom client ID for the respective cloud. By default, the application uses the IMEI of the nRF9160-based device as the client ID in the cloud connection.
-
-.. option:: CLOUD_CLIENT_ID - Configuration for providing a custom cloud client ID
-
-   This application configuration sets a custom client ID for the respective cloud. For setting a custom client ID, you need to set :option:`CONFIG_CLOUD_CLIENT_ID_USE_CUSTOM` to ``y``.
-
-
-.. _default_config_values:
-
-The default values for the device configuration parameters can be set by manipulating the following configurations:
-
-.. option:: CONFIG_DATA_DEVICE_MODE - Configuration for the device mode
-
-   This application configuration sets the device mode.
-
-.. option:: CONFIG_DATA_ACTIVE_TIMEOUT_SECONDS - Configuration for Active mode
-
-   This application configuration sets the Active mode timeout value.
-
-.. option:: CONFIG_DATA_MOVEMENT_RESOLUTION_SECONDS - Configuration for Movement resolution
-
-   This configuration sets the Movement resolution timeout value.
-
-.. option:: CONFIG_DATA_MOVEMENT_TIMEOUT_SECONDS - Configuration for Movement timeout
-
-   This configuration sets the Movement timeout value.
-
-.. option:: CONFIG_DATA_ACCELEROMETER_THRESHOLD - Configuration for Accelerometer threshold
-
-   This configuration sets the Accelerometer threshold value.
-
-.. option:: CONFIG_DATA_GPS_TIMEOUT_SECONDS - Configuration for GPS timeout
-
-   This configuration sets the GPS timeout value.
-
-
-.. _mandatory_config:
 
 Mandatory library configuration
 ===============================
 
 You can set the mandatory library-specific Kconfig options in the :file:`prj.conf` file of the application.
 
-Configurations for AWS IoT library
-----------------------------------
-
-* :option:`CONFIG_AWS_IOT_BROKER_HOST_NAME`
-* :option:`CONFIG_AWS_IOT_SEC_TAG`
-
-
-Configurations for Azure IoT Hub library
-----------------------------------------
-
-* :option:`CONFIG_AZURE_IOT_HUB_DPS_HOSTNAME`
-* :option:`CONFIG_AZURE_IOT_HUB_DPS_ID_SCOPE`
-* :option:`CONFIG_AZURE_IOT_HUB_SEC_TAG`
-* :option:`CONFIG_AZURE_FOTA_SEC_TAG`
-
-.. note:
-   The nRF Cloud library does not require any library-specific Kconfig options to be set.
 
 Optional library configurations
 ===============================
@@ -239,17 +175,12 @@ You can add the following optional configurations to configure the heap or to pr
 * :option:`CONFIG_PDN_DEFAULTS_OVERRIDE` - Used for manual configuration of the APN. Set the option to ``y`` to override the default PDP context configuration.
 * :option:`CONFIG_PDN_DEFAULT_APN` - Used for manual configuration of the APN. An example is ``apn.example.com``.
 
-The application supports Assisted GPS.
-To set the source of the A-GPS data, set the following options:
-
-* :option:`CONFIG_AGPS_SRC_SUPL` - Sets the external SUPL Client library as A-GPS data source. See the documentation on :ref:`supl_client_lib`.
-* :option:`CONFIG_AGPS_SRC_NRF_CLOUD` - Sets nRF Cloud as A-GPS data source. You must set nRF Cloud as the firmware cloud backend.
 
 Configuration files
 ===================
 
-The application provides predefined configuration files for typical use cases.
-You can find the configuration files in the :file:`applications/asset_tracker_v2/` directory.
+The application provides predefined configuration files for the summer project in 2021.
+You can find the configuration files in the :file:`nRF-Beehavior-Firmware/` directory.
 
 It is possible to build the application with overlay files for both DTS and Kconfig to override the default values for the board.
 The application contains examples of Kconfig overlays.
@@ -257,9 +188,9 @@ The application contains examples of Kconfig overlays.
 The following configuration files are available in the application folder:
 
 * :file:`prj.conf` - Configuration file common for all build targets
-* :file:`boards/thingy91_nrf9160ns.conf` - Configuration file specific for Thingy:91. The file is automatically merged with :file:`prj.conf` when you build for the ``thingy91_nrf9160ns`` build target.
-* :file:`overlay-low-power.conf` - Configuration file that achieves the lowest power consumption by disabling features  that consume extra power like LED control and logging.
-* :file:`overlay-debug.conf` - Configuration file that adds additional verbose logging capabilities to the application
+* :file:`boards/thingy53_nrf5340_cpuappns.conf` - Configuration file specific for Thingy:53. The file is automatically merged with :file:`prj.conf` when you build for the ``thingy53_nrf5340_cpuappns`` build target. This board might need some further work.
+* :file:`WIP! TO DO. overlay-low-power.conf` - Configuration file that achieves the lowest power consumption by disabling features  that consume extra power like LED control and logging.
+* :file:`WIP! TO DO. overlay-debug.conf` - Configuration file that adds additional verbose logging capabilities to the application
 
 Generally, Kconfig overlays have an ``overlay-`` prefix and a ``.conf`` extension.
 Board-specific configuration files are placed in the :file:`boards` folder and are named as :file:`<BOARD>.conf`.
@@ -269,33 +200,16 @@ When the DTS overlay filename matches the build target, the overlay is automatic
 Building and running
 ********************
 
-Before building and running the firmware ensure that the cloud side is set up.
-Also, the device must be provisioned and configured with the certificates according to the instructions for the respective cloud for the connection attempt to succeed.
-
-.. note::
-
-   This application supports :ref:`ug_bootloader`, which is disabled by default.
-   To enable the immutable bootloader, set ``CONFIG_SECURE_BOOT=y``.
-
-
-.. |sample path| replace:: :file:`applications/asset_tracker_v2`
-.. include:: /includes/build_and_run_nrf9160.txt
-
-.. external_antenna_note_start
-
-.. note::
-   For nRF9160 DK v0.15.0 and later, set the :option:`CONFIG_NRF9160_GPS_ANTENNA_EXTERNAL` option to ``y`` when building the application to achieve the best external antenna performance.
-
-.. external_antenna_note_end
+Before building and running the firmware ensure that the Thingy:52 is set up and configured to a name recognized by the code used in the 53-unit.
 
 Building with overlays
 ======================
 
 To build with Kconfig overlay, it must be based to the build system, as shown in the following example:
 
-``west build -b nrf9160dk_nrf9160ns -- -DOVERLAY_CONFIG=overlay-low-power.conf``
+``west build -b thingy53_nrf5340_cpuappns \ nrf5340dk_nrf5340_cpuappns -- -DOVERLAY_CONFIG=overlay-low-power.conf``. Note that this overlay is not yet created.
 
-The above command will build for nRF9160 DK using the configurations found in :file:`overlay-low-power.conf`, in addition to the configurations found in :file:`prj_nrf9160dk_nrf9160ns.conf`.
+The above command will build for Thingy:53 \ nRF5340 DK using the configurations found in :file:`overlay-low-power.conf`, in addition to the configurations found in :file:`thingy53_nrf5340_cpuappns.conf`.
 If some options are defined in both files, the options set in the overlay take precedence.
 
 Testing
@@ -304,7 +218,7 @@ Testing
 After programming the application and all the prerequisites to your development kit, test the application by performing the following steps:
 
 1. |connect_kit|
-#. Connect to the kit with a terminal emulator (for example, LTE Link Monitor). See :ref:`lte_connect` for more information.
+#. Connect to the kit with a terminal emulator (for example, LTE Link Monitor or Termite). See :ref:`lte_connect` for more information.
 #. Reset the development kit.
 #. Observe in the terminal window that the development kit starts up in the Secure Partition Manager and that the application starts.
    This is indicated by the following output::
@@ -342,7 +256,7 @@ After programming the application and all the prerequisites to your development 
 Known issues and limitations
 ****************************
 
-.. _nrf_cloud_limitations:
+There are probably mane issues and limitations, but this will take some time to write. The following text is kept as a template for writing this one.
 
 Enabling full support for nRF Cloud is currently a work in progress.
 Following are the current limitations in the nRF Cloud implementation of the Asset Tracker v2:
@@ -379,7 +293,7 @@ Following are the current limitations in the nRF Cloud implementation of the Ass
 
 Dependencies
 ************
-
+WIP TODO! Must be customized to fit this unit
 This application uses the following |NCS| libraries and drivers:
 
 * :ref:`event_manager`
@@ -406,32 +320,11 @@ In addition, it uses the following sample:
 
 .. _asset_tracker_v2_internal_modules:
 
-Internal modules
-****************
-
-The application has two types of modules:
-
-* Module with dedicated thread
-* Module without thread
-
-Every module has an event manager handler function, which subscribes to one or more event types.
-When an event is sent from a module, all subscribers receive that event in the respective handler, and acts on the event in the following ways:
-
-1. The event is converted into a message
-#. The event is either processed directly or queued.
-
-Modules may also receive events from other sources such as drivers and libraries.
-For instance, the cloud module will also receive events from the configured cloud backend.
-The event handler converts the events to messages.
-The messages are then queued in the case of the cloud module or processed directly in the case of modules that do not have a processing thread.
-
-.. figure:: /images/asset_tracker_v2_module_structure.svg
-    :alt: Event handling in modules
-
-    Event handling in modules
 
 Thread usage
 ============
+
+WIP TODO! Need to write the final iteration with either/and/or threads and workqueue.
 
 In addition to system threads, some modules have dedicated threads to process messages.
 Some modules receive messages that may potentially take an extended amount of time to process.
