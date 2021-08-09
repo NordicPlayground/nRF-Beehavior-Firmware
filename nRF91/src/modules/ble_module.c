@@ -173,6 +173,8 @@ static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
 			memcpy(ble_event->dyndata.data, data_array, 4);
 
 			memcpy(ble_event->address, log_strdup(addr), 17);
+			
+			memcpy(ble_event->name, log_strdup(name_array[(uint8_t)data[1]]), 20);
 
 			EVENT_SUBMIT(ble_event);
 		}
@@ -193,6 +195,8 @@ static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
 			memcpy(ble_event->dyndata.data, data_array, 8);
 
 			memcpy(ble_event->address, log_strdup(addr), 17);
+			
+			memcpy(ble_event->name, log_strdup(name_array[(uint8_t)data[1]]), 20);
 
 			EVENT_SUBMIT(ble_event);
 		}
@@ -213,9 +217,7 @@ static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
 
 			memcpy(ble_event->address, log_strdup(addr), 17);
 
-			LOG_INF("Checkpoint");
 			memcpy(ble_event->name, log_strdup(name_array[(uint8_t)data[1]]), 20);
-			LOG_INF("Checkpoint 2");
 
 			EVENT_SUBMIT(ble_event);
 			

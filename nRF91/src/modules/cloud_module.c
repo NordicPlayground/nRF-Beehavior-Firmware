@@ -465,8 +465,8 @@ static bool event_handler(const struct event_header *eh)
 
 					LOG_INF("Time: %d", ts);
 
-					err = snprintk(message, 100, "{\"appID\":\"BEE-CNT\"\"OUT\":\"%i\"\"IN\":\"%i\"\"TIME\":\"%lld\"}" \
-						, totalOut, totalIn, ts);
+					err = snprintk(message, 100, "{\"appID\":\"BEE-CNT\"\"OUT\":\"%i\"\"IN\":\"%i\"\"TIME\":\"%lld\"\"NAME\":\"%s\"}" \
+						, totalOut, totalIn, ts, event->name);
 					LOG_INF("Message formatted: %s, length: %i", message, err);
 				
 					struct cloud_msg msg = {
@@ -570,9 +570,9 @@ static bool event_handler(const struct event_header *eh)
 					// LOG_INF("Time: %lld", ts);
 					// LOG_INF("Time: %d", ts);
 
-					err = snprintk(message, 100, "{\"appID\":\"BM-W\"\"WEIGHTR\":\"%i.%i\"\"WEIGHTL\":\"%i.%i\"\"RTT\":\"%i.%i\"\"TEMP\":\"%i.%i\"\"TIME\":\"%lld\"}" \
+					err = snprintk(message, 100, "{\"appID\":\"BM-W\"\"WEIGHTR\":\"%i.%i\"\"WEIGHTL\":\"%i.%i\"\"RTT\":\"%i.%i\"\"TEMP\":\"%i.%i\"\"TIME\":\"%lld\"\"NAME\":\"%s\"}" \
 						, event->dyndata.data[0], event->dyndata.data[1], event->dyndata.data[2], event->dyndata.data[3], event->dyndata.data[4], event->dyndata.data[5] \
-						, event->dyndata.data[6], event->dyndata.data[7], ts);
+						, event->dyndata.data[6], event->dyndata.data[7], ts, event->name);
 					// err = snprintk(message, 100, "{\"TIME\":\"%lld\"}", ts);
 					LOG_INF("Message formatted: %s, length: %i", message, err);
 				
