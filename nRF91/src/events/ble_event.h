@@ -17,6 +17,7 @@ struct ble_event {
 
         /* Custom data fields. */
         char address[17];
+        char name[20];
         struct event_dyndata dyndata;
 
 };
