@@ -153,8 +153,6 @@ static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
 	if((char)data[0]=='*'){
 
 		strcpy(addr, address_array[(uint8_t)data[1]]);
-		LOG_INF("Checkpoint");
-		// strcpy(name, name_array[(uint8_t)data[1]]);
 		
 		if(len==6){	
 			
