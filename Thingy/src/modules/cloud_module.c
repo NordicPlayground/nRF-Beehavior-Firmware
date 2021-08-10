@@ -67,25 +67,40 @@ static void connect_work_fn(struct k_work *work)
 //Might be unnecessesary
 static void cloud_update_work_fn(struct k_work *work)
 {
-	// int err;
-
-	// if(!k_sem_count_get()){
-	// 	LOG_INF()
-	// 	return;
-	// }
-	LOG_INF("Does this ever get called?");
-
 	if (!cloud_connected) {
 		LOG_INF("Not connected to cloud, abort cloud publication");
+		k_work_reschedule(&cloud_update_work, K_SECONDS(30));
 		return;
 	}
+	int err;
 
-	/*LOG_INF("Publishing message: %s", log_strdup("Test"));
+	char buf[20];
+	enum at_cmd_state *response;
+	err = at_cmd_write(AT_CMD_VBAT, &buf, 20, response);
+
+	LOG_INF("%.20s, with code %i", buf, err);
+	char voltage[4];
+	for(uint8_t i=8; i<13; i++){
+		voltage[i-8] = buf[i];
+	}
+	LOG_INF("%.4s", voltage);
+
+	int64_t unix_time_ms = k_uptime_get();
+	err = date_time_now(&unix_time_ms);
+	int64_t divide = 1000;
+	int64_t ts = unix_time_ms / divide;
+
+	LOG_INF("Time: %d", ts);
+
+	char message[50];
+	int len = snprintk(message, 50, "{\"BAT\":\"%.4s\"\"TIME\":\"%lld\"}", voltage, ts);
+
+	LOG_INF("%.50s", message);
 
 	struct cloud_msg msg = {
 		.qos = CLOUD_QOS_AT_MOST_ONCE,
-		.buf = "{\"message\":\"Test!\"}",
-		.len = strlen("{\"message\":\"Test!\"}")
+		.buf = message,
+		.len = len
 	};
 
 	// When using the nRF Cloud backend data is sent to the message topic.
@@ -95,18 +110,14 @@ static void cloud_update_work_fn(struct k_work *work)
 	
 	msg.endpoint.type = CLOUD_EP_MSG; //For nRF Cloud
 	
-    //msg.endpoint.type = CLOUD_EP_STATE; //For the inferior Clouds
+	// //msg.endpoint.type = CLOUD_EP_STATE; //For the inferior Clouds
 
 	err = cloud_send(cloud_backend, &msg);
 	LOG_INF("Message sent with code %i", err);
 	if (err) {
 		LOG_ERR("cloud_send failed, error: %d", err);
 	}
-
-// #if defined(CONFIG_CLOUD_PUBLICATION_SEQUENTIAL)
-	k_work_schedule(&cloud_update_work,
-			K_SECONDS(10));
-// #endif*/
+	k_work_reschedule(&cloud_update_work, K_MINUTES(15));
 }
 
 void cloud_event_handler(const struct cloud_backend *const backend,
@@ -156,8 +167,8 @@ void cloud_event_handler(const struct cloud_backend *const backend,
         memcpy(cloud_event_ready->dyndata.data, log_strdup("Cloud ready"), strlen("Cloud ready"));
 
         EVENT_SUBMIT(cloud_event_ready);
-// #if defined(CONFIG_CLOUD_PUBLICATION_SEQUENTIAL)
-		k_work_reschedule(&cloud_update_work, K_NO_WAIT);
+// // #if defined(CONFIG_CLOUD_PUBLICATION_SEQUENTIAL)
+// 		k_work_reschedule(&cloud_update_work, K_NO_WAIT);
 // #endif
 		break;
 	case CLOUD_EVT_DISCONNECTED:
@@ -409,6 +420,7 @@ void cloud_setup_fn(void)
 	LOG_INF("Connecting to cloud");
 
 	k_work_schedule(&connect_work, K_NO_WAIT);
+	k_work_reschedule(&cloud_update_work, K_NO_WAIT);
 }
 static bool event_handler(const struct event_header *eh)
 {
