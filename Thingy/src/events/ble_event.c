@@ -5,7 +5,7 @@ static int log_ble_event(const struct event_header *eh, char *buf,
 {
         struct ble_event *event = cast_ble_event(eh);
 
-        return snprintf(buf, buf_len, "Address= %.17s, Message: %s", event->address,event->dyndata.data);
+        return snprintf(buf, buf_len, "Address: %.17s, Name:%.20s, Message: %s", event->address, event->name, event->dyndata.data);
 }
 
 EVENT_TYPE_DEFINE(ble_event,      /* Unique event name. */

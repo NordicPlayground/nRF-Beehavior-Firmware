@@ -1,7 +1,6 @@
 #include "event_manager.h"
 
 enum ble_event_type {
-        BLE_INIT,
 	BLE_READY,
 	BLE_CONNECTED,
 	BLE_DISCONNECTED,
@@ -18,6 +17,7 @@ struct ble_event {
 
         /* Custom data fields. */
         char address[17];
+        char name[20];
         struct event_dyndata dyndata;
 
 };
