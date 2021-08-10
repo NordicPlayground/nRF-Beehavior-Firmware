@@ -246,8 +246,6 @@ static struct k_work_delayable temperature_interval;
 			 { { 0x93, 0x05, 0x47, 0x16, 0x09, 0x06 } } } })
 
 #endif
-// // #define USE_BMW;
-// // #define USE_TEMPERATURE;
 
 #if defined(CONFIG_THINGY_ENABLE)
 static int scan_init(bool first);
