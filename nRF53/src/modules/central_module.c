@@ -285,9 +285,8 @@ static void discovery_write_to_led_completed(struct bt_gatt_dm *disc, void *ctx)
 	if (err) {
 		LOG_INF("Could not release write to led discovery data, err: %d\n", err);
 	}
-	
-
 }
+
 static void discovery_write_to_led_service_not_found(struct bt_conn *conn, void *ctx)
 {
 	LOG_INF("Thingy write service not found!\n");
@@ -297,12 +296,6 @@ static void discovery_write_to_led_error_found(struct bt_conn *conn, int err, vo
 {
 	LOG_INF("The write discovery procedure failed, err %d\n", err);
 }
-
-static struct bt_gatt_dm_cb discovery_write_to_led_cb = {
-	.completed = discovery_write_to_led_completed,
-	.service_not_found = discovery_write_to_led_service_not_found,
-	.error_found = discovery_write_to_led_error_found,
-};
 
 static void write_to_led_gattp(struct bt_conn *conn){
 	int err;
@@ -372,12 +365,6 @@ static void discovery_write_error_found(struct bt_conn *conn, int err, void *ctx
 {
 	LOG_INF("The write discovery procedure failed, err %d\n", err);
 }
-
-static struct bt_gatt_dm_cb discovery_write_cb = {
-	.completed = discovery_write_completed,
-	.service_not_found = discovery_write_service_not_found,
-	.error_found = discovery_write_error_found,
-};
 
 static void write_to_characteristic_gattp(struct bt_conn *conn){
 	int err;

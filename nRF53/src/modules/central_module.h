@@ -184,19 +184,44 @@ static struct bt_gatt_dm_cb discovery_battery_cb = {
 	.error_found = discovery_battery_error_found,
 };
 
+
+ /* -------------------------- write to led and write discovery callbscks --------------------*/
+static void discovery_write_to_led_completed(struct bt_gatt_dm *disc, void *ctx);
+static void discovery_write_to_led_service_not_found(struct bt_conn *conn, void *ctx);
+static void discovery_write_to_led_error_found(struct bt_conn *conn, int err, void *ctx);
+
+
+static struct bt_gatt_dm_cb discovery_write_to_led_cb = {
+	.completed = discovery_write_to_led_completed,
+	.service_not_found = discovery_write_to_led_service_not_found,
+	.error_found = discovery_write_to_led_error_found,
+};
+
+static void discovery_write_completed(struct bt_gatt_dm *disc, void *ctx);
+static void discovery_write_service_not_found(struct bt_conn *conn, void *ctx);
+static void discovery_write_error_found(struct bt_conn *conn, int err, void *ctx);
+
+static struct bt_gatt_dm_cb discovery_write_cb = {
+	.completed = discovery_write_completed,
+	.service_not_found = discovery_write_service_not_found,
+	.error_found = discovery_write_error_found,
+};
+
 /* ------------------------ Declaration of connection and gattp functions ----------------------*/
 static void discover_temperature_gattp(struct bt_conn *conn);
 static void discover_humidity_gattp(struct bt_conn *conn);
 static void discover_air_pressure_gattp(struct bt_conn *conn);
 static void discover_orientation_gattp(struct bt_conn *conn);
 static void discover_battery_gattp(struct bt_conn *conn);
+static void write_to_led_gattp(struct bt_conn *conn);
+static void write_to_characteristic_gattp(struct bt_conn *conn);
 
 static void connected(struct bt_conn *conn, uint8_t conn_err);
 static void disconnected(struct bt_conn *conn, uint8_t reason);
 static void security_changed(struct bt_conn *conn, bt_security_t level, enum bt_security_err err);
 
 
-// ------------------ Connected struct
+/* ------------------ Connected struct   ---------------------- */
 static struct bt_conn_cb conn_callbacks = {
 	.connected = connected,
 	.disconnected = disconnected,
