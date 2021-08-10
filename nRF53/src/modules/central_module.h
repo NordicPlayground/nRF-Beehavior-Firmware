@@ -92,10 +92,13 @@ K_SEM_DEFINE(service_ready, 0, 1)
 	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
 			    0x33, 0x49, 0x35, 0x9B, 0x01, 0x03, 0x68, 0xEF)
 
-#define BT_UUID_BTRY                                                            \
-	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
-			    0x33, 0x49, 0x35, 0x9B, 0x0F, 0x18, 0x68, 0xEF)
-
+				/*Thingy Battery service */
+#define BT_UUID_TBS                                                           \
+	BT_UUID_DECLARE_16(0x180F)
+				/*Thingy Battery characteristic */
+#define BT_UUID_TBC                                                            \
+	BT_UUID_DECLARE_16(0x2A19)
+	 
 
 struct ble_tes_color_config_t
 {
@@ -166,18 +169,59 @@ static struct bt_gatt_dm_cb discovery_orientation_cb = {
 	.error_found = discovery_orientation_error_found,
 };
 
+/* ------------------ Battery headers and cb --------------------
+	This can be left out or used for alarm purposes, i.e "Notify when sensor is moving and trigger "hive has been
+	toppled"- alarm.
+
+*/
+static void discovery_battery_completed(struct bt_gatt_dm *disc, void *ctx);
+static void discovery_battery_service_not_found(struct bt_conn *conn, void *ctx);
+static void discovery_battery_error_found(struct bt_conn *conn, int err, void *ctx);
+
+static struct bt_gatt_dm_cb discovery_battery_cb = {
+	.completed = discovery_battery_completed,
+	.service_not_found = discovery_battery_service_not_found,
+	.error_found = discovery_battery_error_found,
+};
+
+
+ /* -------------------------- write to led and write discovery callbscks --------------------*/
+static void discovery_write_to_led_completed(struct bt_gatt_dm *disc, void *ctx);
+static void discovery_write_to_led_service_not_found(struct bt_conn *conn, void *ctx);
+static void discovery_write_to_led_error_found(struct bt_conn *conn, int err, void *ctx);
+
+
+static struct bt_gatt_dm_cb discovery_write_to_led_cb = {
+	.completed = discovery_write_to_led_completed,
+	.service_not_found = discovery_write_to_led_service_not_found,
+	.error_found = discovery_write_to_led_error_found,
+};
+
+static void discovery_write_completed(struct bt_gatt_dm *disc, void *ctx);
+static void discovery_write_service_not_found(struct bt_conn *conn, void *ctx);
+static void discovery_write_error_found(struct bt_conn *conn, int err, void *ctx);
+
+static struct bt_gatt_dm_cb discovery_write_cb = {
+	.completed = discovery_write_completed,
+	.service_not_found = discovery_write_service_not_found,
+	.error_found = discovery_write_error_found,
+};
+
 /* ------------------------ Declaration of connection and gattp functions ----------------------*/
 static void discover_temperature_gattp(struct bt_conn *conn);
 static void discover_humidity_gattp(struct bt_conn *conn);
 static void discover_air_pressure_gattp(struct bt_conn *conn);
 static void discover_orientation_gattp(struct bt_conn *conn);
+static void discover_battery_gattp(struct bt_conn *conn);
+static void write_to_led_gattp(struct bt_conn *conn);
+static void write_to_characteristic_gattp(struct bt_conn *conn);
 
 static void connected(struct bt_conn *conn, uint8_t conn_err);
 static void disconnected(struct bt_conn *conn, uint8_t reason);
 static void security_changed(struct bt_conn *conn, bt_security_t level, enum bt_security_err err);
 
 
-// ------------------ Connected struct
+/* ------------------ Connected struct   ---------------------- */
 static struct bt_conn_cb conn_callbacks = {
 	.connected = connected,
 	.disconnected = disconnected,
