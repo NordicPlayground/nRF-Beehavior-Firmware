@@ -82,7 +82,7 @@ The sensor data used in the system so far can be seen in the following table:
 +-------------------------------------+-----------------------+----------------+------------------------+
 | BM_W - Temperature (external)       | Temperature in Celsius| ? bytes        | [Celsius]              |
 +-------------------------------------+-----------------------+----------------+------------------------+
-| BeeCounter -WIP! Flux of bees in/out| Flux in/out per minute| ? bytes        | [Bees/min]  🐝pm       |
+| BeeCounter -WIP! Flux of bees in/out| Flux in/out per minute| ? bytes        | [Bees/min]             |
 +-------------------------------------+-----------------------+----------------+------------------------+
 
 
