@@ -24,10 +24,6 @@
 
 #include <date_time.h>
 
-// #include <at.h>
-
-// static struct at_client at;
-
 LOG_MODULE_REGISTER(cloud_module, CONFIG_LOG_DEFAULT_LEVEL);
 
 static struct cloud_backend *cloud_backend;
@@ -64,6 +60,8 @@ static void connect_work_fn(struct k_work *work)
 		K_SECONDS(30));
 }
 
+
+//Might be unnecessesary
 static void cloud_update_work_fn(struct k_work *work)
 {
 	// int err;
@@ -179,9 +177,6 @@ void cloud_event_handler(const struct cloud_backend *const backend,
         struct cloud_event_abbr *cloud_event_abbr = new_cloud_event_abbr(evt->data.msg.len);
 
         cloud_event_abbr->type = CLOUD_RECEIVED;
-
-        // ble_event->address = address_temp;
-        //memcpy(ble_event->address, address_temp, 17);
 
         memcpy(cloud_event_abbr->dyndata.data, log_strdup(evt->data.msg.buf), evt->data.msg.len);
 
@@ -302,12 +297,10 @@ static void modem_configure(void)
 static void button_handler(uint32_t button_states, uint32_t has_changed)
 {
 	if (has_changed & button_states & DK_BTN1_MSK) {
-		// k_work_reschedule(&cloud_update_work, K_NO_WAIT);
 		
 		int err;
 
 		int64_t unix_time_ms = k_uptime_get();
-		// struct tm *date;
 		err = date_time_now(&unix_time_ms);
 		LOG_INF("Time: %d, error %i", unix_time_ms, err);
 		int64_t divide = 1000;
@@ -351,25 +344,15 @@ static void button_handler(uint32_t button_states, uint32_t has_changed)
 
         cloud_event_sleep->type = CLOUD_SLEEP;
 
-        // ble_event->address = address_temp;
-        //memcpy(ble_event->address, address_temp, 17);
-
         memcpy(cloud_event_sleep->dyndata.data, log_strdup("Cloud entering sleep mode"), strlen("Cloud entering sleep mode"));
 
         EVENT_SUBMIT(cloud_event_sleep);
 	}
 }
-//#endif
 
 void cloud_setup_fn(void)
 {
 	int err;
-	// int ms;
-	// err = date_time_now(&ms);
-	// LOG_INF("Time: %i, btw: %i", ms, err);
-
-	// time(&seconds);
-	// LOG_INF("Time: %lld", seconds);
 
 	err = dk_leds_init();
 	dk_set_leds_state(DK_ALL_LEDS_MSK, 0);
@@ -399,32 +382,8 @@ void cloud_setup_fn(void)
 	LOG_INF("Connecting to LTE network, this may take several minutes...");
 
 	k_sem_take(&lte_connected, K_FOREVER);
-	
-	// struct net_buf *buf;
-	// int len;	
-	// at.buf_max_len = 140U;
-	// at.buf = "+CCLK";
-
-	// buf = net_buf_alloc(&at_pool, K_FOREVER);
-	// zassert_not_null(buf, "Failed to get buffer");
-
-	// at_register(&at, at_resp, NULL);
-	// // len = strlen(example_data);
-
-	// // zassert_true(net_buf_tailroom(buf) >= len,
-	// // 	    "Allocated buffer is too small");
-	// strncpy((char *)buf->data, "+CCLK", 6);
-	// net_buf_add(buf, len);
-
-	// err = at_parse_input(&at, buf);
-	// LOG_INF("btw: %i", err);
 
 	date_time_update_async(NULL);
-
-	int64_t unix_time_ms = k_uptime_get();
-	// struct tm *date;
-	err = date_time_now(&unix_time_ms);
-	LOG_INF("Time: %i, error %i", unix_time_ms*1000, err);
 
 	LOG_INF("Connected to LTE network");
 	LOG_INF("Connecting to cloud");
@@ -503,24 +462,13 @@ static bool event_handler(const struct event_header *eh)
 					}
 					int32_t pressure_little_endian;
 
-					// memcpy(&pressure_big_endian, pressure_arr, sizeof(pressure_big_endian));
-					// printf("The number is %X,%i \n",pressure_big_endian,pressure_big_endian);
-
 					char reverse_press_arr[4];
 					for (uint8_t i = 0; i <=3; i++){
 						reverse_press_arr[i] = pressure_arr[3-i];
-						// printf("Index of reverse temp %i \n", i);
-						// printf("temp[i] after reversing: %X\n", reverse_press_arr[i]);
 					}
 
 					memcpy(&pressure_little_endian, reverse_press_arr, sizeof(pressure_little_endian));
-					
-					// printf("The number after reversing is %X,%i \n",pressure_little_endian,pressure_little_endian);
-
-					// int err = snprintf(data_string, 100, "Temperature [C]: %i,%i, Humidity [%%]: %i, Air Pressure [hPa]: %i,%i, ID: %i", \
-					// 			(uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4],(uint32_t)pressure_little_endian, (uint8_t)data[9], (uint8_t)data[1]);
-					// LOG_INF("Did it work? %i", err);
-
+				
 					char message[100]; 
 
 					int64_t unix_time_ms = k_uptime_get();
@@ -567,13 +515,9 @@ static bool event_handler(const struct event_header *eh)
 					int64_t divide = 1000;
 					int64_t ts = (int64_t)(unix_time_ms / divide);
 
-					// LOG_INF("Time: %lld", ts);
-					// LOG_INF("Time: %d", ts);
-
 					err = snprintk(message, 100, "{\"appID\":\"BM-W\"\"WEIGHTR\":\"%i.%i\"\"WEIGHTL\":\"%i.%i\"\"RTT\":\"%i.%i\"\"TEMP\":\"%i.%i\"\"TIME\":\"%lld\"\"NAME\":\"%s\"}" \
 						, event->dyndata.data[0], event->dyndata.data[1], event->dyndata.data[2], event->dyndata.data[3], event->dyndata.data[4], event->dyndata.data[5] \
 						, event->dyndata.data[6], event->dyndata.data[7], ts, event->name);
-					// err = snprintk(message, 100, "{\"TIME\":\"%lld\"}", ts);
 					LOG_INF("Message formatted: %s, length: %i", message, err);
 				
 					struct cloud_msg msg = {
@@ -582,11 +526,6 @@ static bool event_handler(const struct event_header *eh)
 						.len = strlen(message)
 					};
 					
-					// /* When using the nRF Cloud backend data is sent to the message topic.
-					// * This is in order to visualize the data in the web UI terminal.
-					// * For Azure IoT Hub and AWS IoT, messages are addressed directly to the
-					// * device twin (Azure) or device shadow (AWS).
-					// */
 					msg.endpoint.type = CLOUD_EP_MSG; //For nRF Cloud
 					
 					//msg.endpoint.type = CLOUD_EP_STATE; //For the inferior Clouds
@@ -599,35 +538,6 @@ static bool event_handler(const struct event_header *eh)
 					}
 					return false;
 				}
-				// // int strip = (event->dyndata.size==20) ? 0 : 2; 
-				// LOG_INF("Publishing message: %.*s", event->dyndata.size, event->dyndata.data);// %.*s", event->dyndata.size, event->dyndata.size
-				// char message[100]; 
-				// // err = snprintf(message, 100, "{\"payload\":{\"message\":\"%.*s\",\"address\":\"%.17s\"}}",event->dyndata.size-strip, event->dyndata.data, log_strdup(event->address));
-				// err = snprintf(message, 100, "{\"message\":\"%.*s\"}",event->dyndata.size, event->dyndata.data);
-				// LOG_INF("Message formatted: %s", message);
-				// LOG_INF("Returned: %i", err);
-				
-				// struct cloud_msg msg = {
-				// 	.qos = CLOUD_QOS_AT_MOST_ONCE,
-				// 	.buf = message,
-				// 	.len = strlen(message)
-				// };
-				
-				// /* When using the nRF Cloud backend data is sent to the message topic.
-				// * This is in order to visualize the data in the web UI terminal.
-				// * For Azure IoT Hub and AWS IoT, messages are addressed directly to the
-				// * device twin (Azure) or device shadow (AWS).
-				// */
-				// msg.endpoint.type = CLOUD_EP_MSG; //For nRF Cloud
-				
-				// //msg.endpoint.type = CLOUD_EP_STATE; //For the inferior Clouds
-
-				// err = cloud_send(cloud_backend, &msg);
-				// LOG_INF("Published message with code: %i", err);
-
-				// if (err) {
-				// 	LOG_ERR("cloud_send failed, error: %d", err);
-				// }
 			}
 			return false;
 		}
