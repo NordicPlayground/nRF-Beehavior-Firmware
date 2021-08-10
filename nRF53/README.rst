@@ -5,8 +5,7 @@ nRF5340dk: Beehavior Monitoring
    :local:
    :depth: 2
 
-The Beehavior Monitoring is a real-time configurable ultra-low power capable application for the nRF5340dk used in the
-Summer Project for 2021.
+The Beehavior Monitoring is a real-time configurable ultra-low power capable application for the nRF5340dk used in the Summer Project for 2021.
 
 This module is based on multiple nrf-samples, customized and merged to fit the project.
 It is a complete rework of the :ref:`asset_tracker` application.

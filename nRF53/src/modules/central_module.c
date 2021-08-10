@@ -229,6 +229,8 @@ static uint8_t on_received_battery(struct bt_conn *conn,
 			struct bt_gatt_subscribe_params *params,
 			const void *data, uint16_t length)
 {
+
+	
 	if (length > 0) {
 		LOG_INF("Battery charge: %x%%\n", ((uint8_t *)data)[0]);
 
@@ -806,7 +808,7 @@ static void connected(struct bt_conn *conn, uint8_t conn_err)
 		
 	LOG_INF("connected(): Connected: %.17s", log_strdup(addr));
 
-	if(conn_info.type){
+	if(!conn_info.role){
 		#if defined(CONFIG_THINGY_ENABLE)
 		if(thingy_scan){
 			LOG_INF("connected(): Thingy:52	Connected.");
@@ -835,7 +837,7 @@ static void connected(struct bt_conn *conn, uint8_t conn_err)
 			gatt_discover(conn);
 		#endif
 		#if defined(CONFIG_THINGY_ENABLE)
-		}
+}		
 		#endif
 	}
 	else{
@@ -1127,9 +1129,12 @@ void central_module_thread_fn(void)
 
 	err = bt_scan_start(BT_SCAN_TYPE_SCAN_ACTIVE);
 	if (err) {
-		LOG_ERR("Scanning failed to start (err %d)", err);
+		LOG_ERR("Scanning for BeeCounter failed to start (err %d)", err);
 		return;
 	}
+	LOG_INF("Scanning for BeeCounter succesfully started\n");
+	LOG_INF("LED 4 toggled while scanning for BeeCounter. \n");
+	dk_set_led_on(LED_4);
 
 	LOG_INF("STOP!... (Wait for bee_count_done semaphore)\n");
     k_sem_take(&bee_count_done, K_SECONDS(30));
