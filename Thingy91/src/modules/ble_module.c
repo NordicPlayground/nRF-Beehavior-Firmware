@@ -776,6 +776,10 @@ static bool event_handler(const struct event_header *eh)
 						EVENT_SUBMIT(ble_event);
 						return false;
 					}
+					if(!strcmp(message->valuestring, "Battery")){
+						scan_start(true);
+						return false;
+					}
 				}
 				return false;
 			}
