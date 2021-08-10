@@ -61,35 +61,13 @@ static struct k_work_delayable ble_scan_stop;
 
 #define STACKSIZE 2048
 
-/* UART payload buffer element size. */
-#define UART_BUF_SIZE 20
-
-#define KEY_PASSKEY_ACCEPT DK_BTN1_MSK
-#define KEY_PASSKEY_REJECT DK_BTN2_MSK
-
 #define NUS_WRITE_TIMEOUT K_MSEC(500)
-#define UART_WAIT_FOR_BUF_DELAY K_MSEC(50)
-#define UART_RX_TIMEOUT 50
-
-static const struct device *uart;
-static struct k_delayed_work uart_work;
 
 K_SEM_DEFINE(nus_write_sem, 0, 1);
-
-struct uart_data_t {
-	void *fifo_reserved;
-	uint8_t  data[UART_BUF_SIZE];
-	uint16_t len;
-};
-
-static K_FIFO_DEFINE(fifo_uart_tx_data);
-static K_FIFO_DEFINE(fifo_uart_rx_data);
 
 static struct bt_conn *default_conn;
 
 BT_CONN_CTX_DEF(conns, CONFIG_BT_MAX_CONN, sizeof(struct bt_nus_client));
-static bool routedMessage = false;
-static bool messageStart = true;
 
 #define BT_UUID_BEEHAVIOUR_MONITORING_VAL \
 	BT_UUID_128_ENCODE(0x6e400001, 0xb5b3, 0xf393, 0xe1a9, 0xe50e14dcea9e)
@@ -100,6 +78,8 @@ static bool messageStart = true;
 #define BROADCAST_INDEX 99
 
 char address_array[CONFIG_BT_MAX_CONN][BT_ADDR_LE_STR_LEN]; 
+char name_array[CONFIG_BT_MAX_CONN][20]; 
+char name_buffer[20];
 
 static void ble_scan_stop_fn(struct k_work *work)
 {
@@ -122,6 +102,8 @@ static void ble_scan_stop_fn(struct k_work *work)
 }
 
 void scan_start(bool start){
+
+	dk_set_led_on(DK_LED1);
 	int err = bt_scan_start(BT_SCAN_TYPE_SCAN_PASSIVE);
 
 	if (err) {
@@ -156,74 +138,92 @@ static void ble_data_sent(uint8_t err, const uint8_t *const data, uint16_t len)
 	}
 }
 
+
 static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
 {
 	LOG_INF("ble_data_received");
-	char data_string[100];
 	// char data_received[len];
 	char addr[BT_ADDR_LE_STR_LEN];
+	// char name[20];
 
-	LOG_INF("%i: %.*s", len, len, data);
+	LOG_INF("%.*s", len, data);
+
+	LOG_INF("Length: %i", len);
 
 	if((char)data[0]=='*'){
+
 		strcpy(addr, address_array[(uint8_t)data[1]]);
-		if(len==10){	
-			LOG_INF("WeightR: %i,%i, WeightL: %i,%i, RealTimeWeight: %i,%i, Temperature: %i,%i, received from %s, ID: %i", \
-					(uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint8_t)data[5], (uint8_t)data[6], (uint8_t)data[7],\
-					(uint8_t)data[8], (uint8_t)data[9], log_strdup(addr), (uint8_t)data[1]);
-
-			int err = snprintf(data_string, 100, "WeightR: %i,%i, WeightL: %i,%i, RealTimeWeight: %i,%i, Temperature: %i,%i, ID: %i", \
-					 (uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint8_t)data[5], (uint8_t)data[6], (uint8_t)data[7], \
-					 (uint8_t)data[8], (uint8_t)data[9], (uint8_t)data[1]);
-			LOG_INF("Did it work? %i", err);
-		}
-		if(len==11){	
-			char pressure_arr[4];
-		for (uint8_t i = 5; i <= 8; i++){
-			pressure_arr[i-5] = data[i];
-			// printf("index of temp: %i\n", i-5);
-			// printf("Address of this element: %pn \n",&pressure_arr[i-5]);
-			// printf("Value of element: %X\n", pressure_arr[i-5]);
-
-		}
-		// printf("\n"); 
-		// int32_t pressure_big_endian;//= (int32_t)temp;
-		int32_t pressure_little_endian;
-
-		// memcpy(&pressure_big_endian, pressure_arr, sizeof(pressure_big_endian));
-		// printf("The number is %X,%i \n",pressure_big_endian,pressure_big_endian);
-
-		char reverse_press_arr[4];
-		for (uint8_t i = 0; i <=3; i++){
-			reverse_press_arr[i] = pressure_arr[3-i];
-			// printf("Index of reverse temp %i \n", i);
-			// printf("temp[i] after reversing: %X\n", reverse_press_arr[i]);
-		}
-
-		memcpy(&pressure_little_endian, reverse_press_arr, sizeof(pressure_little_endian));
 		
-    	printf("The number after reversing is %X,%i \n",pressure_little_endian,pressure_little_endian);
+		if(len==6){	
+			
+			struct ble_event *ble_event = new_ble_event(4);
 
-			LOG_INF("Temperature [C]: %i,%i, Humidity [%%]: %i, Air Pressure [hPa]: %i,%i, received from %s, ID: %i", \
-						(uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4], (uint32_t)pressure_little_endian, (uint8_t)data[9], log_strdup(addr), (uint8_t)data[1]);
+			ble_event->type = BLE_RECEIVED;
 
-			int err = snprintf(data_string, 100, "Temperature [C]: %i,%i, Humidity [%%]: %i, Air Pressure [hPa]: %i,%i, ID: %i", \
-						(uint8_t)data[2], (uint8_t)data[3], (uint8_t)data[4],(uint32_t)pressure_little_endian, (uint8_t)data[9], (uint8_t)data[1]);
-			LOG_INF("Did it work? %i", err);
+			uint8_t data_array[4];
+			for(int i=0; i<4; i++){
+				data_array[i] = (uint8_t)data[i+2];
+				LOG_INF("%.02x", data_array[i]);
+			}
+
+			strcpy(addr, address_array[(uint8_t)data[1]]);
+
+			memcpy(ble_event->dyndata.data, data_array, 4);
+
+			memcpy(ble_event->address, log_strdup(addr), 17);
+			
+			memcpy(ble_event->name, log_strdup(name_array[(uint8_t)data[1]]), 20);
+
+			EVENT_SUBMIT(ble_event);
+		}
+		if(len==10){	
+			
+			struct ble_event *ble_event = new_ble_event(8);
+
+			ble_event->type = BLE_RECEIVED;
+
+			uint8_t data_array[8];
+			for(int i=0; i<8; i++){
+				data_array[i] = (uint8_t)data[i+2];
+				LOG_INF("%.02x", data_array[i]);
+			}
+
+			strcpy(addr, address_array[(uint8_t)data[1]]);
+
+			memcpy(ble_event->dyndata.data, data_array, 8);
+
+			memcpy(ble_event->address, log_strdup(addr), 17);
+			
+			memcpy(ble_event->name, log_strdup(name_array[(uint8_t)data[1]]), 20);
+
+			EVENT_SUBMIT(ble_event);
+		}
+		if(len==11){
+			struct ble_event *ble_event = new_ble_event(9);
+
+			ble_event->type = BLE_RECEIVED;
+
+			uint8_t data_array[9];
+			for(int i=0; i<9; i++){
+				data_array[i] = (uint8_t)data[i+2];
+				LOG_INF("%.02x", data_array[i]);
+			}
+
+			strcpy(addr, address_array[(uint8_t)data[1]]);
+
+			memcpy(ble_event->dyndata.data, data_array, 9);
+
+			memcpy(ble_event->address, log_strdup(addr), 17);
+
+			memcpy(ble_event->name, log_strdup(name_array[(uint8_t)data[1]]), 20);
+
+			EVENT_SUBMIT(ble_event);
+			
 		}
 	}
 	// LOG_INF("Received: %s", log_strdup(data_received));
 	// LOG_INF("From %s", log_strdup(addr));
-
-	struct ble_event *ble_event = new_ble_event(100);
-
-	ble_event->type = BLE_RECEIVED;
 	
-	memcpy(ble_event->address, log_strdup(addr), 17);
-
-	memcpy(ble_event->dyndata.data, data_string, 100);
-
-	EVENT_SUBMIT(ble_event);
 
 	return BT_GATT_ITER_CONTINUE;
 }
@@ -269,7 +269,8 @@ static void discovery_complete(struct bt_gatt_dm *dm,
 				char addr[BT_ADDR_LE_STR_LEN];
 				bt_addr_le_to_str(bt_conn_get_dst(nus->conn), addr, sizeof(addr));
 				strcpy(address_array[i], addr);
-				LOG_INF("Address %s, or %s added as number %i", log_strdup(address_array[i]), log_strdup(addr), i);
+				strcpy(name_array[i], name_buffer);
+				LOG_INF("Address %s, name %s added as number %i", log_strdup(address_array[i]), log_strdup(name_array[i]), i);
 				err = bt_nus_client_send(nus, message, length);
 				if (err) {
 					LOG_WRN("Failed to send data over BLE connection (err %d)", err);
@@ -374,6 +375,7 @@ static void connected(struct bt_conn *conn, uint8_t conn_err)
 		return;
 	}
 
+	dk_set_led_off(DK_LED2);
 	LOG_INF("Connected: %s", log_strdup(addr));
 
 	/*Allocate memory for this connection using the connection context library. For reference,
@@ -445,6 +447,7 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 		if(equal){
 			char empty[30] = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
 			strcpy(address_array[i], empty);
+			dk_set_led_on(DK_LED2);
 			LOG_INF("Connection %i removed", i);
 			scan_start(true);
 			return;
@@ -478,6 +481,22 @@ static struct bt_conn_cb conn_callbacks = {
 	.security_changed = security_changed
 };
 
+static bool data_cb(struct bt_data *data, void *user_data)
+{
+	char *connection_name = user_data;
+	uint8_t len;
+
+	switch (data->type) {
+	case BT_DATA_NAME_COMPLETE:
+		len = data->data_len;
+		memcpy(connection_name, data->data, len);
+		connection_name[len] = '\0';
+		return false;
+	default:
+		return true;
+	}
+}
+
 static void scan_filter_match(struct bt_scan_device_info *device_info,
 			      struct bt_scan_filter_match *filter_match,
 			      bool connectable)
@@ -485,6 +504,32 @@ static void scan_filter_match(struct bt_scan_device_info *device_info,
 	char addr[BT_ADDR_LE_STR_LEN];
 
 	bt_addr_le_to_str(device_info->recv_info->addr, addr, sizeof(addr));
+
+	uint8_t adv_data_type = net_buf_simple_pull_u8(device_info->adv_data);
+
+	/* Don't update weight value if the advertised data is a scan response */
+	if (adv_data_type != BT_DATA_NAME_COMPLETE){
+		LOG_INF("Scan response name complete");
+		char connection_name[20] = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+		LOG_INF("Length %i", device_info->adv_data->len);
+
+		for(int i=19; i<device_info->adv_data->len; i++){
+			LOG_INF("%i: %c", i, device_info->adv_data->data[i]);
+		}
+		for(int j=19; j<device_info->adv_data->len; j++){
+			connection_name[j-19] = device_info->adv_data->data[j];
+		}
+
+		// bt_data_parse((device_info->adv_data), data_cb, connection_name);
+
+		LOG_INF("%.*s", device_info->adv_data->len - 19, log_strdup(connection_name));
+
+		// name_buffer = connection_name;
+		strcpy(name_buffer, connection_name);
+
+		LOG_INF("%s", log_strdup(name_buffer));
+	}
+
 
 	LOG_INF("Filters matched. Address: %s connectable: %d",
 		log_strdup(addr), connectable);
@@ -516,16 +561,17 @@ static int scan_init(void)
 	bt_scan_init(&scan_init);
 	bt_scan_cb_register(&scan_cb);
 
-	char *name = "Andreas53Test";
+	// char *name = "Andreas53Test";
 	// char *name = "TeppanTest";
-	// err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_UUID, BT_UUID_BEEHAVIOUR_MONITORING_SERVICE);
-	err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, name);
+	err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_UUID, BT_UUID_BEEHAVIOUR_MONITORING_SERVICE);
+	// err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, name);
 	if (err) {
 		LOG_ERR("Scanning filters cannot be set (err %d)", err);
 		return err;
 	}
 
-	err = bt_scan_filter_enable(BT_SCAN_NAME_FILTER, false);
+	// err = bt_scan_filter_enable(BT_SCAN_NAME_FILTER, false);
+	err = bt_scan_filter_enable(BT_SCAN_UUID_FILTER, false);	
 	if (err) {
 		LOG_ERR("Filters cannot be turned on (err %d)", err);
 		return err;
@@ -605,9 +651,8 @@ static void module_thread_fn(void){
 		LOG_ERR("Failed to register authorization callbacks.");
 		return;
 	}
-	
+
 	err = bt_enable(NULL);
-	LOG_INF("Bluetooth init %d", err);
 	if (err) {
 		LOG_ERR("Bluetooth init failed (err %d)", err);
 		return;

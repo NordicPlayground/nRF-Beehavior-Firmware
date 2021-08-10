@@ -21,12 +21,11 @@
 
 #include "modules/ble_module.h"
 
+#include "battery_monitor/battery_monitor.h"
+
 #include "cJSON.h"
 
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/hci.h>
-
-LOG_MODULE_REGISTER(MODULE, 4);
+LOG_MODULE_REGISTER(MODULE, CONFIG_APPLICATION_MODULE_LOG_LEVEL);
 
 bool led_on;
 
@@ -130,15 +129,23 @@ static bool event_handler(const struct event_header *eh)
 
 void main(void)
 {	
-	// int err = dk_leds_init();
-	// dk_set_leds_state(DK_ALL_LEDS_MSK, 1);
-	// dk_set_led_on(DK_LED1);
-	// int err
-	// if (err) {
-	// 	LOG_ERR("Could not initialize leds, err code: %d\n", err);
-	// 	return err;
+	// int err;
+	// battery_monitor_init();
+	// if(err){
+	// 	LOG_INF("Couldn't init battery monitor: %i", err);
 	// }
-	LOG_INF("Main");
+	// uint8_t battery;
+	// err = battery_monitor_read(&battery);
+	// if(err){
+	// 	LOG_INF("Couldn't read battery monitor: %i", err);
+	// }
+	// LOG_INF("Battery: %i", battery);
+	
+	// int err;
+	// // if (err) {
+	// // 	LOG_ERR("Could not initialize leds, err code: %d\n", err);
+	// // 	return err;
+	// // }
 
 	if(event_manager_init()){
 		LOG_INF("Well this sucks");
@@ -146,12 +153,10 @@ void main(void)
 	else{
 		LOG_INF("All good");
 	}
-
-	// struct ble_event *ble_init = new_ble_event(0);
+	// struct ble_event *test;
 	// /*char test_string[17] ="Testing.........";
 	// test->address=test_string;*/
-	// ble_init->type = BLE_INIT;
-	// EVENT_SUBMIT(ble_init);
+	// EVENT_SUBMIT(test);
 }
 
 EVENT_LISTENER(app_module, event_handler);
