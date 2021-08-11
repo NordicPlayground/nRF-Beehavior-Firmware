@@ -5,17 +5,18 @@ nRF5340dk: Beehavior Monitoring THIS IS A COPY, MUST BE REWRITTEN INTO 9160 SPEC
    :local:
    :depth: 2
 
-The Beehavior Monitoring is a real-time configurable ultra-low power capable application for the nRF5340dk used in the
+The Beehavior Monitoring is a real-time configurable ultra-low power capable application for the nRF9160dk/Thingy:91 used in the
 Summer Project for 2021.
 
 This module is based on multiple nrf-samples, customized and merged to fit the project.
-It is a complete rework of the :ref:`asset_tracker` application.
+It is a complete rework of the :ref:`asset_tracker_v2` application.
 This application introduces a set of new features, which are not present in the :ref:`asset_tracker` application:
 
-* Multi-role feature - The nRF5340dk acts as a central to the peripheral sensors, and as a peripheral to the Cloud-unit with communication going both ways.
+* Multi-central feature - The nRF9160dk acts as a central to upto 20 peripheral sensors, each sensor corresponding to one hive.
+* Battery state notifications - Sends updates of the battery percentage and sends an alert when the battery is about to die.
 * Ultra-low power by design - WIP! The goal of the application is to design a greedy BLE transmission algorithm and preprocess sensor data before transmitting it to the cloud module highlights.
 * Batching of data - WIP! Data can be batched to reduce the number of messages transmitted, and to be able to retain collected data while the device is offline.
-* Configurable at run time - The application behavior (for example, accelerometer sensitivity or GPS timeout) can be configured at run time. This improves the development experience with individual devices or when debugging the device behavior in specific areas and situations. It also reduces the cost for transmitting data to the devices by reducing the frequency of sending firmware updates to the devices.
+* Configurable at run time - WIP! The application behavior (for example, accelerometer sensitivity or GPS timeout) can be configured at run time. This improves the development experience with individual devices or when debugging the device behavior in specific areas and situations. It also reduces the cost for transmitting data to the devices by reducing the frequency of sending firmware updates to the devices.
 
 Implementation of the above features required a rework of existing nrf samples and applications. Most noteworthy are the peripheral_uart and central_uart samples.
 
@@ -25,18 +26,17 @@ Implementation of the above features required a rework of existing nrf samples a
 Overview
 ********
 
-The application initializes BLE and scan modules before scanning and connecting to up to 19 other devices.
-For now, the module scans for a Thingy:52 over NAME and connects with it and subscribes to the Thingy:52 environmental and motion services. 
-When connected, the nRF5340dk writes to the Thingy:52 to change the sample time and to toggle the lights off to reduce light pollution inside the hive.
-The nRF5340dk also scans for advertisements from a BroodMinder Weight, and reads weight measurements form the data message advertised. 
-This module can easily be scaled to include other BroodMinder products.
-The nRF5340dk also connects to a cloud module (nRF9160dk/Thingy:91), and broadcasts sensordata and/or preprocessed data over NUS to the cloud module.
-As of now, this module supports only the configuration for one beehive.
+The application initializes the modem and connects to nRF Cloud, before scanning for the peripheral units by UUID. 
+When connecting to a peripheral it sends the peripheral an unique id and stores its name. That way the 9160 knows which unit it receives data from.
+The data received from the units is then sent to nRF Cloud with an AppID, the name of the hive/unit and a timestamp.
+The user can send commands to the 9160dk/Thingy:91 through the terminal in nRF Cloud.
+
+TODO add a list of the commands.
 
 Firmware architecture
 =====================
 
-The nRF5340dk part of Smarthive: Beehavior Monitoring has a modular structure, where each module has a defined scope of responsibility.
+The nRF9160dk/Thingy:91 part of Smarthive: Beehavior Monitoring has a modular structure, where each module has a defined scope of responsibility.
 The application makes use of the :ref:`event_manager` to distribute events between modules in the system.
 The event manager is used for all the communication between the modules.
 The final messages sent to the Cloud module of the project is arranged into a BLE data message which supports up to 20 bytes.
@@ -124,7 +124,7 @@ The application supports the following development kits:
 
 .. table-from-rows:: /includes/sample_board_rows.txt
    :header: heading
-   :rows: thingy53_nr5340_cpuappns, nrf5340dk_nrf5340_cpuappns
+   :rows: thingy91_nrf9160ns@1.0.0, nrf9160dk_nrf9160ns@1.0.0
 
 .. include:: /includes/spm.txt
 
@@ -141,24 +141,25 @@ Config
 ------
 Maybe write something here? 
 
-Setting up the 5340dk part of Beehavior Monitoring
+Setting up the nrf9160dk/Thingy:91 part of Beehavior Monitoring
 --------------------------------------------------
 
-To set up the nrf5340dk part of the Beehavior Monitoring application to work, see the following steps:
-* Enable the peripheral sensors available for your setup
-* Change the name in the Thingy mobile application and set the same name in Kconfig as a scan parameter.
-* Set the name of the nRF5340dk to the same as the name the 91 unit scans for in prj.conf
+To set up the nrf9160dk/Thingy:91 part of the Beehavior Monitoring application to work, see the following steps:
+* Make sure your Thingy:91/nRF9160dk is connected to your cloud account, see :ref:`asset_tracker_v2` for how to connect.
+* Set number of connections in prj.conf (CONFIG_BT_MAX_CONN).
+* Flash the :ref:`hci_lpuart` example to the thingy91_nrf52840@1.0.0/nrf9160dk_nrf52840@1.0.0 chip.
+* Build and flash to the thingy91_nrf9160ns@1.0.0/nrf9160dk_nrf9160ns@1.0.0
 
 
 Configuration options
 =====================
-Needs filling.
+CONFIG_BT_MAX_CONN
 
 
 Mandatory library configuration
 ===============================
 
-You can set the mandatory library-specific Kconfig options in the :file:`prj.conf` file of the application.
+CONFIG_BT_MAX_CONN
 
 
 Optional library configurations
@@ -196,8 +197,7 @@ When the DTS overlay filename matches the build target, the overlay is automatic
 Building and running
 ********************
 
-Before building and running the firmware ensure that the Thingy:52 is set up and configured to a name recognized by the code used in the 53-unit.
-In the configuration used this summer the name is set to "Hive1". If this name is to be reused, change the name of the Thingy:52 in the Thingy-app to "Hive1".
+Before building and running the firmware ensure that the 9160 unit is connected to your nRF Cloud account.
 
 Building with overlays
 ======================

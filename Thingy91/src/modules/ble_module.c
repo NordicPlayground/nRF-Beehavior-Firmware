@@ -777,7 +777,7 @@ static bool event_handler(const struct event_header *eh)
 						return false;
 					}
 					if(!strcmp(message->valuestring, "Battery")){
-						scan_start(true);
+						// Get battery from Thingy:52
 						return false;
 					}
 				}
