@@ -21,8 +21,6 @@
 
 #include "modules/ble_module.h"
 
-#include "battery_monitor/battery_monitor.h"
-
 #include "cJSON.h"
 
 LOG_MODULE_REGISTER(MODULE, CONFIG_APPLICATION_MODULE_LOG_LEVEL);
