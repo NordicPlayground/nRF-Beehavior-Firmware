@@ -234,6 +234,7 @@ static uint8_t on_received_battery(struct bt_conn *conn,
 	if (length > 0) {
 		LOG_INF("Battery charge: %x%%\n", ((uint8_t *)data)[0]);
 
+
 	} else {
 		LOG_INF("Battery notification with 0 length\n");
 	}
