@@ -225,14 +225,14 @@ static uint8_t on_received_orientation(struct bt_conn *conn,
 	return BT_GATT_ITER_CONTINUE;
 }
 
+
 static uint8_t on_received_battery(struct bt_conn *conn,
 			struct bt_gatt_subscribe_params *params,
 			const void *data, uint16_t length)
 {
 
-	
 	if (length > 0) {
-		LOG_INF("Battery charge: %x%%\n", ((uint8_t *)data)[0]);
+		LOG_INF("Battery charge: %i %%\n", ((uint8_t *)data)[0]);
 
 
 	} else {
@@ -254,9 +254,17 @@ void write_to_led_cb (struct bt_conn *conn, uint8_t err, struct bt_gatt_write_pa
 	EVENT_SUBMIT(thingy_ready);
 }
 
+// uint8_t read_cb (struct bt_conn *conn, uint8_t err,
+// 				    struct bt_gatt_read_params *params,
+// 				    const void *data, uint16_t length){
+
+// 	LOG_INF("Read callback started, %i, length: %i, offset: %i, handle: %i", err, length, params->offset, params->handle);
+
+// 	LOG_INF("Data: \n",  ((uint8_t *)data)[0]);
+// }
+
 static void discovery_write_to_led_completed(struct bt_gatt_dm *disc, void *ctx){
 	
-
 	uint8_t data[1] = {0x00};
 
 	const struct bt_gatt_dm_attr *chrc;
@@ -644,9 +652,17 @@ static void discovery_battery_completed(struct bt_gatt_dm *disc, void *ctx)
 	int err;
 
 	/* Must be statically allocated */
+	
 	static struct bt_gatt_subscribe_params param = {
 		.notify = on_received_battery,
 	};
+
+	// static struct bt_gatt_read_params read_params ={
+		
+	// };
+
+
+
 	param.value = BT_GATT_CCC_NOTIFY;
 
 	const struct bt_gatt_dm_attr *chrc;
@@ -681,6 +697,7 @@ static void discovery_battery_completed(struct bt_gatt_dm *disc, void *ctx)
 
 	LOG_INF("Battery discovery completed\n");
 
+
 release:
 	LOG_INF("Releasing battery discovery\n");
 	err = bt_gatt_dm_data_release(disc);
@@ -688,8 +705,12 @@ release:
 		LOG_INF("Could not release battery discovery data, err: %d\n", err);
 	}
 
-	write_to_characteristic_gattp(bt_gatt_dm_conn_get(disc));
 
+
+	// LOG_INF("Reading initial battery charge \n");
+	// uint8_t charge = bt_gatt_read(bt_gatt_dm_conn_get(disc), &param);
+	// LOG_INF("Initial battery charge = %i \n", charge);
+	write_to_characteristic_gattp(bt_gatt_dm_conn_get(disc));
 }
 
 
