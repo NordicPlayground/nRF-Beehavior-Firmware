@@ -232,11 +232,11 @@ static uint8_t on_received_battery(struct bt_conn *conn,
 {
 
 	if (length > 0) {
-		LOG_INF("Battery charge: %i %%\n", ((uint8_t *)data)[0]);
-
+		LOG_INF("on_received_battery(): Battery charge: %i %%\n", ((uint8_t *)data)[0]);
+		battery_charge = ((uint8_t *)data)[0];
 
 	} else {
-		LOG_INF("Battery notification with 0 length\n");
+		LOG_INF("on_received_battery(): Battery notification with 0 length\n");
 	}
 	return BT_GATT_ITER_CONTINUE;
 }
@@ -254,14 +254,20 @@ void write_to_led_cb (struct bt_conn *conn, uint8_t err, struct bt_gatt_write_pa
 	EVENT_SUBMIT(thingy_ready);
 }
 
-// uint8_t read_cb (struct bt_conn *conn, uint8_t err,
-// 				    struct bt_gatt_read_params *params,
-// 				    const void *data, uint16_t length){
-
-// 	LOG_INF("Read callback started, %i, length: %i, offset: %i, handle: %i", err, length, params->offset, params->handle);
-
-// 	LOG_INF("Data: \n",  ((uint8_t *)data)[0]);
-// }
+uint8_t read_cb (struct bt_conn *conn, uint8_t err,
+				    struct bt_gatt_read_params *params,
+				    const void *data, uint16_t length){
+						
+	if (length > 0){
+		// memcpy(&rx_buf, data, len_rx_buf);
+		LOG_INF("read_cb(): Battery charge: %d %%. \n ", ((uint8_t *)data)[0]);
+		battery_charge = ((uint8_t *)data)[0];
+		LOG_INF("read_cb(): Data length: %d. \n", length);
+	} else {
+		LOG_DBG("read_cb(): Read data with 0 length. \n");
+	}
+	return BT_GATT_ITER_CONTINUE;	
+}
 
 static void discovery_write_to_led_completed(struct bt_gatt_dm *disc, void *ctx){
 	
@@ -272,7 +278,7 @@ static void discovery_write_to_led_completed(struct bt_gatt_dm *disc, void *ctx)
 
 	chrc = bt_gatt_dm_char_by_uuid(disc, BT_UUID_LED);
 	if (!chrc) {
-		LOG_INF("Missing Thingy configuration characteristic\n");
+		LOG_INF("Missing Thingy configuration characteristic. \n");
 	}
 
 	desc = bt_gatt_dm_desc_by_uuid(disc, chrc, BT_UUID_LED);
@@ -657,11 +663,11 @@ static void discovery_battery_completed(struct bt_gatt_dm *disc, void *ctx)
 		.notify = on_received_battery,
 	};
 
-	// static struct bt_gatt_read_params read_params ={
-		
-	// };
-
-
+	static struct bt_gatt_read_params read_params = {
+		.func = read_cb,
+		.handle_count = 1,
+		.single.offset = 0,
+	};
 
 	param.value = BT_GATT_CCC_NOTIFY;
 
@@ -681,6 +687,9 @@ static void discovery_battery_completed(struct bt_gatt_dm *disc, void *ctx)
 	}
 
 	param.value_handle = desc->handle,
+	read_params.single.handle = desc->handle,
+	// read_params.single.handle = desc->handle; 
+	// read_params.by_uuid = desc->single.handle,
 
 	desc = bt_gatt_dm_desc_by_uuid(disc, chrc, BT_UUID_GATT_CCC);
 	if (!desc) {
@@ -699,17 +708,18 @@ static void discovery_battery_completed(struct bt_gatt_dm *disc, void *ctx)
 
 
 release:
+
+	LOG_INF("Reading initial battery charge \n");
+	battery_charge = bt_gatt_read(bt_gatt_dm_conn_get(disc), &read_params);
+	LOG_INF("Initial battery charge = %i \n", battery_charge);
+
 	LOG_INF("Releasing battery discovery\n");
 	err = bt_gatt_dm_data_release(disc);
 	if (err) {
 		LOG_INF("Could not release battery discovery data, err: %d\n", err);
 	}
 
-
-
-	// LOG_INF("Reading initial battery charge \n");
-	// uint8_t charge = bt_gatt_read(bt_gatt_dm_conn_get(disc), &param);
-	// LOG_INF("Initial battery charge = %i \n", charge);
+	
 	write_to_characteristic_gattp(bt_gatt_dm_conn_get(disc));
 }
 
@@ -1204,6 +1214,7 @@ void central_module_thread_fn(void)
 		thingy_send->data_array[2] = data_array[2];
 		thingy_send->pressure_int = pressure_int;
 		thingy_send->pressure_float = pressure_float;
+		thingy_send->battery_charge = battery_charge;
 
 		EVENT_SUBMIT(thingy_send);
 		LOG_INF("thingy_module_thread_fn(): thingy_send event submitted. \n");

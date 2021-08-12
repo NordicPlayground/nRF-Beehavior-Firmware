@@ -23,6 +23,7 @@ uint8_t data_array[3];
 
 int32_t pressure_int;
 uint8_t pressure_float;
+uint8_t battery_charge;
 
 static struct bt_conn *thingy_conn;
 #endif
@@ -174,6 +175,10 @@ static struct bt_gatt_dm_cb discovery_orientation_cb = {
 	toppled"- alarm.
 
 */
+
+// static struct bt_gatt_read_params read_params){
+
+// };
 static void discovery_battery_completed(struct bt_gatt_dm *disc, void *ctx);
 static void discovery_battery_service_not_found(struct bt_conn *conn, void *ctx);
 static void discovery_battery_error_found(struct bt_conn *conn, int err, void *ctx);
