@@ -262,6 +262,7 @@ uint8_t read_cb (struct bt_conn *conn, uint8_t err,
 		// memcpy(&rx_buf, data, len_rx_buf);
 		LOG_INF("read_cb(): Battery charge: %d %%. \n ", ((uint8_t *)data)[0]);
 		battery_charge = ((uint8_t *)data)[0];
+		// LOG_INF("read_cb(): Checking battery_charge: %i. \n", battery_charge);
 		LOG_INF("read_cb(): Data length: %d. \n", length);
 	} else {
 		LOG_DBG("read_cb(): Read data with 0 length. \n");
@@ -710,8 +711,8 @@ static void discovery_battery_completed(struct bt_gatt_dm *disc, void *ctx)
 release:
 
 	LOG_INF("Reading initial battery charge \n");
-	battery_charge = bt_gatt_read(bt_gatt_dm_conn_get(disc), &read_params);
-	LOG_INF("Initial battery charge = %i \n", battery_charge);
+	bt_gatt_read(bt_gatt_dm_conn_get(disc), &read_params);
+	// LOG_INF("Initial battery charge = %i \n", battery_charge);
 
 	LOG_INF("Releasing battery discovery\n");
 	err = bt_gatt_dm_data_release(disc);
