@@ -454,8 +454,8 @@ static bool event_handler(const struct event_header *eh)
 
 					LOG_INF("Time: %d", ts);
 
-					err = snprintk(message, 100, "{\"appID\":\"Thingy\"\"TEMP\":\"%i.%i\"\"HUMID\":\"%i\"\"AIR\":\"%d.%i\"\"TIME\":\"%lld\"\"NAME\":\"%s\"}" \
-						, event->dyndata.data[0], event->dyndata.data[1], event->dyndata.data[2], pressure_little_endian, event->dyndata.data[7], ts, event->name);
+					err = snprintk(message, 110, "{\"appID\":\"Thingy\"\"TEMP\":\"%i.%i\"\"HUMID\":\"%i\"\"AIR\":\"%d.%i\"\"BTRY\":\"%i\"\"TIME\":\"%lld\"\"NAME\":\"%s\"}" \
+						, event->dyndata.data[0], event->dyndata.data[1], event->dyndata.data[2], pressure_little_endian, event->dyndata.data[7],event->dyndata.data[8], ts, event->name);
 					LOG_INF("Message formatted: %s, length: %i", message, err);
 				
 					struct cloud_msg msg = {
