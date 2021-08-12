@@ -107,7 +107,7 @@ static void connected(struct bt_conn *conn, uint8_t err)
 
 	current_conn = bt_conn_ref(conn);
 
-	printk("Sending test data\n");
+	//printk("Sending test data\n");
 
 	// char msg[20];
 	// uint8_t length = snprintf(msg, 20, "%i,%i\n", outTotal, inTotal);
@@ -136,7 +136,6 @@ static struct bt_conn_cb conn_callbacks = {
 static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
 			  uint16_t len)
 {
-	int err;
 	char addr[BT_ADDR_LE_STR_LEN] = {0};
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, ARRAY_SIZE(addr));
@@ -152,10 +151,12 @@ static struct bt_nus_cb nus_cb = {
 };
 
 void sendData() {
+	
     printk("Total out: ");
     printk("%i", outTotal);
     printk("\n");
-    printk("Total in: %i\n", inTotal); 
+    printk("Total in: %i\n", inTotal);
+	 
     if(current_conn){
 		uint16_t msg[2] = {outTotal, inTotal};
 		bt_nus_send(current_conn, msg, sizeof(msg));
@@ -171,7 +172,7 @@ void main(void){
 		printk("BLE not enabled, %i\n", err);
 	}
 
-	printk("Bluetooth initialized");
+	//printk("Bluetooth initialized");
 
 	if (IS_ENABLED(CONFIG_SETTINGS)) {
 		settings_load();
@@ -188,8 +189,6 @@ void main(void){
 	if (err) {
 		printk("Advertising failed to start (err %d)", err);
 	}
-
-	//printk("Starting Nordic UART service example\n");
 
 	const struct device *spi_dev = device_get_binding("SPI_1");
 	const struct device * dev = device_get_binding("GPIO_0");
@@ -314,11 +313,11 @@ void main(void){
 		   	  		printk(", IT ,");
 		   	  		printk("%ld", inReadingTimeHigh[i]);
 		   	  		printk(", ");
-					*/    
+					*/   
 		   	  		if(outReadingTimeHigh[i] < 650 && inReadingTimeHigh[i] < 650)
 					{ //should be less than 650ms
 		   	    		if((current_time - lastOutFinishedTime[i]) < 200){ //the sensors are pretty cose together so the time it takes to trigger on and then the other should be small.. ~200ms
-		   	     			inTotal++;
+		   	     			outTotal++;
 							/*
 		   	     			printk("%lld", current_time);
 		   	     			printk(",");
@@ -345,21 +344,21 @@ void main(void){
 			  {  
 			  		lastOutFinishedTime[i] = current_time;
 			  		outReadingTimeHigh[i] = (current_time- startOutReadingTime[i]); //this variable is how long the bee was present for
-				/*
+					/*
 			  		printk("%i", i);
 			  		printk(", OT ,");
 			  		printk("%ld", outReadingTimeHigh[i]);
 			  		printk(", ");
-				*/        
+				    */    
 			  		if((outReadingTimeHigh[i] < 600) && (inReadingTimeHigh[i] < 600)) //should be less than 600ms
 					{ 
 			  		   	if((current_time - lastInFinishedTime[i]) < 200){ //the sensors are pretty cose together so this time should be small
-			  		     	outTotal++;
-						/*
+			  		     	inTotal++;
+							/*
 			  		 		printk("%lld\n", current_time);
 			  		     	printk(",");
 			  		    	printk("1\n");
-						*/ 
+							*/
 			  			}else{
 			  		    //printk("%lld\n", current_time);
 						break; 
