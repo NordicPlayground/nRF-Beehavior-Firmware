@@ -9,6 +9,7 @@ struct thingy_event {
 
         int32_t pressure_int; /*Integer part of the air pressure */
         uint8_t pressure_float; /*Decimal part of the air pressure */
+        uint8_t battery_charge;
 };
 
 

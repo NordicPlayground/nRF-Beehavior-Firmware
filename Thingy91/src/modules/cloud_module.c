@@ -80,7 +80,7 @@ static void cloud_update_work_fn(struct k_work *work)
 
 	LOG_INF("%.20s, with code %i", buf, err);
 	char voltage[4];
-	for(uint8_t i=8; i<13; i++){
+	for(uint8_t i=8; i<12; i++){
 		voltage[i-8] = buf[i];
 	}
 	LOG_INF("%.4s", voltage);
@@ -311,65 +311,9 @@ static void modem_configure(void)
 static void button_handler(uint32_t button_states, uint32_t has_changed)
 {
 	if (has_changed & button_states & DK_BTN1_MSK) {
-		
-		int err;
-
-		char buf[20];
-		enum at_cmd_state *response;
-		err = at_cmd_write(AT_CMD_VBAT, &buf, 20, response);
-
-		LOG_INF("%.20s, with code %i", buf, err);
-
-		// int64_t unix_time_ms = k_uptime_get();
-		// err = date_time_now(&unix_time_ms);
-		// LOG_INF("Time: %d, error %i", unix_time_ms, err);
-		// int64_t divide = 1000;
-		// int64_t test = 100000;
-		// int64_t test_div = test/divide;
-		// LOG_INF("Test: %d, %d", test, test_div);
-		// test = 100324;
-		// test_div = test/1000;
-		// LOG_INF("Test: %d, %d", test, test_div);
-		// int64_t sec = unix_time_ms / divide;
-
-		// LOG_INF("Seconds: %d", sec);
-		// LOG_INF("Size milli: %d, size sec %d", sizeof(unix_time_ms), sizeof(sec));
-		// nrf_cloud_process();
-		char message[50];
-		int len = snprintf(message, 50, "{\"message\":\"%.20s\"}", buf);
-
-		struct cloud_msg msg = {
-			.qos = CLOUD_QOS_AT_MOST_ONCE,
-			.buf = message,
-			.len = len
-		};
-
-		// When using the nRF Cloud backend data is sent to the message topic.
-		// This is in order to visualize the data in the web UI terminal.
-		// For Azure IoT Hub and AWS IoT, messages are addressed directly to the
-		// device twin (Azure) or device shadow (AWS).
-		
-		msg.endpoint.type = CLOUD_EP_MSG; //For nRF Cloud
-		
-		// //msg.endpoint.type = CLOUD_EP_STATE; //For the inferior Clouds
-
-		err = cloud_send(cloud_backend, &msg);
-		LOG_INF("Message sent with code %i", err);
-		if (err) {
-			LOG_ERR("cloud_send failed, error: %d", err);
-		}
+		dk_set_leds_state(DK_ALL_LEDS_MSK, 0);
+		LOG_INF("Kom igjen da!");
 	}
-	// if (has_changed & button_states & DK_BTN1_MSK) {
-	// 	int err;
-	
-	// 	struct cloud_event_abbr *cloud_event_sleep = new_cloud_event_abbr(strlen("Cloud entering sleep mode"));
-
-    //     cloud_event_sleep->type = CLOUD_SLEEP;
-
-    //     memcpy(cloud_event_sleep->dyndata.data, log_strdup("Cloud entering sleep mode"), strlen("Cloud entering sleep mode"));
-
-    //     EVENT_SUBMIT(cloud_event_sleep);
-	// }
 }
 
 void cloud_setup_fn(void)
@@ -547,8 +491,8 @@ static bool event_handler(const struct event_header *eh)
 					int64_t divide = 1000;
 					int64_t ts = (int64_t)(unix_time_ms / divide);
 
-					err = snprintk(message, 100, "{\"appID\":\"BM-W\"\"WEIGHTR\":\"%i.%i\"\"WEIGHTL\":\"%i.%i\"\"RTT\":\"%i.%i\"\"TEMP\":\"%i.%i\"\"TIME\":\"%lld\"\"NAME\":\"%s\"}" \
-						, event->dyndata.data[0], event->dyndata.data[1], event->dyndata.data[2], event->dyndata.data[3], event->dyndata.data[4], event->dyndata.data[5] \
+					err = snprintk(message, 100, "{\"appID\":\"BM-W\"\"RTT\":\"%i.%i\"\"TEMP\":\"%i.%i\"\"TIME\":\"%lld\"\"NAME\":\"%s\"}" \
+						, event->dyndata.data[4], event->dyndata.data[5] \
 						, event->dyndata.data[6], event->dyndata.data[7], ts, event->name);
 					LOG_INF("Message formatted: %s, length: %i", message, err);
 				
