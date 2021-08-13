@@ -7,9 +7,7 @@ nRF5340dk: Beehavior Monitoring
 
 The Beehavior Monitoring is a real-time configurable ultra-low power capable application for the nRF5340dk used in the Summer Project for 2021.
 
-This module is based on multiple nrf-samples, customized and merged to fit the project.
-It is a complete rework of the :ref:`asset_tracker` application.
-This application introduces a set of new features, which are not present in the :ref:`asset_tracker` application:
+This module is based on multiple nrf-samples,  and the asset_trackerv2 application, customized and merged to fit the project.
 
 * Multi-role feature - The nRF5340dk acts as a central to the peripheral sensors, and as a peripheral to the Cloud-unit with communication going both ways.
 * Ultra-low power by design - WIP! The goal of the application is to design a greedy BLE transmission algorithm and preprocess sensor data before transmitting it to the cloud module highlights.
@@ -261,7 +259,7 @@ The order should be something like:
 Known issues and limitations
 ****************************
 
-There are probably mane issues and limitations, but this will take some time to write. The following text is kept as a template for writing this one. Sample text for asset_tracker_v2 is kept as example.
+There are probably mane issues and limitations, but this will take some time to write. The following text is kept as a template for writing this one. NOTE!! Sample text for asset_tracker_v2 is kept as example.
 
 Following are the current limitations in the nRF Cloud implementation of the Asset Tracker v2:
 

@@ -8,9 +8,7 @@ nRF5340dk: Beehavior Monitoring THIS IS A COPY, MUST BE REWRITTEN INTO 9160 SPEC
 The Beehavior Monitoring is a real-time configurable ultra-low power capable application for the nRF9160dk/Thingy:91 used in the
 Summer Project for 2021.
 
-This module is based on multiple nrf-samples, customized and merged to fit the project.
-It is a complete rework of the :ref:`asset_tracker_v2` application.
-This application introduces a set of new features, which are not present in the :ref:`asset_tracker` application:
+This module is based on multiple nrf-samples, and the asset_tracker_v2 application, customized and merged to fit the project.
 
 * Multi-central feature - The nRF9160dk acts as a central to upto 20 peripheral sensors, each sensor corresponding to one hive.
 * Battery state notifications - Sends updates of the battery percentage and sends an alert when the battery is about to die.
@@ -83,7 +81,7 @@ The sensor data used in the system so far can be seen in the following table:
 +-------------------------------------+-----------------------+----------------+------------------------+
 | BM_W - Temperature (external)       | Temperature in Celsius| ? bytes        | [Celsius]              |
 +-------------------------------------+-----------------------+----------------+------------------------+
-| BeeCounter -WIP! Flux of bees in/out| Flux in/out per minute| ? bytes        | [Bees/min]             |
+| BeeCounter -WIP! Flux of bees in/out| Flux in/out per minute| 2/2 bytes      | [Bees/min]             |
 +-------------------------------------+-----------------------+----------------+------------------------+
 
 
@@ -262,7 +260,7 @@ The order should be something like:
 Known issues and limitations
 ****************************
 
-There are probably mane issues and limitations, but this will take some time to write. The following text is kept as a template for writing this one. Sample text for asset_tracker_v2 is kept as example.
+There are probably mane issues and limitations, but this will take some time to write. The following text is kept as a template for writing this one. NOTE!! Sample text for asset_tracker_v2 is kept as example.
 
 Following are the current limitations in the nRF Cloud implementation of the Asset Tracker v2:
 
