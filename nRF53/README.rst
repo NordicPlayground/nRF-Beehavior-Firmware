@@ -7,9 +7,10 @@ nRF5340dk: Beehavior Monitoring
 
 The Beehavior Monitoring is a real-time configurable ultra-low power capable application for the nRF5340dk used in the Summer Project for 2021.
 
-This module is based on multiple nrf-samples,  and the asset_trackerv2 application, customized and merged to fit the project.
+This module is based on multiple nrf-samples,  and the asset_tracker_v2 application, customized and merged to fit the project.
 
 * Multi-role feature - The nRF5340dk acts as a central to the peripheral sensors, and as a peripheral to the Cloud-unit with communication going both ways.
+* Modular build - The application is based on the event_manager library and can be expanded to include other sensors.
 * Ultra-low power by design - WIP! The goal of the application is to design a greedy BLE transmission algorithm and preprocess sensor data before transmitting it to the cloud module highlights.
 * Batching of data - WIP! Data can be batched to reduce the number of messages transmitted, and to be able to retain collected data while the device is offline.
 * Configurable at run time - The application behavior (for example, accelerometer or sensitivity) can be configured at run time. This improves the development experience with individual devices or when debugging the device behavior in specific areas and situations. It also reduces the cost for transmitting data to the devices by reducing the frequency of sending firmware updates to the devices.
@@ -25,10 +26,9 @@ Overview
 The application initializes BLE and scan modules before scanning and connecting to up to 19 other devices.
 For now, the module scans for a Thingy:52 over NAME and connects with it and subscribes to the Thingy:52 environmental and motion services. 
 When connected, the nRF5340dk writes to the Thingy:52 to change the sample time and to toggle the lights off to reduce light pollution inside the hive.
-The nRF5340dk also scans for advertisements from a BroodMinder Weight, and reads weight measurements form the data message advertised. 
+The nRF5340dk also scans for advertisements from a BroodMinder Weight, and reads weight measurements from the data message advertised. 
 This module can easily be scaled to include other BroodMinder products.
 The nRF5340dk also connects to a cloud module (nRF9160dk/Thingy:91), and broadcasts sensordata and/or preprocessed data over NUS to the cloud module.
-As of now, this module supports only the configuration for one beehive.
 
 Firmware architecture
 =====================
@@ -42,7 +42,7 @@ The final messages sent to the Cloud module of the project is arranged into a BL
 Data types and sampling rate
 ============================
 
-Data from multiple sensor sources are collected to construct information about the orientation, and environment. Battery service will also be included at a later stage.
+Data from multiple sensor sources are collected to construct information about the orientation, battery life, and environment.
 The application supports the following data types:
 
 +---------------+-------------------------------------------+-----------------------------------------------+
@@ -74,7 +74,7 @@ The sensor data used in the system so far can be seen in the following table:
 +-------------------------------------+-----------------------+----------------+------------------------+
 | T:52 - Relative humidity            | Relative humidity in %| 1 byte         | [%]                    |
 +-------------------------------------+-----------------------+----------------+------------------------+
-| T:52 - WIP! Battery charge          | Battery charge in %   | 1 byte         | [%]                    |
+| T:52 - Battery charge               | Battery charge in %   | 1 byte         | [%]                    |
 +-------------------------------------+-----------------------+----------------+------------------------+
 | BM_W - Weight                       | Weight in Kg          | 2 bytes        | [Kg]                   |
 +-------------------------------------+-----------------------+----------------+------------------------+
@@ -109,7 +109,7 @@ The following table shows the LED behavior demonstrated by the application:
 +----------------------------------+-------------------------+
 | Scanning for BM_W advertisements | LED3 on                 |
 +----------------------------------+-------------------------+
-| Error  TO DO                     |  all 4 LEDs blinking    |
+| WIP! Error                       |  all 4 LEDs blinking    |
 +----------------------------------+-------------------------+
 
 
@@ -138,30 +138,42 @@ Setting up the 5340dk part of Beehavior Monitoring
 --------------------------------------------------
 
 To set up the nrf5340dk part of the Beehavior Monitoring application to work, see the following steps:
+
 * Enable the peripheral sensors available for your setup.
 * Change the name in the Thingy mobile application and set the same name in Kconfig as a scan parameter.
-* Set the name of the nRF5340dk to the name the 91 unit sends to nRF Cloud.
+* Set the name of the nRF5340dk to the name the 91 unit will send to nRF Cloud.
 
 
 Configuration options
 =====================
 Peripheral ensor support can be disabled in prj.conf to prevent the 5340dk to search for sensors that are not needed.
+
 CONFIG_BROODMINDER_WEIGHT_ENABLE=n
+
 CONFIG_BEE_COUNTER_ENABLE=n
+
 CONFIG_THINGY_ENABLE=n
+
 All of these ara enabled by default.
 
 CONFIG_THINGY_NAME="Thingy123"
+
 Set to the name of the Thingy:52 in your hive.
 
 CONFIG_BT_DEVICE_NAME="Hive1"
+
 Set to the name of your hive.
 
 CONFIG_LOG_DEFAULT_LEVEL=4
+
 Set to 0 to turn of logging.
+
 1 = LOG_INF
+
 2 = LOG_WRN
+
 3 = LOG_ERR
+
 4 = LOG_DBG
 
 
