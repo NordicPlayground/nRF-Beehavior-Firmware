@@ -29,7 +29,7 @@ When connecting to a peripheral it sends the peripheral an unique id and stores 
 The data received from the units is then sent to nRF Cloud with an AppID, the name of the hive/unit and a timestamp.
 The user can send commands to the 9160dk/Thingy:91 through the terminal in nRF Cloud.
 
-----------------+-----------------------------------------------+
++---------------+-----------------------------------------------+
 | Commands      | Description                                   |
 +===============+===============================================+
 | StartScan     | Starts scanning for peripheral units          |
