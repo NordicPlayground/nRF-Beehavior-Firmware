@@ -87,11 +87,11 @@ BroodMinder Weight
 | Data          | ID    | Description           | Data size      | [Unit]                 |
 +===============+=======+=======================+================+========================+
 | Weight        | RTW   | Weight in Kg          | 2 bytes        | [Kg]                   |
-+---------------+-------------------------------+----------------+------------------------+
++---------------+-------+-----------------------+----------------+------------------------+
 | Temperature   | TEMP  | Temperature in Celsius| 2 bytes        | [Celsius]              |
-+---------------+-------------------------------+----------------+------------------------+
++---------------+-------+-----------------------+----------------+------------------------+
 | Weight Right* | WT-R  | Weight on right side  | 2 bytes        | [Kg]                   |
-+---------------+-------------------------------+----------------+------------------------+
++---------------+-------+-----------------------+----------------+------------------------+
 | Weight Left*  | WT-L  | Weight on left side   | 2 bytes        | [Kg]                   |
 +---------------+-------+-----------------------+----------------+------------------------+
 *Not sent to cloud to save power and data.
@@ -102,35 +102,27 @@ Bee Counter
 | Data          | ID    | Description           | Data size      | [Unit]                 |
 +===============+=======+=======================+================+========================+
 | Bees Out      | OUT   | Flux of bees out      | 2 bytes        | [Bees/min]             |
-+---------------+-------------------------------+----------------+------------------------+
++---------------+-------+-----------------------+----------------+------------------------+
 | Bees In       | IN    | Flux of bees in       | 2 bytes        | [Bees/min]             |
 +---------------+-------+-----------------------+----------------+------------------------+
-
-Data buffers (WIP! Remains to be done.)
-=======================================
-Data sampled from the onboard modem and the external sensors is to be stored in a buffer, where a ring buffer is a suggested option.
-This enables to store data for a while if the units become disconnected from each other, and reduce transmission rate to conserve power.
 
 User interface
 **************
 
-The application uses non of the buttons at this point in time, except the reset button which restarts the dk. 
-It is suggested that buttons can be configured to read health (battery charge) from Thingy:52 and to send a message to the cloud unit to verify if the units are connected.
+The application uses button number 1 and 2, plus the reset button which restarts the dk.
+Button1 currently prints a UNIX timestamp in seconds.
+Button2 starts scanning for peripheral units.
 
 Additionally, the application displays LED behavior that corresponds to the task performed by the application.
-The following table shows the purpose of each supported button:
-
 
 The following table shows the LED behavior demonstrated by the application:
 
 +----------------------------------+-------------------------+
-| State                            | nRF5340dk               |
+| State                            | nRF9160dk               |
 +==================================+=========================+
-| Connected to Thingy:52           | LED1 on                 |
+| Connected to Cloud               | LED1 on                 |
 +----------------------------------+-------------------------+
-| Connected to nrf9160dk/Thingy:91 | LED2 on                 |
-+----------------------------------+-------------------------+
-| Scanning for BM_W advertisements | LED3 on                 |
+| Connected to nRF53/peripheral    | LED2 on                 |
 +----------------------------------+-------------------------+
 | WIP! Error                       |  all 4 LEDs blinking    |
 +----------------------------------+-------------------------+
@@ -285,11 +277,7 @@ There are probably mane issues and limitations, but this will take some time to 
 
 Following are the current limitations in the nRF Cloud implementation of the Asset Tracker v2:
 
-* Data that is sampled by the device must ideally be addressed to the cloud-side device state and published in a single packet for regular device updates.
-  This is to avoid the unnecessary stack overhead associated with splitting the payload and the additional current consumption that might result from splitting and sending the data as separate packets.
-  However, in the case of nRF Cloud implementation, the nRF Cloud front end supports only the display of APP_DATA_MODEM_DYNAMIC (networkInfo) and APP_DATA_MODEM_STATIC (deviceInfo) through the device shadow.
-  The other supported data types (GPS, temperature, and humidity) must be sent in a specified format to a separate message endpoint for the front end to graphically represent the data.
-  You can find the JSON protocol definitions for data sent to the message endpoint in `nRF Cloud JSON protocol schemas`_.
+* As of now this project only supports nRF CLoud. If you want to expand the project to other Cloud services you can use the Cloud_Client example as a guide.
 
 * The nRF Cloud web application does not support the manipulation of real-time configurations.
   However, this is possible by using the REST API calls described in `nRF Cloud Patch Device State`_.
@@ -322,10 +310,17 @@ This application uses the following |NCS| libraries and drivers:
 
 * :ref:`event_manager`
 
+* :ref:`nordic_uart_service`
+
+* :ref:`modem`
+
 In addition, it uses the following sample:
 
 * :ref:`secure_partition_manager`
 
+* :ref:`bluetooth/peripheral_uart`
+
+* :ref:`nrf9160/cloud_client`
 
 Thread usage
 ============
