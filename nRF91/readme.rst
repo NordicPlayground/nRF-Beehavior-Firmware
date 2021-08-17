@@ -10,13 +10,13 @@ Summer Project for 2021.
 
 This module is based on multiple nrf-samples, and the asset_tracker_v2 application, customized and merged to fit the project.
 
-* Multi-central feature - The nRF9160dk acts as a central to upto 20 peripheral sensors, each sensor corresponding to one hive.
-* Battery state notifications - Sends updates of the battery percentage and sends an alert when the battery is about to die.
+* Multi-central feature - The nRF9160dk acts as a central to up to 20 peripheral sensors, each sensor corresponding to one hive.
+* Battery state notifications - Sends updates of the battery percentage. WIP! Sends an alert when the battery is about to die.
 * Ultra-low power by design - WIP! The goal of the application is to design a greedy BLE transmission algorithm and preprocess sensor data before transmitting it to the cloud module highlights.
 * Batching of data - WIP! Data can be batched to reduce the number of messages transmitted, and to be able to retain collected data while the device is offline.
 * Configurable at run time - WIP! The application behavior (for example, accelerometer sensitivity or GPS timeout) can be configured at run time. This improves the development experience with individual devices or when debugging the device behavior in specific areas and situations. It also reduces the cost for transmitting data to the devices by reducing the frequency of sending firmware updates to the devices.
 
-Implementation of the above features required a rework of existing nrf samples and applications. Most noteworthy are the peripheral_uart and central_uart samples.
+Implementation of the above features required a rework of existing nrf samples and applications. Most noteworthy are the event_manager, cloud_client and central_uart samples.
 
 .. note::
     The code is currently a work in progress and is not fully optimized yet. It will undergo changes and improvements in the future.
@@ -29,7 +29,13 @@ When connecting to a peripheral it sends the peripheral an unique id and stores 
 The data received from the units is then sent to nRF Cloud with an AppID, the name of the hive/unit and a timestamp.
 The user can send commands to the 9160dk/Thingy:91 through the terminal in nRF Cloud.
 
-TODO add a list of the commands.
+----------------+-----------------------------------------------+
+| Commands      | Description                                   |
++===============+===============================================+
+| StartScan     | Starts scanning for peripheral units          |
++---------------+-----------------------------------------------+
+| BLE_status    | Returns number of connected peripheral units  |
++---------------+-----------------------------------------------+
 
 Firmware architecture
 =====================
@@ -37,53 +43,68 @@ Firmware architecture
 The nRF9160dk/Thingy:91 part of Smarthive: Beehavior Monitoring has a modular structure, where each module has a defined scope of responsibility.
 The application makes use of the :ref:`event_manager` to distribute events between modules in the system.
 The event manager is used for all the communication between the modules.
-The final messages sent to the Cloud module of the project is arranged into a BLE data message which supports up to 20 bytes.
+The final messages sent to the Cloud module of the project is taken from BLE data messages which supports up to 20 bytes.
 
 
-Data types and sampling rate
-============================
+Data types
+==========
 
-Data from multiple sensor sources are collected to construct information about the orientation, and environment. Battery service will also be included at a later stage.
-The application supports the following data types:
+Data from multiple peripherals are collected to construct information about the weight, battery and environment. 
+The application supports the following sensor types:
 
-+---------------+-------------------------------------------+-----------------------------------------------+
-| Data type     | Description                               | Identifiers                                   |
-+===============+===========================================+===============================================+
-| Environmental | Temperature, humidity and air pressure    | APP_DATA_ENVIRONMENTAL (not yet identifiers)  |
-+---------------+-------------------------------------------+-----------------------------------------------+
-| Movement      | Orientation                               | APP_DATA_MOVEMENT (not yet identifiers)       |
-+---------------+-------------------------------------------+-----------------------------------------------+
-| Battery       | Remaining power                           | APP_DATA_BATTERY (not yet identifiers)        |
-+---------------+-------------------------------------------+-----------------------------------------------+
++-----------------------+-------------------------------------------------------+---------------+
+| Sensor type           | Description                                           | App ID        |
++=======================+=======================================================+===============+
+| BroodMinder Weight    | Weight and Temperature                                | BM-W          |
++-----------------------+-------------------------------------------------------+---------------+
+| Thingy:52             | Temperature, Humidity, Air Pressure and battery       | THINGY        |
++-----------------------+-------------------------------------------------------+---------------+
+| BeeCounter            | Bees in and out of hive                               | BEE-CNT       |
++-----------------------+-------------------------------------------------------+---------------+
 
-WIP! The sets of sensor data that are published to the cloud service consist of relative `timestamps <Timestamping_>`_ that originate from the time of sampling.
-WIP! The data sampling should be concatenated in a buffer matrix containing a finite number of measurements, f.ex 15 samples. 
-The elements in the buffer matrix contains the 15 prior measurements with a timestamp.
-If an event such as swarm event is triggered, all the measurements in the buffer are sent to increase the resolution of the graphs and figures.
-Otherwise, send every 15th sample to the cloud unit. 
+The sets of sensor data that are published to the cloud service consist of relative `timestamps <Timestamping_>`_ that originate from the time
+the nRF91 unit received the data. Aswell all data are sent with a NAME to differentiate messages from different peripherals/hives.
 
-This is motivated by a possible energy conservation from transmitting data, and that the dynamics of the system is rather slow and does not require a 1/60 Hz resolution.
+The sensor data used in the system so far can be seen in the following tables:
 
-The sensor data used in the system so far can be seen in the following table:
+Thingy:52
+---------
++-----------------------+-------+-----------------------+----------------+------------------------+
+| Data                  | ID    | Description           | Data size      | [Unit]                 |
++=======================+=======+=======================+================+========================+
+| Air pressure          | AIR   | Air pressure in hPa   | 5 bytes        | [hPa]                  |
++-----------------------+-------+-----------------------+----------------+------------------------+
+| Temperature           | TEMP  | Temperature in Celsius| 2 bytes        | [Celsius]              |
++-----------------------+-------+-----------------------+----------------+------------------------+
+| Relative humidity     | HUMID | Relative humidity in %| 1 byte         | [%]                    |
++-----------------------+-------+-----------------------+----------------+------------------------+
+| Battery charge        | BTRY  | Battery charge in %   | 1 byte         | [%]                    |
++-----------------------+-------+-----------------------+----------------+------------------------+        
 
-+-------------------------------------+-----------------------+----------------+------------------------+
-| Sensor data from peripheral sensors | Description           | Data size      | [Unit]                 |
-+=====================================+=======================+================+========================+
-| T:52 - Air pressure                 | Air pressure in hPa   | 5 bytes        | [hPa]                  |
-+-------------------------------------+-----------------------+----------------+------------------------+
-| T:52 - Temperature                  | Temperature in Celsius| 2 bytes        | [Celsius]              |
-+-------------------------------------+-----------------------+----------------+------------------------+
-| T:52 - Relative humidity            | Relative humidity in %| 1 byte         | [%]                    |
-+-------------------------------------+-----------------------+----------------+------------------------+
-| T:52 - WIP! Battery charge          | Battery charge in %   | 1 byte         | [%]                    |
-+-------------------------------------+-----------------------+----------------+------------------------+
-| BM_W - Weight                       | Weight in Kg          | ? bytes        | [Kg]                   |
-+-------------------------------------+-----------------------+----------------+------------------------+
-| BM_W - Temperature (external)       | Temperature in Celsius| ? bytes        | [Celsius]              |
-+-------------------------------------+-----------------------+----------------+------------------------+
-| BeeCounter -WIP! Flux of bees in/out| Flux in/out per minute| 2/2 bytes      | [Bees/min]             |
-+-------------------------------------+-----------------------+----------------+------------------------+
+BroodMinder Weight
+------------------
++---------------+-------+-----------------------+----------------+------------------------+
+| Data          | ID    | Description           | Data size      | [Unit]                 |
++===============+=======+=======================+================+========================+
+| Weight        | RTW   | Weight in Kg          | 2 bytes        | [Kg]                   |
++---------------+-------------------------------+----------------+------------------------+
+| Temperature   | TEMP  | Temperature in Celsius| 2 bytes        | [Celsius]              |
++---------------+-------------------------------+----------------+------------------------+
+| Weight Right* | WT-R  | Weight on right side  | 2 bytes        | [Kg]                   |
++---------------+-------------------------------+----------------+------------------------+
+| Weight Left*  | WT-L  | Weight on left side   | 2 bytes        | [Kg]                   |
++---------------+-------+-----------------------+----------------+------------------------+
+*Not sent to cloud to save power and data.
 
+Bee Counter
+------------------
++---------------+-------+-----------------------+----------------+------------------------+
+| Data          | ID    | Description           | Data size      | [Unit]                 |
++===============+=======+=======================+================+========================+
+| Bees Out      | OUT   | Flux of bees out      | 2 bytes        | [Bees/min]             |
++---------------+-------------------------------+----------------+------------------------+
+| Bees In       | IN    | Flux of bees in       | 2 bytes        | [Bees/min]             |
++---------------+-------+-----------------------+----------------+------------------------+
 
 Data buffers (WIP! Remains to be done.)
 =======================================
@@ -111,7 +132,7 @@ The following table shows the LED behavior demonstrated by the application:
 +----------------------------------+-------------------------+
 | Scanning for BM_W advertisements | LED3 on                 |
 +----------------------------------+-------------------------+
-| Error  TO DO                     |  all 4 LEDs blinking    |
+| WIP! Error                       |  all 4 LEDs blinking    |
 +----------------------------------+-------------------------+
 
 

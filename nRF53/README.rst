@@ -320,9 +320,16 @@ This application uses the following |NCS| libraries and drivers:
 
 * :ref:`event_manager`
 
+* :ref:`nordic_uart_service`
+
+
 In addition, it uses the following sample:
 
 * :ref:`secure_partition_manager`
+
+* :ref:`peripheral_uart`
+
+* :ref:`central_uart`
 
 
 Thread usage
