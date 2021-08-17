@@ -1,2 +1,0 @@
-TODO:
-Forhindre at den prøver å connecte til vekten

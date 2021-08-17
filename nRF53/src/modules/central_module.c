@@ -1135,7 +1135,7 @@ void central_module_thread_fn(void)
 	}
 
 	LOG_INF("thingy_module_thread_fn(): Scanning successfully started. \n");
-	LOG_INF("thingy_module_thread_fn(): Scanning for Thingy:52: \n", strlen(THINGY), THINGY);
+	LOG_INF("thingy_module_thread_fn(): Scanning for Thingy:52:", strlen(THINGY), THINGY);
     // bm module thread fn sketch
 	LOG_INF("Waiting for thingy_done semaphore.");
 	#else

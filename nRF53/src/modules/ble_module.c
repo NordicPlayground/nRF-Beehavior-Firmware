@@ -48,7 +48,7 @@
 
 
 #define MODULE ble_module
-LOG_MODULE_REGISTER(MODULE, 4);
+LOG_MODULE_REGISTER(MODULE, CONFIG_LOG_DEFAULT_LEVEL);
 
 bool console_prints = true; /*Toggle this to display console prints*/
 
@@ -185,7 +185,7 @@ void ble_module_thread_fn(void)
 	}
 
 
-	LOG_INF("ble_module_thread_fn(): Enabling BLE\n");
+	LOG_INF("ble_module_thread_fn(): Enabling BLE.");
 	err = bt_enable(NULL);
 	if (err) {
 		LOG_ERR("Bluetooth init failed (err %d)\n", err);
@@ -210,7 +210,7 @@ void ble_module_thread_fn(void)
 	ble_ready->type = BLE_READY;
 
 	EVENT_SUBMIT(ble_ready);
-	LOG_INF("ble_module_thread_fn(): ble_ready event submitted. \n");
+	LOG_INF("ble_module_thread_fn(): BLE_READY event submitted.");
 }
 
 static bool event_handler(const struct event_header *eh)

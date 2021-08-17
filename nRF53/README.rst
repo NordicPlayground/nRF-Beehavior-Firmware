@@ -76,13 +76,12 @@ The sensor data used in the system so far can be seen in the following table:
 +-------------------------------------+-----------------------+----------------+------------------------+
 | T:52 - WIP! Battery charge          | Battery charge in %   | 1 byte         | [%]                    |
 +-------------------------------------+-----------------------+----------------+------------------------+
-| BM_W - Weight                       | Weight in Kg          | ? bytes        | [Kg]                   |
+| BM_W - Weight                       | Weight in Kg          | 2 bytes        | [Kg]                   |
 +-------------------------------------+-----------------------+----------------+------------------------+
-| BM_W - Temperature (external)       | Temperature in Celsius| ? bytes        | [Celsius]              |
+| BM_W - Temperature (external)       | Temperature in Celsius| 2 bytes        | [Celsius]              |
 +-------------------------------------+-----------------------+----------------+------------------------+
 | BeeCounter -WIP! Flux of bees in/out| Flux in/out per minute| 2/2 bytes      | [Bees/min]             |
 +-------------------------------------+-----------------------+----------------+------------------------+
-
 
 Data buffers (WIP! Remains to be done.)
 =======================================
@@ -134,22 +133,36 @@ These options can be used to enable and disable modules and modify their behavio
 
 Setup
 =====
-Config
-------
-Maybe write something here? 
 
 Setting up the 5340dk part of Beehavior Monitoring
 --------------------------------------------------
 
 To set up the nrf5340dk part of the Beehavior Monitoring application to work, see the following steps:
-* Enable the peripheral sensors available for your setup
+* Enable the peripheral sensors available for your setup.
 * Change the name in the Thingy mobile application and set the same name in Kconfig as a scan parameter.
-* Set the name of the nRF5340dk to the same as the name the 91 unit scans for in prj.conf
+* Set the name of the nRF5340dk to the name the 91 unit sends to nRF Cloud.
 
 
 Configuration options
 =====================
-Needs filling.
+Peripheral ensor support can be disabled in prj.conf to prevent the 5340dk to search for sensors that are not needed.
+CONFIG_BROODMINDER_WEIGHT_ENABLE=n
+CONFIG_BEE_COUNTER_ENABLE=n
+CONFIG_THINGY_ENABLE=n
+All of these ara enabled by default.
+
+CONFIG_THINGY_NAME="Thingy123"
+Set to the name of the Thingy:52 in your hive.
+
+CONFIG_BT_DEVICE_NAME="Hive1"
+Set to the name of your hive.
+
+CONFIG_LOG_DEFAULT_LEVEL=4
+Set to 0 to turn of logging.
+1 = LOG_INF
+2 = LOG_WRN
+3 = LOG_ERR
+4 = LOG_DBG
 
 
 Mandatory library configuration
@@ -220,32 +233,27 @@ After programming the application and all the prerequisites to your development 
       *** Booting Zephyr OS build v2.4.0-ncs1-2616-g3420cde0e37b  ***
       <inf> event_manager: APP_EVT_START
 
-#. Observe in the terminal window that LTE connection is established, indicated by the following output::
+#. Observe in the terminal window that Bluetooth is enabled, indicated by the following output::
 
-     <inf> event_manager: MODEM_EVT_LTE_CONNECTING
+     <inf> ble_module: Enabling BLE
      ...
-     <inf> event_manager: MODEM_EVT_LTE_CONNECTED
+     <inf> ble_module: BLE_READY event submitted.
 
-#. Observe that the device establishes connection to the cloud::
+#. Observe that the device establishes connection to Thingy:52 and LED1 turns on::
 
-    <inf> event_manager: CLOUD_EVT_CONNECTING
+    <inf> central_module: Scanning for Thingy:52:
     ...
-    <inf> event_manager: CLOUD_EVT_CONNECTED
+    <inf> central_module: Starting Thingy:52 service discovery chain.
+
+#. Observe that the device establishes connection to the nRF9160dk/Thingy:91 and LED2 turn on::
+
+    <inf> peripheral_module: bt_nus_init and bt_le_adv_start completed.
+    ...
+    <inf> peripheral_module: New ID is: <id>
 
 #. Observe that data is sampled periodically and sent to the cloud::
 
-    <inf> event_manager: APP_EVT_DATA_GET_ALL
-    <inf> event_manager: APP_EVT_DATA_GET - Requested data types (MOD_DYN, BAT, ENV, GNSS)
-    <inf> event_manager: GPS_EVT_ACTIVE
-    <inf> event_manager: SENSOR_EVT_ENVIRONMENTAL_NOT_SUPPORTED
-    <inf> event_manager: MODEM_EVT_MODEM_DYNAMIC_DATA_READY
-    <inf> event_manager: MODEM_EVT_BATTERY_DATA_READY
-    <inf> event_manager: GPS_EVT_DATA_READY
-    <inf> event_manager: DATA_EVT_DATA_READY
-    <inf> event_manager: GPS_EVT_INACTIVE
-    <inf> event_manager: DATA_EVT_DATA_SEND
-    <wrn> data_module: No batch data to encode, ringbuffers empty
-    <inf> event_manager: CLOUD_EVT_DATA_ACK
+    <inf> event_manager: Temperature [C]: %i,%i, Humidity [Percentage]: %i, Air pressure [hPa]: %d,%i, Battery charge [%%]: %i.
 
 The order should be something like:
 * Initialize BLE and scan.
