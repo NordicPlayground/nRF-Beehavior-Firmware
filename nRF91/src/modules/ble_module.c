@@ -8,9 +8,6 @@
  *  @brief Nordic UART Service Client sample
  */
 
-//Når cloud og BLE scan kjører samtidig
-//W: opcode 0x0000 pool id 3 pool 0x2001530c != &hci_cmd_pool 0x20015364
-
 #include <errno.h>
 #include <zephyr.h>
 #include <init.h>
@@ -69,18 +66,19 @@ static struct bt_conn *default_conn;
 
 BT_CONN_CTX_DEF(conns, CONFIG_BT_MAX_CONN, sizeof(struct bt_nus_client));
 
+/* UUID made for this project */
 #define BT_UUID_BEEHAVIOUR_MONITORING_VAL \
 	BT_UUID_128_ENCODE(0x6e400001, 0xb5b3, 0xf393, 0xe1a9, 0xe50e14dcea9e)
 
 #define BT_UUID_BEEHAVIOUR_MONITORING_SERVICE   BT_UUID_DECLARE_128(BT_UUID_BEEHAVIOUR_MONITORING_VAL)
 
-#define ROUTED_MESSAGE_CHAR '*'
-#define BROADCAST_INDEX 99
-
+/* Array of addresses of connected peripherals */
 char address_array[CONFIG_BT_MAX_CONN][BT_ADDR_LE_STR_LEN]; 
+/* Array of names of connected peripherals, correlates with address_array */
 char name_array[CONFIG_BT_MAX_CONN][20]; 
 char name_buffer[20];
 
+/* Function to stop BLE scanning */
 static void ble_scan_stop_fn(struct k_work *work)
 {
 	int err;
@@ -90,6 +88,7 @@ static void ble_scan_stop_fn(struct k_work *work)
 		LOG_ERR("Stop LE scan failed (err %d)", err);
 	}
 
+	/* Let cloud_module know that scanning has been stopped */
 	struct ble_event *ble_stopped_scanning = new_ble_event(strlen("Stopped scanning"));
 
 	ble_stopped_scanning->type = BLE_DONE_SCANNING;
@@ -123,6 +122,7 @@ void scan_start(bool start){
 
 	EVENT_SUBMIT(ble_started_scanning);
 
+	/* Schedule the scan to be stopped in 10 seconds */
 	if(start){
 		k_work_reschedule(&ble_scan_stop, K_SECONDS(10));
 	}
@@ -130,7 +130,7 @@ void scan_start(bool start){
 
 static void ble_data_sent(uint8_t err, const uint8_t *const data, uint16_t len)
 {
-	LOG_INF("BLE Data sent");
+	LOG_DBG("BLE Data sent");
 	k_sem_give(&nus_write_sem);
 
 	if (err) {
@@ -141,51 +141,53 @@ static void ble_data_sent(uint8_t err, const uint8_t *const data, uint16_t len)
 
 static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
 {
-	LOG_INF("ble_data_received");
-	// char data_received[len];
+	LOG_DBG("ble_data_received");
+	
 	char addr[BT_ADDR_LE_STR_LEN];
-	// char name[20];
 
-	LOG_INF("%.*s", len, data);
+	LOG_DBG("%.*s. Length: %i", len, data, len);
 
-	LOG_INF("Length: %i", len);
-
+	/* All messages sent by the peripherals start with an * followed by 
+	* the units given ID */
 	if((char)data[0]=='*'){
-
+		/* Get address from received ID */
 		strcpy(addr, address_array[(uint8_t)data[1]]);
 		
+		/* Length 6 means data from the Bee Counter */
 		if(len==6){	
 			
 			struct ble_event *ble_event = new_ble_event(4);
 
 			ble_event->type = BLE_RECEIVED;
 
+			/* Send the data without the * and ID to cloud_module */
 			uint8_t data_array[4];
 			for(int i=0; i<4; i++){
 				data_array[i] = (uint8_t)data[i+2];
-				LOG_INF("%.02x", data_array[i]);
+				LOG_DBG("%.02x", data_array[i]);
 			}
-
-			strcpy(addr, address_array[(uint8_t)data[1]]);
 
 			memcpy(ble_event->dyndata.data, data_array, 4);
 
 			memcpy(ble_event->address, log_strdup(addr), 17);
 			
+			/* Get name from received ID */
 			memcpy(ble_event->name, log_strdup(name_array[(uint8_t)data[1]]), 20);
 
 			EVENT_SUBMIT(ble_event);
 		}
+		/* Length 10 means data from BroodMinder weight */
 		if(len==10){	
 			
 			struct ble_event *ble_event = new_ble_event(8);
 
 			ble_event->type = BLE_RECEIVED;
 
+			/* Send the data without the * and ID to cloud_module */
 			uint8_t data_array[8];
 			for(int i=0; i<8; i++){
 				data_array[i] = (uint8_t)data[i+2];
-				LOG_INF("%.02x", data_array[i]);
+				LOG_DBG("%.02x", data_array[i]);
 			}
 
 			strcpy(addr, address_array[(uint8_t)data[1]]);
@@ -194,19 +196,22 @@ static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
 
 			memcpy(ble_event->address, log_strdup(addr), 17);
 			
+			/* Get name from received ID */
 			memcpy(ble_event->name, log_strdup(name_array[(uint8_t)data[1]]), 20);
 
 			EVENT_SUBMIT(ble_event);
 		}
+		/* Length 11 means data from the Thingy:52 */
 		if(len==11){
 			struct ble_event *ble_event = new_ble_event(9);
 
 			ble_event->type = BLE_RECEIVED;
 
+			/* Send the data without the * and ID to cloud_module */
 			uint8_t data_array[9];
 			for(int i=0; i<9; i++){
 				data_array[i] = (uint8_t)data[i+2];
-				LOG_INF("%.02x", data_array[i]);
+				LOG_DBG("%.02x", data_array[i]);
 			}
 
 			strcpy(addr, address_array[(uint8_t)data[1]]);
@@ -215,25 +220,23 @@ static uint8_t ble_data_received(const uint8_t *const data, uint16_t len)
 
 			memcpy(ble_event->address, log_strdup(addr), 17);
 
+			/* Get name from received ID */
 			memcpy(ble_event->name, log_strdup(name_array[(uint8_t)data[1]]), 20);
 
 			EVENT_SUBMIT(ble_event);
 			
 		}
 	}
-	// LOG_INF("Received: %s", log_strdup(data_received));
-	// LOG_INF("From %s", log_strdup(addr));
-	
-
 	return BT_GATT_ITER_CONTINUE;
 }
 
 static void discovery_complete(struct bt_gatt_dm *dm,
 			       void *context)
 {
-	LOG_INF("discovery_complete");
+	/* This function is taken from NordicMatt's multi-NUS
+	* example: https://github.com/NordicMatt/multi-NUS */
 	struct bt_nus_client *nus = context;
-	LOG_INF("Service discovery completed");
+	LOG_DBG("Service discovery completed");
 
 	bt_gatt_dm_data_print(dm);
 
@@ -275,7 +278,7 @@ static void discovery_complete(struct bt_gatt_dm *dm,
 				if (err) {
 					LOG_WRN("Failed to send data over BLE connection (err %d)", err);
 				} else {
-					LOG_INF("Sent to server %d: %s",
+					LOG_DBG("Sent to server %d: %s",
 						nus_index, log_strdup(message));
 				}
 
@@ -291,14 +294,15 @@ static void discovery_complete(struct bt_gatt_dm *dm,
 			}
 		}
 	}
+	/* Check if max number of peripherals are connected.
+	* If max number of peripherals aren't reached, start scan */
 	for(int i=0; i<CONFIG_BT_MAX_CONN; i++){
-		LOG_INF("%i",i);
 		if(address_array[i][0]=='\0'){		
 			scan_start(false);
-
 			return;
 		}
 	}
+	/* If max reached stop scan immediatly */
 	k_work_reschedule(&ble_scan_stop, K_NO_WAIT);
 
 }
@@ -306,14 +310,14 @@ static void discovery_complete(struct bt_gatt_dm *dm,
 static void discovery_service_not_found(struct bt_conn *conn,
 					void *context)
 {
-	LOG_INF("Service not found");
+	LOG_WRN("Service not found");
 }
 
 static void discovery_error(struct bt_conn *conn,
 			    int err,
 			    void *context)
 {
-	LOG_WRN("Error while discovering GATT database: (%d)", err);
+	LOG_ERR("Error while discovering GATT database: (%d)", err);
 }
 
 struct bt_gatt_dm_cb discovery_cb = {
@@ -325,7 +329,7 @@ struct bt_gatt_dm_cb discovery_cb = {
 static void gatt_discover(struct bt_conn *conn)
 {
 	int err;
-	LOG_INF("gatt_discover");
+	LOG_DBG("gatt_discover");
 
 	struct bt_nus_client *nus_client =
 		bt_conn_ctx_get(&conns_ctx_lib, conn);
@@ -349,7 +353,7 @@ static void gatt_discover(struct bt_conn *conn)
 
 static void connected(struct bt_conn *conn, uint8_t conn_err)
 {
-	LOG_INF("connected");
+	LOG_DBG("connected");
 	char addr[BT_ADDR_LE_STR_LEN];
 	int err;
 	struct bt_nus_client_init_param init = {
@@ -392,12 +396,12 @@ static void connected(struct bt_conn *conn, uint8_t conn_err)
 
 	err = bt_nus_client_init(nus_client, &init);
 
-	bt_conn_ctx_release(&conns_ctx_lib, (void *)nus_client);
+	bt_conn_ctx_release(&conns_ctx_lib, (void*)nus_client);
 	
 	if (err) {
 		LOG_ERR("NUS Client initialization failed (err %d)", err);
 	}else{
-		LOG_INF("NUS Client module initialized");
+		LOG_DBG("NUS Client module initialized");
 	}
 
 	gatt_discover(conn);
@@ -411,7 +415,7 @@ static void connected(struct bt_conn *conn, uint8_t conn_err)
 
 static void disconnected(struct bt_conn *conn, uint8_t reason)
 {
-	LOG_INF("disconnected");
+	LOG_DBG("disconnected");
 	char addr[BT_ADDR_LE_STR_LEN];
 	int err;
 
@@ -430,36 +434,41 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 	bt_conn_unref(conn);
 	default_conn = NULL;
 
+	/* Find out the ID of the disconnected unit */
 	for(int i = 0; i<CONFIG_BT_MAX_CONN; i++){
 		if(address_array[i][0]=='\0'){
-			LOG_INF("Array %i is empty", i);
+			LOG_DBG("Array %i is empty", i);
 			continue;
 		}
-		LOG_INF("Checkpoint %i, also %s and %s", i, log_strdup(addr), log_strdup(address_array[i]));
-
+	
 		bool equal = true;
-		for(int t=0; t<17; t++){
-			if(addr[t]!=address_array[i][t]){
+		for(int j=0; j<17; j++){
+			if(addr[j]!=address_array[i][j]){
 				equal = false;
 				break;
 			}
 		}
 		if(equal){
+			/* Empty the address and name array to the disconnected unit */ 
 			char empty[30] = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
 			strcpy(address_array[i], empty);
+			char empty_name[20] = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+			strcpy(name_array[i], empty_name);
 			dk_set_led_on(DK_LED2);
 			LOG_INF("Connection %i removed", i);
+			/* Scan for 10 seconds */
 			scan_start(true);
 			return;
 		}
 	}
-	LOG_INF("The address was not registered");
+	LOG_ERR("The address was not registered");
 }
 
 static void security_changed(struct bt_conn *conn, bt_security_t level,
+
 			     enum bt_security_err err)
 {
-	LOG_INF("security_changed");
+	LOG_DBG("security_changed");
 	char addr[BT_ADDR_LE_STR_LEN];
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
@@ -481,22 +490,6 @@ static struct bt_conn_cb conn_callbacks = {
 	.security_changed = security_changed
 };
 
-static bool data_cb(struct bt_data *data, void *user_data)
-{
-	char *connection_name = user_data;
-	uint8_t len;
-
-	switch (data->type) {
-	case BT_DATA_NAME_COMPLETE:
-		len = data->data_len;
-		memcpy(connection_name, data->data, len);
-		connection_name[len] = '\0';
-		return false;
-	default:
-		return true;
-	}
-}
-
 static void scan_filter_match(struct bt_scan_device_info *device_info,
 			      struct bt_scan_filter_match *filter_match,
 			      bool connectable)
@@ -507,29 +500,21 @@ static void scan_filter_match(struct bt_scan_device_info *device_info,
 
 	uint8_t adv_data_type = net_buf_simple_pull_u8(device_info->adv_data);
 
-	/* Don't update weight value if the advertised data is a scan response */
+	/* Get the name from the scan response */
 	if (adv_data_type != BT_DATA_NAME_COMPLETE){
-		LOG_INF("Scan response name complete");
+		LOG_DBG("Scan response name complete");
 		char connection_name[20] = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
-		LOG_INF("Length %i", device_info->adv_data->len);
+		LOG_DBG("Length %i", device_info->adv_data->len);
 
 		for(int i=19; i<device_info->adv_data->len; i++){
-			LOG_INF("%i: %c", i, device_info->adv_data->data[i]);
-		}
-		for(int j=19; j<device_info->adv_data->len; j++){
-			connection_name[j-19] = device_info->adv_data->data[j];
+			LOG_DBG("%i: %c", i, device_info->adv_data->data[i]);
+			connection_name[i-19] = device_info->adv_data->data[i];
 		}
 
-		// bt_data_parse((device_info->adv_data), data_cb, connection_name);
+		LOG_INF("Filter matched unit with name: %.*s", device_info->adv_data->len - 19, log_strdup(connection_name));
 
-		LOG_INF("%.*s", device_info->adv_data->len - 19, log_strdup(connection_name));
-
-		// name_buffer = connection_name;
 		strcpy(name_buffer, connection_name);
-
-		LOG_INF("%s", log_strdup(name_buffer));
 	}
-
 
 	LOG_INF("Filters matched. Address: %s connectable: %d",
 		log_strdup(addr), connectable);
@@ -543,7 +528,7 @@ static void scan_connecting_error(struct bt_scan_device_info *device_info)
 static void scan_connecting(struct bt_scan_device_info *device_info,
 			    struct bt_conn *conn)
 {
-	LOG_INF("scan_connecting");
+	LOG_DBG("scan_connecting");
 	default_conn = bt_conn_ref(conn);
 }
 
@@ -552,7 +537,7 @@ BT_SCAN_CB_INIT(scan_cb, scan_filter_match, NULL,
 
 static int scan_init(void)
 {
-	LOG_INF("scan_init");
+	LOG_DBG("scan_init");
 	int err;
 	struct bt_scan_init_param scan_init = {
 		.connect_if_match = 1,
@@ -561,16 +546,12 @@ static int scan_init(void)
 	bt_scan_init(&scan_init);
 	bt_scan_cb_register(&scan_cb);
 
-	// char *name = "Andreas53Test";
-	// char *name = "TeppanTest";
 	err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_UUID, BT_UUID_BEEHAVIOUR_MONITORING_SERVICE);
-	// err = bt_scan_filter_add(BT_SCAN_FILTER_TYPE_NAME, name);
 	if (err) {
 		LOG_ERR("Scanning filters cannot be set (err %d)", err);
 		return err;
 	}
 
-	// err = bt_scan_filter_enable(BT_SCAN_NAME_FILTER, false);
 	err = bt_scan_filter_enable(BT_SCAN_UUID_FILTER, false);	
 	if (err) {
 		LOG_ERR("Filters cannot be turned on (err %d)", err);
@@ -584,7 +565,7 @@ static int scan_init(void)
 
 static void auth_cancel(struct bt_conn *conn)
 {
-	LOG_INF("auth_cancel");
+	LOG_DBG("auth_cancel");
 	char addr[BT_ADDR_LE_STR_LEN];
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
@@ -595,7 +576,7 @@ static void auth_cancel(struct bt_conn *conn)
 
 static void pairing_confirm(struct bt_conn *conn)
 {
-	LOG_INF("pairing_confirm");
+	LOG_DBG("pairing_confirm");
 	char addr[BT_ADDR_LE_STR_LEN];
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
@@ -608,7 +589,7 @@ static void pairing_confirm(struct bt_conn *conn)
 
 static void pairing_complete(struct bt_conn *conn, bool bonded)
 {
-	LOG_INF("pairing_complete");
+	LOG_DBG("pairing_complete");
 	char addr[BT_ADDR_LE_STR_LEN];
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
@@ -620,7 +601,7 @@ static void pairing_complete(struct bt_conn *conn, bool bonded)
 
 static void pairing_failed(struct bt_conn *conn, enum bt_security_err reason)
 {
-	LOG_INF("pairing_failed");
+	LOG_DBG("pairing_failed");
 	char addr[BT_ADDR_LE_STR_LEN];
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
@@ -665,18 +646,10 @@ static void module_thread_fn(void){
 
 	bt_conn_cb_register(&conn_callbacks);
 
-	int (*module_init[])(void) = {scan_init};//uart_init,  , nus_client_init};
-	for (size_t i = 0; i < ARRAY_SIZE(module_init); i++) {
-		err = (*module_init[i])();
-		LOG_INF("Error: %i on operation %i", err, i);
-		if (err) {
-			return;
-		}
+	err = scan_init();
+	if (err) {
+		LOG_ERR("Scan failed to initialize. Error: %i", err);
 	}
-	// err = scan_init();
-	// LOG_INF("Scan exited with code: %i",err);
-
-	LOG_INF("Starting Bluetooth Central UART example\n");
 
 	k_work_init_delayable(&ble_scan_stop, ble_scan_stop_fn);
 
@@ -696,7 +669,8 @@ static bool event_handler(const struct event_header *eh)
 
 		struct cloud_event_abbr *event = cast_cloud_event_abbr(eh);
 		if(event->type==CLOUD_CONNECTED){
-			LOG_INF("Cloud connected");
+			LOG_DBG("Cloud connected");
+			/* Start initialization of Bluetooth */
 			k_sem_give(&cloud_connected);
 			return false;
 		}
@@ -711,21 +685,18 @@ static bool event_handler(const struct event_header *eh)
 			if(message!=NULL){
 				if(message->valuestring!=NULL){
 					LOG_INF("JSON message: %s, Length: %i", message->valuestring, strlen(message->valuestring));
+					/* Logc to send data received from cloud to one of the connected peripherals
+					* PS. Not used for anything yet */
 					if(message->valuestring[0]=='*'){
-						LOG_INF("Should be sent to BLE");
+						LOG_DBG("Send to BLE");
 						struct ble_event *ble_event_routed = new_ble_event(strlen(message->valuestring));
 
 						ble_event_routed->type = BLE_SEND;
 						
-						// char *address_ptr = "Placeholder"; //Finne ut hvordan man kan velge mellom to devicer.
-						// char address_temp[17];
-						// for(int i=0;i<17;i++){
-						// 	address_temp[i]=address_ptr[i];
-						// }
 						char addr[2];
 						addr[0]=message->valuestring[0];
 						addr[1]=message->valuestring[1];
-						// ble_event->address = address_temp;
+						
 						memcpy(ble_event_routed->address, addr, 2);
 
 						memcpy(ble_event_routed->dyndata.data, message->valuestring, strlen(message->valuestring));
@@ -733,19 +704,17 @@ static bool event_handler(const struct event_header *eh)
 						EVENT_SUBMIT(ble_event_routed);
 						return false;
 					}
+					/* Start scanning */
 					if(!strcmp(message->valuestring, "StartScan")){
 						scan_start(true);
 						return false;
 					}
+					/* Find number of connected and missing units and send to cloud_module */
 					if(!strcmp(message->valuestring,"BLE_status")){
-						LOG_INF("Checkpoint 1");
 						char status[2];
 						uint8_t connected = 0;
-						LOG_INF("Checkpoint 2");
 						for(int i=0; i < CONFIG_BT_MAX_CONN; i++){
-							LOG_INF("Checkpoint 3");
 							if(address_array[i][0]!='\0'){
-								LOG_INF("Checkpoint 4");
 								connected++;
 							}
 						}
@@ -754,30 +723,17 @@ static bool event_handler(const struct event_header *eh)
 
 						status[1] = '0' + (char)(CONFIG_BT_MAX_CONN - connected);
 
-						LOG_INF("Checkpoint 2, %i, %c, %c", connected, status[0], status[1]);
-
-						// LOG_INF("%c, %c, %c", (char)status[0], (char)status[1], (char)connected);
-
-						// char toretang = '1';
-
-						// LOG_INF("%i", (uint8_t)toretang);
+						LOG_DBG("Connected: %i or %c, Missing %c", connected, status[0], status[1]);
 
 						struct ble_event *ble_event = new_ble_event(strlen(status));
 						
 						ble_event->type = BLE_STATUS;
 						
-						LOG_INF("Checkpoint 3");
-						
 						memcpy(ble_event->address, "Placeholder", strlen("Placeholder"));
 
 						memcpy(ble_event->dyndata.data, status, strlen(status));
 
-						LOG_INF("Checkpoint 4");
 						EVENT_SUBMIT(ble_event);
-						return false;
-					}
-					if(!strcmp(message->valuestring, "Battery")){
-						// Get battery from Thingy:52
 						return false;
 					}
 				}
@@ -787,13 +743,7 @@ static bool event_handler(const struct event_header *eh)
 				LOG_INF("Message is null");
 				return false;
 			}
-			//char addr[17] = event->address;
-
-			// led_on=!led_on;
-			
-			// dk_set_led(DK_LED1, led_on);
-
-			LOG_INF("Message: %.*s",event->dyndata.size, event->dyndata.data);
+			LOG_DBG("Message: %.*s",event->dyndata.size, event->dyndata.data);
 
 			return false;
 		}
@@ -802,6 +752,7 @@ static bool event_handler(const struct event_header *eh)
 	if(is_ble_event(eh)){
 		int err;
 		struct ble_event *event = cast_ble_event(eh);
+		/* Send to peripheral unit with corresponding ID */
 		if(event->type==BLE_SEND){
 			if(event->address[0]=='*'){
 				int id = (int)event->address[1]-(int)'0';
@@ -848,7 +799,6 @@ static bool event_handler(const struct event_header *eh)
 K_THREAD_DEFINE(ble_module_thread, STACKSIZE,
 		module_thread_fn, NULL, NULL, NULL,
 		K_LOWEST_APPLICATION_THREAD_PRIO, 0, 0);
-
 
 EVENT_LISTENER(MODULE, event_handler);
 EVENT_SUBSCRIBE(MODULE, ble_event);

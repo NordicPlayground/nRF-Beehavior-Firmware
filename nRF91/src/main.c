@@ -19,22 +19,18 @@
 #include "events/ble_event.h"
 #include "events/cloud_event.h"
 
-#include "modules/ble_module.h"
-
 #include "cJSON.h"
 
 LOG_MODULE_REGISTER(MODULE, CONFIG_APPLICATION_MODULE_LOG_LEVEL);
-
-bool led_on;
 
 void main(void)
 {	
 
 	if(event_manager_init()){
-		LOG_INF("Event manager failed to initialize");
+		LOG_ERR("Event manager failed to initialize");
 		//Restart manually somehow
 	}
 	else{
-		LOG_INF("Event manager initalized");
+		LOG_DBG("Event manager initalized");
 	}
 }

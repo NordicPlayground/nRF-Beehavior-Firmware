@@ -1,1 +1,0 @@
-void scan_start(bool start);
