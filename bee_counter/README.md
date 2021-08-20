@@ -21,6 +21,13 @@ To build and flash using the Zephyr RTOS, make sure to have to necessary devicet
 
 1. Install necessary software if you haven't already following [this](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_installing.html) guide.
 
+1. On line 21 in prj.conf, set the name which is advertised to match the name the nRF5340 DK search's for.
+
+    ```
+    CONFIG_BT_DEVICE_NAME="ItsyBitsy"
+    ```
+
+
 1. Build the project using west from commandline:
 
     ```

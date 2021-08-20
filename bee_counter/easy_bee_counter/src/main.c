@@ -44,7 +44,7 @@ static const struct bt_data sd[] = {
 #define startGate 0
 #define endGate 24
 #define debeebounce 30
-#define outputDelay 10000
+#define outputDelay 60000
 
 unsigned long lastOutput = 0;
 unsigned long long current_time;
