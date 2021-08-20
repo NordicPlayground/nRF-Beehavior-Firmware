@@ -184,8 +184,8 @@ static bool event_handler(const struct event_header *eh)
 		// LOG_INF("Toggling LED 4 while Thingy event is handled.\n");
 		// dk_set_led_on(LED_4);
 		struct thingy_event *event = cast_thingy_event(eh);
-		LOG_INF("Temperature [C]: %i,%i, Humidity [%%]: %i, Air pressure [hPa]: %d,%i ID: %i.\n", event->data_array[0], \
-				event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, id-(uint8_t)'0');
+		LOG_INF("event_handler(thingy_event): Temperature [C]: %i,%i, Humidity [%%]: %i, Air pressure [hPa]: %d,%i, Battery charge [%%]: %i, ID: %i,\n", event->data_array[0], \
+				event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, event->battery_charge, id-(uint8_t)'0');
 
 		// LOG_INF("Hex-version: Temperature [C]: %x,%x, Humidity [%%]: %x, Air pressure [hPa]: %x,%x ID: %x\n", event->data_array[0], \
 		// 		event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, id-(uint8_t)'0');
@@ -209,6 +209,7 @@ static bool event_handler(const struct event_header *eh)
 		// printf("\n");
 		// printf("%d\n",sizeof(thingy_data));
 		thingy_data[9] = event->pressure_float;
+		thingy_data[10] = event->battery_charge;
 
 		// LOG_INF("Checking Thingy_data element 4,5,6,7, 8: %d,%d,%d,%d,%d\n", thingy_data[5], thingy_data[6], thingy_data[7], thingy_data[8],thingy_data[9]);
 		// LOG_INF("HEX VERSION Checking Thingy_data element 4,5,6,7, 8: %x,%x,%x,%x,%x \n", thingy_data[5], thingy_data[6], thingy_data[7], thingy_data[8],thingy_data[9]);
