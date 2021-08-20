@@ -34,17 +34,17 @@ static const struct bt_data sd[] = {
 	BT_DATA_BYTES(BT_DATA_UUID128_ALL, BT_UUID_BEE_VAL),
 };
 
-#define LED0 6
-#define LATCH 3 //A5 on the itsybitsy, used to pulse and load the shift registers
+#define LED0 6 //13 on the itsybitsy
+#define LATCH 3 //27 on the itsybitsy, used to pulse and load the shift registers
 
-#define powerGate1 5 //Arduino 10 on the itsybitsy
-#define powerGate2 26 //Arduino 11 on the itsybitsy
+#define powerGate1 5 //Arduino 4 on the itsybitsy
+#define powerGate2 26 //Arduino 28 on the itsybitsy
 
 #define numberOfGates 24
 #define startGate 0
 #define endGate 24
 #define debeebounce 30
-#define outputDelay 60000
+#define outputDelay 10000
 
 unsigned long lastOutput = 0;
 unsigned long long current_time;
@@ -156,8 +156,9 @@ void sendData() {
     printk("%i", outTotal);
     printk("\n");
     printk("Total in: %i\n", inTotal);
-	 
+	
     if(current_conn){
+		//printk("Connected\n");
 		uint16_t msg[2] = {outTotal, inTotal};
 		bt_nus_send(current_conn, msg, sizeof(msg));
 	}
@@ -200,6 +201,15 @@ void main(void){
 		printk("Device not found\n");
 		return;
 	}
+
+	gpio_pin_configure(dev, LATCH, GPIO_OUTPUT); //We need to pulse these shift registers to read them
+	gpio_pin_configure(dev, powerGate1, GPIO_OUTPUT);
+	gpio_pin_configure(dev, powerGate2, GPIO_OUTPUT);
+	gpio_pin_configure(dev, LED0, GPIO_OUTPUT); //LED pin is 6, one could use aliases here
+	gpio_pin_configure(dev, 2, GPIO_OUTPUT_INACTIVE);
+	gpio_pin_configure(dev, 14, GPIO_OUTPUT_INACTIVE);
+	gpio_pin_configure(dev, 16, GPIO_OUTPUT_INACTIVE);
+
 	while(1){
 		current_time = k_uptime_get();
 		static uint8_t rx_buffer[6]; //6 shift registers requires an array with length 6
@@ -212,24 +222,19 @@ void main(void){
 			.buffers = &rx_buf,
 			.count = 1
 		};
-
-		gpio_pin_configure(dev, LATCH, GPIO_OUTPUT_ACTIVE); //We need to pulse these shift registers to read them
-		gpio_pin_configure(dev, powerGate1, GPIO_OUTPUT_INACTIVE);
-		gpio_pin_configure(dev, powerGate2, GPIO_OUTPUT_INACTIVE);
-		gpio_pin_configure(dev, LED0, GPIO_OUTPUT); //LED pin is 6, one could use aliases here
 		
-		int err;	
+		int err;
 
 		gpio_pin_set(dev, powerGate1, 1);
 		gpio_pin_set(dev, powerGate2, 1);
 
-		k_busy_wait(75); //Setting first 24 gates takes ~ 15us, while the gates closer to the end takes ~40-75us. This needs to be verified.
+		k_usleep(75); //Setting first 24 gates takes ~ 15us, while the gates closer to the end takes ~40-75us. This needs to be verified.
 
 		gpio_pin_set(dev, LATCH, 0);
-		k_busy_wait(3);
+		k_usleep(3);
 		gpio_pin_set(dev, LATCH, 1);
 
-		k_busy_wait(3);
+		k_usleep(3);
 
 		gpio_pin_set(dev, powerGate1, 0);
 		gpio_pin_set(dev, powerGate2, 0);
@@ -313,7 +318,7 @@ void main(void){
 		   	  		printk(", IT ,");
 		   	  		printk("%ld", inReadingTimeHigh[i]);
 		   	  		printk(", ");
-					*/   
+					*/
 		   	  		if(outReadingTimeHigh[i] < 650 && inReadingTimeHigh[i] < 650)
 					{ //should be less than 650ms
 		   	    		if((current_time - lastOutFinishedTime[i]) < 200){ //the sensors are pretty cose together so the time it takes to trigger on and then the other should be small.. ~200ms
@@ -349,7 +354,7 @@ void main(void){
 			  		printk(", OT ,");
 			  		printk("%ld", outReadingTimeHigh[i]);
 			  		printk(", ");
-				    */    
+				    */
 			  		if((outReadingTimeHigh[i] < 600) && (inReadingTimeHigh[i] < 600)) //should be less than 600ms
 					{ 
 			  		   	if((current_time - lastInFinishedTime[i]) < 200){ //the sensors are pretty cose together so this time should be small
@@ -371,7 +376,7 @@ void main(void){
 			}        
 		}
 
-		k_busy_wait(15);   // debounce
+		k_msleep(15);   // debounce
 
 		if ((current_time - lastOutput) > outputDelay) 
 		{
