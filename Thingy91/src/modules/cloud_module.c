@@ -322,7 +322,6 @@ void cloud_setup_fn(void)
 {
 	int err;
 
-	
 	err = bt_enable(NULL);
 	if (err) {
 		LOG_ERR("Bluetooth init failed (err %d)", err);
