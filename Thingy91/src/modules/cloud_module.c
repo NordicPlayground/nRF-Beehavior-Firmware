@@ -25,6 +25,8 @@
 
 #include <date_time.h>
 
+#include <bluetooth/bluetooth.h>
+
 LOG_MODULE_REGISTER(cloud_module, CONFIG_LOG_DEFAULT_LEVEL);
 
 #define AT_CMD_VBAT		"AT%XVBAT"
@@ -319,6 +321,13 @@ static void button_handler(uint32_t button_states, uint32_t has_changed)
 void cloud_setup_fn(void)
 {
 	int err;
+
+	
+	err = bt_enable(NULL);
+	if (err) {
+		LOG_ERR("Bluetooth init failed (err %d)", err);
+		return;
+	}
 
 	err = dk_leds_init();
 	dk_set_leds_state(DK_ALL_LEDS_MSK, 0);
