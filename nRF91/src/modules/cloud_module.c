@@ -24,7 +24,15 @@
 
 #include <date_time.h>
 
+#include <bluetooth/bluetooth.h>
+
 LOG_MODULE_REGISTER(cloud_module, CONFIG_LOG_DEFAULT_LEVEL);
+
+#if defined(CONFIG_BOARD_THINGY91)
+#include <modem/at_cmd.h>
+#define AT_CMD_VBAT		"AT%XVBAT"
+static struct k_work_delayable cloud_update_work;
+#endif
 
 static struct cloud_backend *cloud_backend;
 static struct k_work_delayable connect_work;
@@ -56,6 +64,64 @@ static void connect_work_fn(struct k_work *work)
 	k_work_schedule(&connect_work,
 		K_SECONDS(30));
 }
+
+#if defined(CONFIG_BOARD_THINGY91)
+static void cloud_update_work_fn(struct k_work *work)
+{
+	LOG_INF("But does this start");
+	if (!cloud_connected) {
+		LOG_INF("Not connected to cloud, abort cloud publication");
+		k_work_reschedule(&cloud_update_work, K_SECONDS(30));
+		return;
+	}
+	int err;
+
+	char buf[20];
+	enum at_cmd_state *response;
+	err = at_cmd_write(AT_CMD_VBAT, &buf, 20, response);
+
+	LOG_INF("%.20s, with code %i", buf, err);
+	char voltage[4];
+	for(uint8_t i=8; i<12; i++){
+		voltage[i-8] = buf[i];
+	}
+	LOG_INF("%.4s", voltage);
+
+	int64_t unix_time_ms = k_uptime_get();
+	err = date_time_now(&unix_time_ms);
+	int64_t divide = 1000;
+	int64_t ts = unix_time_ms / divide;
+
+	LOG_INF("Time: %d", ts);
+
+	char message[50];
+	int len = snprintk(message, 50, "{\"BAT\":\"%.4s\"\"TIME\":\"%lld\"}", voltage, ts);
+
+	LOG_INF("%.50s", message);
+
+	struct cloud_msg msg = {
+		.qos = CLOUD_QOS_AT_MOST_ONCE,
+		.buf = message,
+		.len = len
+	};
+
+	// When using the nRF Cloud backend data is sent to the message topic.
+	// This is in order to visualize the data in the web UI terminal.
+	// For Azure IoT Hub and AWS IoT, messages are addressed directly to the
+	// device twin (Azure) or device shadow (AWS).
+	
+	msg.endpoint.type = CLOUD_EP_MSG; //For nRF Cloud
+	
+	// //msg.endpoint.type = CLOUD_EP_STATE; //For the inferior Clouds
+
+	err = cloud_send(cloud_backend, &msg);
+	LOG_INF("Message sent with code %i", err);
+	if (err) {
+		LOG_ERR("cloud_send failed, error: %d", err);
+	}
+	k_work_reschedule(&cloud_update_work, K_MINUTES(15));
+}
+#endif
 
 void cloud_event_handler(const struct cloud_backend *const backend,
 			 const struct cloud_event *const evt,
@@ -232,8 +298,14 @@ static void modem_configure(void)
 
 static void button_handler(uint32_t button_states, uint32_t has_changed)
 {
-	/* Press Button 1 to search for peripherals */
+	/* Press Button 1 to turn of the lights to save power */
 	if (has_changed & button_states & DK_BTN1_MSK) {
+		dk_set_leds_state(DK_ALL_LEDS_MSK, 0);
+	}
+	#if defined(CONFIG_BOARD_THINGY91)
+	#else
+	/* Press Button 2 to search for peripherals */
+	if (has_changed & button_states & DK_BTN2_MSK) {
 		cloud_disconnect(cloud_backend);
 		struct cloud_event_abbr *cloud_event_sleep = new_cloud_event_abbr(strlen("Cloud entering sleep mode"));
 
@@ -243,22 +315,21 @@ static void button_handler(uint32_t button_states, uint32_t has_changed)
 
         EVENT_SUBMIT(cloud_event_sleep);
 	}
-	/* Press Button 2 to test the UNIX timestamping */	
-	if (has_changed & button_states & DK_BTN2_MSK) {
-		int err;
-
-		int64_t unix_time_ms = k_uptime_get();
-		err = date_time_now(&unix_time_ms);
-		int64_t divide = 1000;
-		int64_t sec = unix_time_ms / divide;
-
-		LOG_INF("Seconds: %d", sec);
-	}
+	#endif
 }
 
 void cloud_setup_fn(void)
 {
 	int err;
+
+	err = bt_enable(NULL);
+	if (err) {
+		LOG_ERR("Bluetooth init failed (err %d)", err);
+		return;
+	}
+	#if defined(CONFIG_BOARD_THINGY91)
+	LOG_INF("You are using a Thingy:91, but you probably allready knew that.");
+	#endif
 
 	err = dk_leds_init();
 	dk_set_leds_state(DK_ALL_LEDS_MSK, 0);
@@ -275,6 +346,9 @@ void cloud_setup_fn(void)
 	}
 
 	k_work_init_delayable(&connect_work, connect_work_fn);
+	#if defined(CONFIG_BOARD_THINGY91)
+	k_work_init_delayable(&cloud_update_work, cloud_update_work_fn);
+	#endif
 	modem_configure();
 
 	err = dk_buttons_init(button_handler);
@@ -292,6 +366,9 @@ void cloud_setup_fn(void)
 	LOG_INF("Connecting to cloud");
 
 	k_work_schedule(&connect_work, K_NO_WAIT);
+	#if defined(CONFIG_BOARD_THINGY91)
+	k_work_reschedule(&cloud_update_work, K_NO_WAIT);
+	#endif
 }
 static bool event_handler(const struct event_header *eh)
 {

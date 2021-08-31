@@ -633,11 +633,6 @@ static void module_thread_fn(void){
 		return;
 	}
 
-	err = bt_enable(NULL);
-	if (err) {
-		LOG_ERR("Bluetooth init failed (err %d)", err);
-		return;
-	}
 	LOG_INF("Bluetooth initialized");
 
 	if (IS_ENABLED(CONFIG_SETTINGS)) {

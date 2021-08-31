@@ -14,6 +14,9 @@ config BLE_TO_CLOUD_APP_VERSION_MAX_LEN
 	int "Maximum length of application firmware version"
 	default 150
 
+config BOARD_THINGY91
+	bool "Set when flashing to thingy91_nrf9160ns"
+	default n
 endmenu
 
 menu "Zephyr Kernel"
