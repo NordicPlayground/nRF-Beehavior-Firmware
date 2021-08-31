@@ -1,4 +1,4 @@
-nRF5340dk: Beehavior Monitoring THIS IS A COPY, MUST BE REWRITTEN INTO 9160 SPECIFIC README
+nRF9160dk/Thingy:91: Beehavior Monitoring
 #########################
 
 .. contents::
@@ -14,7 +14,7 @@ This module is based on multiple nrf-samples, and the asset_tracker_v2 applicati
 * Battery state notifications - Sends updates of the battery percentage. WIP! Sends an alert when the battery is about to die.
 * Ultra-low power by design - WIP! The goal of the application is to design a greedy BLE transmission algorithm and preprocess sensor data before transmitting it to the cloud module highlights.
 * Batching of data - WIP! Data can be batched to reduce the number of messages transmitted, and to be able to retain collected data while the device is offline.
-* Configurable at run time - WIP! The application behavior (for example, accelerometer sensitivity or GPS timeout) can be configured at run time. This improves the development experience with individual devices or when debugging the device behavior in specific areas and situations. It also reduces the cost for transmitting data to the devices by reducing the frequency of sending firmware updates to the devices.
+* Configurable at run time - WIP! The application behavior (for example, data sampling rate) can be configured at run time. This improves the development experience with individual devices or when debugging the device behavior in specific areas and situations. It also reduces the cost for transmitting data to the devices by reducing the frequency of sending firmware updates to the devices.
 
 Implementation of the above features required a rework of existing nrf samples and applications. Most noteworthy are the event_manager, cloud_client and central_uart samples.
 
@@ -63,7 +63,7 @@ The application supports the following sensor types:
 +-----------------------+-------------------------------------------------------+---------------+
 
 The sets of sensor data that are published to the cloud service consist of relative `timestamps <Timestamping_>`_ that originate from the time
-the nRF91 unit received the data. Aswell all data are sent with a NAME to differentiate messages from different peripherals/hives.
+the nRF91 unit received the data. All data are sent with a NAME to differentiate messages from different peripherals/hives.
 
 The sensor data used in the system so far can be seen in the following tables:
 
@@ -110,22 +110,22 @@ User interface
 **************
 
 The application uses button number 1 and 2, plus the reset button which restarts the dk.
-Button1 currently prints a UNIX timestamp in seconds.
-Button2 starts scanning for peripheral units.
+Button1 turns of LED's to save power.
+Button2 starts scanning for peripheral units. PS. Only works on the DevKit.
 
 Additionally, the application displays LED behavior that corresponds to the task performed by the application.
 
 The following table shows the LED behavior demonstrated by the application:
 
-+----------------------------------+-------------------------+
-| State                            | nRF9160dk               |
-+==================================+=========================+
-| Connected to Cloud               | LED1 on                 |
-+----------------------------------+-------------------------+
-| Connected to nRF53/peripheral    | LED2 on                 |
-+----------------------------------+-------------------------+
-| WIP! Error                       |  all 4 LEDs blinking    |
-+----------------------------------+-------------------------+
++----------------------------------+-------------------------+--------------------------+
+| State                            | nRF9160dk               | Thingy:91                |
++==================================+=========================+==========================+
+| Connected to Cloud               | LED1 on                 | Blue                     |
++----------------------------------+-------------------------+--------------------------+
+| Connected to nRF53/peripheral    | LED2 on                 | Green                    |
++----------------------------------+-------------------------+--------------------------+
+| WIP! Error                       |  all 4 LEDs blinking    | Red                      |
++----------------------------------+-------------------------+--------------------------+
 
 
 Requirements
@@ -139,18 +139,11 @@ The application supports the following development kits:
 
 .. include:: /includes/spm.txt
 
-Configuration
-*************
-
-The application has a Kconfig file with options that are specific to the the 5340dk part of Beehavior Monitoring, where each of the modules has a separate submenu.
-These options can be used to enable and disable modules and modify their behavior and properties.
-
-
 Setup
 =====
 Config
 ------
-Maybe write something here? 
+Change CONFIG_BT_MAX_CONN in prj.conf to amount of nRF5340dk you want to connect to. 
 
 Setting up the nrf9160dk/Thingy:91 part of Beehavior Monitoring
 --------------------------------------------------
@@ -160,29 +153,6 @@ To set up the nrf9160dk/Thingy:91 part of the Beehavior Monitoring application t
 * Set number of connections in prj.conf (CONFIG_BT_MAX_CONN).
 * Flash the :ref:`hci_lpuart` example to the thingy91_nrf52840@1.0.0/nrf9160dk_nrf52840@1.0.0 chip.
 * Build and flash to the thingy91_nrf9160ns@1.0.0/nrf9160dk_nrf9160ns@1.0.0
-
-
-Configuration options
-=====================
-CONFIG_BT_MAX_CONN
-
-
-Mandatory library configuration
-===============================
-
-CONFIG_BT_MAX_CONN
-
-
-Optional library configurations
-===============================
-Needs filling?
-
-You can add the following optional configurations to configure the heap or to provide additional information such as APN to the modem for registering with an LTE network:
-
-* :option:`CONFIG_HEAP_MEM_POOL_SIZE` - Configures the size of the heap that is used by the application when encoding and sending data to the cloud. More information can be found in :ref:`memory_allocation`.
-* :option:`CONFIG_PDN_DEFAULTS_OVERRIDE` - Used for manual configuration of the APN. Set the option to ``y`` to override the default PDP context configuration.
-* :option:`CONFIG_PDN_DEFAULT_APN` - Used for manual configuration of the APN. An example is ``apn.example.com``.
-
 
 Configuration files
 ===================
@@ -196,7 +166,7 @@ The application contains examples of Kconfig overlays.
 The following configuration files are available in the application folder:
 
 * :file:`prj.conf` - Configuration file common for all build targets
-* :file:`boards/thingy53_nrf5340_cpuappns.conf` - Configuration file specific for Thingy:53. The file is automatically merged with :file:`prj.conf` when you build for the ``thingy53_nrf5340_cpuappns`` build target. This board might need some further work.
+* :file:`boards/thingy91_nrf9160ns.conf` - Configuration file specific for Thingy:91. The file is automatically merged with :file:`prj.conf` when you build for the ``thingy91_nrf9160ns@1.0.0`` build target. This board might need some further work.
 * :file:`WIP! TO DO. overlay-low-power.conf` - Configuration file that achieves the lowest power consumption by disabling features  that consume extra power like LED control and logging.
 * :file:`WIP! TO DO. overlay-debug.conf` - Configuration file that adds additional verbose logging capabilities to the application
 
@@ -208,16 +178,16 @@ When the DTS overlay filename matches the build target, the overlay is automatic
 Building and running
 ********************
 
-Before building and running the firmware ensure that the 9160 unit is connected to your nRF Cloud account.
+Before building and running the firmware ensure that the nRF9160dk/Thingy:91 is connected to your nRF Cloud account.
 
 Building with overlays
 ======================
 
 To build with Kconfig overlay, it must be based to the build system, as shown in the following example:
 
-``west build -b thingy53_nrf5340_cpuappns \ nrf5340dk_nrf5340_cpuappns -- -DOVERLAY_CONFIG=overlay-low-power.conf``. Note that this overlay is not yet created.
+``west build -b thingy91_nrf9160ns@1.0.0 \ nrf9160dk_nrf9160ns@1.0.0 -- -DOVERLAY_CONFIG=overlay-low-power.conf``. Note that this overlay is not yet created.
 
-The above command will build for Thingy:53 \ nRF5340 DK using the configurations found in :file:`overlay-low-power.conf`, in addition to the configurations found in :file:`thingy53_nrf5340_cpuappns.conf`.
+The above command will build for Thingy:91 \ nRF9160 DK using the configurations found in :file:`overlay-low-power.conf`, in addition to the configurations found in :file:`thingy53_nrf5340_cpuappns.conf`.
 If some options are defined in both files, the options set in the overlay take precedence.
 
 Testing
@@ -226,7 +196,7 @@ Testing
 After programming the application and all the prerequisites to your development kit, test the application by performing the following steps:
 
 1. |connect_kit|
-#. Connect to the kit with a terminal emulator (for example, LTE Link Monitor or Termite).
+#. Connect to the kit with a terminal emulator (for example, LTE Link Monitor, Termite or RTT viewer if you are using a Thingy:91).
 #. Reset the development kit.
 #. Observe in the terminal window that the development kit starts up in the Secure Partition Manager and that the application starts.
    This is indicated by several <inf> module_name: function_name(): "placeholder text" outputs, similar to the following example from asset_tracker_v2.
@@ -248,64 +218,21 @@ After programming the application and all the prerequisites to your development 
 
 #. Observe that data is sampled periodically and sent to the cloud::
 
-    <inf> event_manager: APP_EVT_DATA_GET_ALL
-    <inf> event_manager: APP_EVT_DATA_GET - Requested data types (MOD_DYN, BAT, ENV, GNSS)
-    <inf> event_manager: GPS_EVT_ACTIVE
-    <inf> event_manager: SENSOR_EVT_ENVIRONMENTAL_NOT_SUPPORTED
-    <inf> event_manager: MODEM_EVT_MODEM_DYNAMIC_DATA_READY
-    <inf> event_manager: MODEM_EVT_BATTERY_DATA_READY
-    <inf> event_manager: GPS_EVT_DATA_READY
-    <inf> event_manager: DATA_EVT_DATA_READY
-    <inf> event_manager: GPS_EVT_INACTIVE
-    <inf> event_manager: DATA_EVT_DATA_SEND
-    <wrn> data_module: No batch data to encode, ringbuffers empty
-    <inf> event_manager: CLOUD_EVT_DATA_ACK
+    <inf> cloud_module: Message formatted: {"appID":"Thingy""TEMP":"23.48""HUMID":"44""AIR":"1017.3""BTRY":"58""TIME":"1630395932""NAME":"Hive1"}, length: 102 
 
-The order should be something like:
-* Initialize BLE and scan.
-* Scan for Thingy:52 and connect (LED1 ON).
-* Discover services from Thingy:52.
-* Subscribe to notifications for a set of services.
-* Scan for Thingy:91 and connect either when notification is given OR 91 requests connection through scanning (LED2 ON).
-* Scan for BroodMinder Weight advertisements and read data message (LED3 ON/OFF while doing/not doing this).
-* Loop.
 
 Known issues and limitations
 ****************************
 
-There are probably mane issues and limitations, but this will take some time to write. The following text is kept as a template for writing this one. NOTE!! Sample text for asset_tracker_v2 is kept as example.
+Following are the current limitations in the nRF9160dk/Thingy:91 code:
 
-Following are the current limitations in the nRF Cloud implementation of the Asset Tracker v2:
+* As of now this project only supports nRF CLoud. If you want to expand the project to other Cloud services you can use the nRF9160/Cloud_Client example as a guide.
 
-* As of now this project only supports nRF CLoud. If you want to expand the project to other Cloud services you can use the Cloud_Client example as a guide.
-
-* The nRF Cloud web application does not support the manipulation of real-time configurations.
-  However, this is possible by using the REST API calls described in `nRF Cloud Patch Device State`_.
-  To manipulate the device configuration, the ``desired`` section of the device state must be populated with the desired configuration of the device.
-  The following schema sets the various device configuration parameters to their default values:
-
-   .. parsed-literal::
-      :class: highlight
-
-	{
-		"desired":{
-			"config":{
-				"activeMode":true,
-				"activeWaitTime":120,
-				"movementTimeout":3600,
-				"movementResolution":120,
-				"gpsTimeout":60,
-				"movementThreshold":10
-			}
-		}
-	}
-
-* nRF Cloud does not support a separate endpoint for *batch* data updates. To temporarily circumvent this, batched data updates are sent to the message endpoint.
-
+* The Thingy:91/nRF9160dk need to send a message to nRF Cloud every 5 minutes or you need to manually reconnect to Cloud to send new messages. It should be possible to ping 
+nRF Cloud to keep the connection alive, but as of now it is not implemented in this project.
 
 Dependencies
 ************
-WIP TODO! Must be customized to fit this unit
 This application uses the following |NCS| libraries and drivers:
 
 * :ref:`event_manager`
@@ -316,86 +243,8 @@ This application uses the following |NCS| libraries and drivers:
 
 In addition, it uses the following sample:
 
-* :ref:`secure_partition_manager`
+* :ref:`event_manager`
 
 * :ref:`bluetooth/peripheral_uart`
 
 * :ref:`nrf9160/cloud_client`
-
-Thread usage
-============
-
-WIP TODO! Need to write the final iteration with either/and/or threads and workqueue.
-
-In addition to system threads, some modules have dedicated threads to process messages.
-Some modules receive messages that may potentially take an extended amount of time to process.
-Such messages are not suitable to be processed directly in the event handler callbacks that run on the system queue.
-Therefore, these modules have a dedicated thread to process the messages.
-
-Application-specific threads:
-
-* Main thread (app module)
-* Data management module
-* Cloud module
-* Sensor module
-* Modem module
-
-Modules that do not have dedicated threads process events in the context of system work queue in the event manager callback.
-Therefore, their workloads must be light and non-blocking.
-
-All module threads have the following identical properties by default:
-
-* Thread is initialized at boot.
-* Thread is preemptive.
-* Priority is set to the lowest application priority in the system, which is done by setting ``CONFIG_NUM_PREEMPT_PRIORITIES`` to ``1``.
-* Thread is started instantly after it is initialized in the boot sequence.
-
-Following is the basic structure for all the threads:
-
-.. code-block:: c
-
-   static void module_thread_fn(void)
-   {
-           struct module_specific msg;
-
-           self.thread_id = k_current_get();
-           module_start(&self);
-
-           /* Module specific setup */
-
-           state_set(STATE_DISCONNECTED);
-
-           while (true) {
-                   module_get_next_msg(&self, &msg);
-
-                   switch (state) {
-                   case STATE_DISCONNECTED:
-                           on_state_disconnected(&msg);
-                           break;
-                   case STATE_CONNECTED:
-                           on_state_connected(&msg);
-                           break;
-                   default:
-                           LOG_WRN("Unknown state");
-                           break;
-                   }
-
-                   on_all_states(&msg);
-           }
-   }
-
-.. _memory_allocation:
-
-Memory allocation
-=================
-
-Mostly, the modules use statically allocated memory.
-Following are some features that rely on dynamically allocated memory, using the :ref:`Zephyr heap memory pool implementation <zephyr:heap_v2>`:
-
-* Event manager events
-* Encoding of the data that will be sent to cloud
-
-You can configure the heap memory by using the :option:`CONFIG_HEAP_MEM_POOL_SIZE`.
-The data management module that encodes data destined for cloud is the biggest consumer of heap memory.
-Therefore, when adjusting buffer sizes in the data management module, you must also adjust the heap accordingly.
-This avoids the problem of running out of heap memory in worst-case scenarios.
