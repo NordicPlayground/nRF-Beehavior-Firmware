@@ -5,7 +5,7 @@ nRF5340dk: Beehavior Monitoring
    :local:
    :depth: 2
 
-The Beehavior Monitoring is a real-time configurable ultra-low power capable application for the nRF5340dk used in the Summer Project for 2021.
+The Beehavior Monitoring is an application for the nRF5340dk used in the Summer Project for 2021.
 
 This module is based on multiple nrf-samples,  and the asset_tracker_v2 application, customized and merged to fit the project.
 
@@ -45,15 +45,15 @@ Data types and sampling rate
 Data from multiple sensor sources are collected to construct information about the orientation, battery life, and environment.
 The application supports the following data types:
 
-+---------------+-------------------------------------------+-----------------------------------------------+
-| Data type     | Description                               | Identifiers                                   |
-+===============+===========================================+===============================================+
-| Environmental | Temperature, humidity and air pressure    | APP_DATA_ENVIRONMENTAL (not yet identifiers)  |
-+---------------+-------------------------------------------+-----------------------------------------------+
-| Movement      | Orientation                               | APP_DATA_MOVEMENT (not yet identifiers)       |
-+---------------+-------------------------------------------+-----------------------------------------------+
-| Battery       | Remaining power                           | APP_DATA_BATTERY (not yet identifiers)        |
-+---------------+-------------------------------------------+-----------------------------------------------+
++---------------+-------------------------------------------+
+| Data type     | Description                               |
++===============+===========================================+
+| Environmental | Temperature, humidity and air pressure    |
++---------------+-------------------------------------------+
+| Movement      | Orientation                               |
++---------------+-------------------------------------------+
+| Battery       | Remaining power                           |
++---------------+-------------------------------------------+
 
 WIP! The sets of sensor data that are published to the cloud service consist of relative `timestamps <Timestamping_>`_ that originate from the time of sampling.
 WIP! The data sampling should be concatenated in a buffer matrix containing a finite number of measurements, f.ex 15 samples. 
@@ -80,10 +80,10 @@ The sensor data used in the system so far can be seen in the following table:
 +-------------------------------------+-----------------------+----------------+------------------------+
 | BM_W - Temperature (external)       | Temperature in Celsius| 2 bytes        | [Celsius]              |
 +-------------------------------------+-----------------------+----------------+------------------------+
-| BeeCounter -WIP! Flux of bees in/out| Flux in/out per minute| 2/2 bytes      | [Bees/min]             |
+| BeeCounter - Flux of bees in/out    | Flux in/out per minute| 2/2 bytes      | [Bees/min]             |
 +-------------------------------------+-----------------------+----------------+------------------------+
 
-Data buffers (WIP! Remains to be done.)
+Data buffers (TO DO!)
 =======================================
 Data sampled from the onboard modem and the external sensors is to be stored in a buffer, where a ring buffer is a suggested option.
 This enables to store data for a while if the units become disconnected from each other, and reduce transmission rate to conserve power.
@@ -109,7 +109,7 @@ The following table shows the LED behavior demonstrated by the application:
 +----------------------------------+-------------------------+
 | Scanning for BM_W advertisements | LED3 on                 |
 +----------------------------------+-------------------------+
-| WIP! Error                       |  all 4 LEDs blinking    |
+| TO DO! Error                     |  All 4 LEDs blinking    |
 +----------------------------------+-------------------------+
 
 
@@ -207,8 +207,8 @@ The following configuration files are available in the application folder:
 
 * :file:`prj.conf` - Configuration file common for all build targets
 * :file:`boards/thingy53_nrf5340_cpuappns.conf` - Configuration file specific for Thingy:53. The file is automatically merged with :file:`prj.conf` when you build for the ``thingy53_nrf5340_cpuappns`` build target. This board might need some further work.
-* :file:`WIP! TO DO. overlay-low-power.conf` - Configuration file that achieves the lowest power consumption by disabling features  that consume extra power like LED control and logging.
-* :file:`WIP! TO DO. overlay-debug.conf` - Configuration file that adds additional verbose logging capabilities to the application
+* :file:`TO DO. overlay-low-power.conf` - Configuration file that achieves the lowest power consumption by disabling features  that consume extra power like LED control and logging.
+* :file:`TO DO. overlay-debug.conf` - Configuration file that adds additional verbose logging capabilities to the application
 
 Generally, Kconfig overlays have an ``overlay-`` prefix and a ``.conf`` extension.
 Board-specific configuration files are placed in the :file:`boards` folder and are named as :file:`<BOARD>.conf`.
@@ -279,120 +279,16 @@ The order should be something like:
 Known issues and limitations
 ****************************
 
-There are probably mane issues and limitations, but this will take some time to write. The following text is kept as a template for writing this one. NOTE!! Sample text for asset_tracker_v2 is kept as example.
-
-Following are the current limitations in the nRF Cloud implementation of the Asset Tracker v2:
-
-* Data that is sampled by the device must ideally be addressed to the cloud-side device state and published in a single packet for regular device updates.
-  This is to avoid the unnecessary stack overhead associated with splitting the payload and the additional current consumption that might result from splitting and sending the data as separate packets.
-  However, in the case of nRF Cloud implementation, the nRF Cloud front end supports only the display of APP_DATA_MODEM_DYNAMIC (networkInfo) and APP_DATA_MODEM_STATIC (deviceInfo) through the device shadow.
-  The other supported data types (GPS, temperature, and humidity) must be sent in a specified format to a separate message endpoint for the front end to graphically represent the data.
-  You can find the JSON protocol definitions for data sent to the message endpoint in `nRF Cloud JSON protocol schemas`_.
-
-* The nRF Cloud web application does not support the manipulation of real-time configurations.
-  However, this is possible by using the REST API calls described in `nRF Cloud Patch Device State`_.
-  To manipulate the device configuration, the ``desired`` section of the device state must be populated with the desired configuration of the device.
-  The following schema sets the various device configuration parameters to their default values:
-
-   .. parsed-literal::
-      :class: highlight
-
-	{
-		"desired":{
-			"config":{
-				"activeMode":true,
-				"activeWaitTime":120,
-				"movementTimeout":3600,
-				"movementResolution":120,
-				"gpsTimeout":60,
-				"movementThreshold":10
-			}
-		}
-	}
-
-* nRF Cloud does not support a separate endpoint for *batch* data updates. To temporarily circumvent this, batched data updates are sent to the message endpoint.
+There are probably many issues and limitations, but this will take some time to write. Thus, this section is incomplete.
 
 
 Dependencies
 ************
-WIP TODO! Must be customized to fit this unit
+This section might need filling.
 This application uses the following |NCS| libraries and drivers:
 
 * :ref:`event_manager`
 
-* :ref:`nordic_uart_service`
-
-
-In addition, it uses the following sample:
-
-* :ref:`secure_partition_manager`
-
-* :ref:`peripheral_uart`
-
-* :ref:`central_uart`
-
-
-Thread usage
-============
-
-WIP TODO! Need to write the final iteration with either/and/or threads and workqueue.
-
-In addition to system threads, some modules have dedicated threads to process messages.
-Some modules receive messages that may potentially take an extended amount of time to process.
-Such messages are not suitable to be processed directly in the event handler callbacks that run on the system queue.
-Therefore, these modules have a dedicated thread to process the messages.
-
-Application-specific threads:
-
-* Main thread (app module)
-* Data management module
-* Cloud module
-* Sensor module
-* Modem module
-
-Modules that do not have dedicated threads process events in the context of system work queue in the event manager callback.
-Therefore, their workloads must be light and non-blocking.
-
-All module threads have the following identical properties by default:
-
-* Thread is initialized at boot.
-* Thread is preemptive.
-* Priority is set to the lowest application priority in the system, which is done by setting ``CONFIG_NUM_PREEMPT_PRIORITIES`` to ``1``.
-* Thread is started instantly after it is initialized in the boot sequence.
-
-Following is the basic structure for all the threads:
-
-.. code-block:: c
-
-   static void module_thread_fn(void)
-   {
-           struct module_specific msg;
-
-           self.thread_id = k_current_get();
-           module_start(&self);
-
-           /* Module specific setup */
-
-           state_set(STATE_DISCONNECTED);
-
-           while (true) {
-                   module_get_next_msg(&self, &msg);
-
-                   switch (state) {
-                   case STATE_DISCONNECTED:
-                           on_state_disconnected(&msg);
-                           break;
-                   case STATE_CONNECTED:
-                           on_state_connected(&msg);
-                           break;
-                   default:
-                           LOG_WRN("Unknown state");
-                           break;
-                   }
-
-                   on_all_states(&msg);
-           }
-   }
 
 .. _memory_allocation:
 
