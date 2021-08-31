@@ -65,8 +65,6 @@ static void connect_work_fn(struct k_work *work)
 		K_SECONDS(30));
 }
 
-
-//Might be unnecessesary
 static void cloud_update_work_fn(struct k_work *work)
 {
 	if (!cloud_connected) {
