@@ -6,7 +6,7 @@ nRF9160dk/Thingy:91: Beehavior Monitoring
    :depth: 2
 
 The Beehavior Monitoring is a real-time configurable ultra-low power capable application for the nRF9160dk/Thingy:91 used in the
-Summer Project for 2021.
+Summer Project for 2021. This project was developed with nRF connect version v1.6.0-rc2.
 
 This module is based on multiple nrf-samples, and the asset_tracker_v2 application, customized and merged to fit the project.
 
