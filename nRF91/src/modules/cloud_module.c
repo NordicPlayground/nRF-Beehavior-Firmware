@@ -68,7 +68,6 @@ static void connect_work_fn(struct k_work *work)
 #if defined(CONFIG_BOARD_THINGY91)
 static void cloud_update_work_fn(struct k_work *work)
 {
-	LOG_INF("But does this start");
 	if (!cloud_connected) {
 		LOG_INF("Not connected to cloud, abort cloud publication");
 		k_work_reschedule(&cloud_update_work, K_SECONDS(30));
@@ -80,19 +79,19 @@ static void cloud_update_work_fn(struct k_work *work)
 	enum at_cmd_state *response;
 	err = at_cmd_write(AT_CMD_VBAT, &buf, 20, response);
 
-	LOG_INF("%.20s, with code %i", buf, err);
+	LOG_DBG("%.20s, with code %i", buf, err);
 	char voltage[4];
 	for(uint8_t i=8; i<12; i++){
 		voltage[i-8] = buf[i];
 	}
-	LOG_INF("%.4s", voltage);
+	LOG_DBG("Voltage: %.4s [mV]", voltage);
 
 	int64_t unix_time_ms = k_uptime_get();
 	err = date_time_now(&unix_time_ms);
 	int64_t divide = 1000;
 	int64_t ts = unix_time_ms / divide;
 
-	LOG_INF("Time: %d", ts);
+	LOG_DBG("Time: %d", ts);
 
 	char message[50];
 	int len = snprintk(message, 50, "{\"BAT\":\"%.4s\"\"TIME\":\"%lld\"}", voltage, ts);
@@ -115,7 +114,7 @@ static void cloud_update_work_fn(struct k_work *work)
 	// //msg.endpoint.type = CLOUD_EP_STATE; //For the inferior Clouds
 
 	err = cloud_send(cloud_backend, &msg);
-	LOG_INF("Message sent with code %i", err);
+	LOG_DBG("Message sent with code %i", err);
 	if (err) {
 		LOG_ERR("cloud_send failed, error: %d", err);
 	}
@@ -327,9 +326,6 @@ void cloud_setup_fn(void)
 		LOG_ERR("Bluetooth init failed (err %d)", err);
 		return;
 	}
-	#if defined(CONFIG_BOARD_THINGY91)
-	LOG_INF("You are using a Thingy:91, but you probably allready knew that.");
-	#endif
 
 	err = dk_leds_init();
 	dk_set_leds_state(DK_ALL_LEDS_MSK, 0);
@@ -362,7 +358,6 @@ void cloud_setup_fn(void)
 
 	date_time_update_async(NULL);
 
-	LOG_INF("Connected to LTE network");
 	LOG_INF("Connecting to cloud");
 
 	k_work_schedule(&connect_work, K_NO_WAIT);

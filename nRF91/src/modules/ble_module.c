@@ -680,7 +680,7 @@ static bool event_handler(const struct event_header *eh)
 			if(message!=NULL){
 				if(message->valuestring!=NULL){
 					LOG_INF("JSON message: %s, Length: %i", message->valuestring, strlen(message->valuestring));
-					/* Logc to send data received from cloud to one of the connected peripherals
+					/* Logic to send data received from cloud to one of the connected peripherals
 					* PS. Not used for anything yet */
 					if(message->valuestring[0]=='*'){
 						LOG_DBG("Send to BLE");
@@ -752,12 +752,9 @@ static bool event_handler(const struct event_header *eh)
 			if(event->address[0]=='*'){
 				int id = (int)event->address[1]-(int)'0';
 				if(id>=CONFIG_BT_MAX_CONN){
-					LOG_INF("Id out of range");
+					LOG_ERR("Id out of range");
 					return false;
 				}
-				int test = (int)address_array[id][0];
-				char ctest = (char)1;
-				LOG_INF("Val: %i, char: %c", test, ctest);
 				if(address_array[id][0]=='\0' || (int)address_array[id][0]==0 || address_array[id]==NULL){
 					LOG_INF("Address associated with id is empty");
 					return false;
