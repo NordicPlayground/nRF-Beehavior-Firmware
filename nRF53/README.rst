@@ -13,11 +13,11 @@ This module is based on multiple nrf-samples,  and the asset_tracker_v2 applicat
 * Modular build - The application is based on the event_manager library and can be expanded to include other sensors.
 * Ultra-low power by design - WIP! The goal of the application is to design a greedy BLE transmission algorithm and preprocess sensor data before transmitting it to the cloud module highlights.
 * Batching of data - WIP! Data can be batched to reduce the number of messages transmitted, and to be able to retain collected data while the device is offline.
-* Configurable at run time - The application behavior (for example, accelerometer or sensitivity) can be configured at run time. This improves the development experience with individual devices or when debugging the device behavior in specific areas and situations. It also reduces the cost for transmitting data to the devices by reducing the frequency of sending firmware updates to the devices.
+* Configurable at run time - WIP! The application behavior (for example, accelerometer or sensitivity) can be configured at run time. This improves the development experience with individual devices or when debugging the device behavior in specific areas and situations. It also reduces the cost for transmitting data to the devices by reducing the frequency of sending firmware updates to the devices.
 
 Implementation of the above features required a rework of existing nrf samples and applications. Most noteworthy are the peripheral_uart and central_uart samples.
 
-.. note::
+.. note: ::
     The code is currently a work in progress and is not fully optimized yet. It will undergo changes and improvements in the future.
 
 Overview
