@@ -111,7 +111,7 @@ User interface
 
 The application uses button number 1 and 2, plus the reset button which restarts the dk.
 Button1 turns of LED's to save power.
-Button2 starts scanning for peripheral units. PS. Only works on the DevKit.
+Button2 starts scanning for peripheral units. PS. Button2 only works on the DevKit.
 
 Additionally, the application displays LED behavior that corresponds to the task performed by the application.
 
@@ -149,6 +149,7 @@ Setting up the nrf9160dk/Thingy:91 part of Beehavior Monitoring
 --------------------------------------------------
 
 To set up the nrf9160dk/Thingy:91 part of the Beehavior Monitoring application to work, see the following steps:
+
 * Make sure your Thingy:91/nRF9160dk is connected to your cloud account, see :ref:`asset_tracker_v2` for how to connect.
 * Set number of connections in prj.conf (CONFIG_BT_MAX_CONN).
 * Flash the :ref:`hci_lpuart` example to the thingy91_nrf52840@1.0.0/nrf9160dk_nrf52840@1.0.0 chip.
@@ -199,7 +200,7 @@ After programming the application and all the prerequisites to your development 
 #. Connect to the kit with a terminal emulator (for example, LTE Link Monitor, Termite or RTT viewer if you are using a Thingy:91).
 #. Reset the development kit.
 #. Observe in the terminal window that the development kit starts up in the Secure Partition Manager and that the application starts.
-   This is indicated by several <inf> module_name: function_name(): "placeholder text" outputs, similar to the following example from asset_tracker_v2.
+   This is indicated by several <inf> module_name: function_name(): "placeholder text" outputs.
 
       *** Booting Zephyr OS build v2.4.0-ncs1-2616-g3420cde0e37b  ***
       <inf> event_manager: APP_EVT_START
@@ -226,10 +227,11 @@ Known issues and limitations
 
 Following are the current limitations in the nRF9160dk/Thingy:91 code:
 
+* Due to a firmware issue the 9160 and the 52840 chips have to start at the same time so the program initially crashes and reboots. After this reboot the program works as itended. 
+
 * As of now this project only supports nRF CLoud. If you want to expand the project to other Cloud services you can use the nRF9160/Cloud_Client example as a guide.
 
-* The Thingy:91/nRF9160dk need to send a message to nRF Cloud every 5 minutes or you need to manually reconnect to Cloud to send new messages. It should be possible to ping 
-nRF Cloud to keep the connection alive, but as of now it is not implemented in this project.
+* The Thingy:91/nRF9160dk need to send a message to nRF Cloud every 5 minutes or you need to manually reconnect to Cloud to send new messages. It should be possible to ping nRF Cloud to keep the connection alive, but as of now it is not implemented in this project.
 
 Dependencies
 ************

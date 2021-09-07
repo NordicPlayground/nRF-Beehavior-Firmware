@@ -17,13 +17,13 @@ This module is based on multiple nrf-samples,  and the asset_tracker_v2 applicat
 
 Implementation of the above features required a rework of existing nrf samples and applications. Most noteworthy are the peripheral_uart and central_uart samples.
 
-.. note: ::
+.. note ::
     The code is currently a work in progress and is not fully optimized yet. It will undergo changes and improvements in the future.
 
 Overview
 ********
 
-The application initializes BLE and scan modules before scanning and connecting to up to 19 other devices.
+The application initializes BLE and scan modules before scanning and connecting to up to 20 other devices.
 For now, the module scans for a Thingy:52 over NAME and connects with it and subscribes to the Thingy:52 environmental and motion services. 
 When connected, the nRF5340dk writes to the Thingy:52 to change the sample time and to toggle the lights off to reduce light pollution inside the hive.
 The nRF5340dk also scans for advertisements from a BroodMinder Weight, and reads weight measurements from the data message advertised. 
@@ -182,18 +182,6 @@ Mandatory library configuration
 
 You can set the mandatory library-specific Kconfig options in the :file:`prj.conf` file of the application.
 
-
-Optional library configurations
-===============================
-Needs filling?
-
-You can add the following optional configurations to configure the heap or to provide additional information such as APN to the modem for registering with an LTE network:
-
-* :option:`CONFIG_HEAP_MEM_POOL_SIZE` - Configures the size of the heap that is used by the application when encoding and sending data to the cloud. More information can be found in :ref:`memory_allocation`.
-* :option:`CONFIG_PDN_DEFAULTS_OVERRIDE` - Used for manual configuration of the APN. Set the option to ``y`` to override the default PDP context configuration.
-* :option:`CONFIG_PDN_DEFAULT_APN` - Used for manual configuration of the APN. An example is ``apn.example.com``.
-
-
 Configuration files
 ===================
 
@@ -240,7 +228,7 @@ After programming the application and all the prerequisites to your development 
 #. Connect to the kit with a terminal emulator (for example, LTE Link Monitor or Termite).
 #. Reset the development kit.
 #. Observe in the terminal window that the development kit starts up in the Secure Partition Manager and that the application starts.
-   This is indicated by several <inf> module_name: function_name(): "placeholder text" outputs, similar to the following example from asset_tracker_v2.
+   This is indicated by several <inf> module_name: function_name(): "placeholder text" outputs.
 
       *** Booting Zephyr OS build v2.4.0-ncs1-2616-g3420cde0e37b  ***
       <inf> event_manager: APP_EVT_START
@@ -267,15 +255,6 @@ After programming the application and all the prerequisites to your development 
 
     <inf> event_manager: Temperature [C]: %i,%i, Humidity [Percentage]: %i, Air pressure [hPa]: %d,%i, Battery charge [%%]: %i.
 
-The order should be something like:
-* Initialize BLE and scan.
-* Scan for Thingy:52 and connect (LED1 ON).
-* Discover services from Thingy:52.
-* Subscribe to notifications for a set of services.
-* Scan for Thingy:91 and connect either when notification is given OR 91 requests connection through scanning (LED2 ON).
-* Scan for BroodMinder Weight advertisements and read data message (LED3 ON/OFF while doing/not doing this).
-* Loop.
-
 Known issues and limitations
 ****************************
 
@@ -289,19 +268,7 @@ This application uses the following |NCS| libraries and drivers:
 
 * :ref:`event_manager`
 
+* :ref:`nordic_uart_service`
+
 
 .. _memory_allocation:
-
-Memory allocation
-=================
-
-Mostly, the modules use statically allocated memory.
-Following are some features that rely on dynamically allocated memory, using the :ref:`Zephyr heap memory pool implementation <zephyr:heap_v2>`:
-
-* Event manager events
-* Encoding of the data that will be sent to cloud
-
-You can configure the heap memory by using the :option:`CONFIG_HEAP_MEM_POOL_SIZE`.
-The data management module that encodes data destined for cloud is the biggest consumer of heap memory.
-Therefore, when adjusting buffer sizes in the data management module, you must also adjust the heap accordingly.
-This avoids the problem of running out of heap memory in worst-case scenarios.
