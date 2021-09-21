@@ -69,7 +69,7 @@ union tagname{
 	unsigned char s[4];
 };
 
-union tagname object;
+union tagname pressure_union;
 
 union tagname16{
 	uint16_t a;
@@ -190,7 +190,7 @@ static bool event_handler(const struct event_header *eh)
 		// LOG_INF("Hex-version: Temperature [C]: %x,%x, Humidity [%%]: %x, Air pressure [hPa]: %x,%x ID: %x\n", event->data_array[0], \
 		// 		event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, id-(uint8_t)'0');
 		
-		object.a = event->pressure_int;
+		pressure_union.a = event->pressure_int;
 		/*LOG_INF("Object.a = %d, %x \n", object.a, object.a);
 		printf("%d\n",sizeof(object));
 		printf("%X\n",object.a);
@@ -204,7 +204,7 @@ static bool event_handler(const struct event_header *eh)
 			// printf("index of data_array: %i\n", 8-i);
 			// printf("%02X \n",object.s[i]);
 			// printf("Test %X \n",object.s[i]);
-			thingy_data[8-i] = object.s[i];
+			thingy_data[8-i] = pressure_union.s[i];
 		}
 		// printf("\n");
 		// printf("%d\n",sizeof(thingy_data));
