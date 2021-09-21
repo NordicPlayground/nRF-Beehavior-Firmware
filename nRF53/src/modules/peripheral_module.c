@@ -75,6 +75,8 @@ union tagname16{
 	uint16_t a;
 	unsigned char s[2];
 };
+uint8_t thingy_matrix[3][11] = {0};
+uint8_t row_index = 0;
 
 union tagname16 object16;
 
@@ -178,77 +180,76 @@ static bool event_handler(const struct event_header *eh)
 		return false;
 	}
 
-	/* The comments in this part of the code is only for debugging and implementation. Functional code is in ble_module.c in nrf91*/
     if (is_thingy_event(eh)) {
         LOG_INF("event_handler(): Thingy event is being handled. \n");
-		// LOG_INF("Toggling LED 4 while Thingy event is handled.\n");
-		// dk_set_led_on(LED_4);
+
 		struct thingy_event *event = cast_thingy_event(eh);
 		LOG_INF("event_handler(thingy_event): Temperature [C]: %i,%i, Humidity [%%]: %i, Air pressure [hPa]: %d,%i, Battery charge [%%]: %i, ID: %i,\n", event->data_array[0], \
 				event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, event->battery_charge, id-(uint8_t)'0');
 
-		// LOG_INF("Hex-version: Temperature [C]: %x,%x, Humidity [%%]: %x, Air pressure [hPa]: %x,%x ID: %x\n", event->data_array[0], \
-		// 		event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, id-(uint8_t)'0');
-		
 		pressure_union.a = event->pressure_int;
-		/*LOG_INF("Object.a = %d, %x \n", object.a, object.a);
-		printf("%d\n",sizeof(object));
-		printf("%X\n",object.a);
-		printf("%X\n", object.s);*/
 
-        uint8_t thingy_data[11] = { (uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2]};//,\
-									event->pressure_int, event->pressure_float};
+		/* Organizing the sensor data in a 11 byte data message which is sent to 91-module. */
 
-		// printf("Individual bytes: \n");
-		for(char i=0;  i<=3; i++){
-			// printf("index of data_array: %i\n", 8-i);
-			// printf("%02X \n",object.s[i]);
-			// printf("Test %X \n",object.s[i]);
+		if (row_index >=3){
+			row_index = 0;
+		}
+
+        uint8_t thingy_data[11] = { (uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2]};
+
+		/*Divide the 32bit integer for pressure into 4 separate 8bit integers. This is merged back to 32 bit integer when 91 module recieves the data.  */
+		for(uint8_t i=0;  i<=3; i++){
 			thingy_data[8-i] = pressure_union.s[i];
 		}
-		// printf("\n");
-		// printf("%d\n",sizeof(thingy_data));
+
 		thingy_data[9] = event->pressure_float;
 		thingy_data[10] = event->battery_charge;
 
-		// LOG_INF("Checking Thingy_data element 4,5,6,7, 8: %d,%d,%d,%d,%d\n", thingy_data[5], thingy_data[6], thingy_data[7], thingy_data[8],thingy_data[9]);
-		// LOG_INF("HEX VERSION Checking Thingy_data element 4,5,6,7, 8: %x,%x,%x,%x,%x \n", thingy_data[5], thingy_data[6], thingy_data[7], thingy_data[8],thingy_data[9]);
 
-		// char temp[4];
-		// for (uint8_t i = 5; i <= 8; i++){
-		// 	temp[i-5] = thingy_data[i];
-		// 	/*printf("index of temp: %i\n", i-5);
-		// 	printf("Address of this element: %pn \n",&temp[i-5]);
-		// 	printf("Value of element: %X\n", temp[i-5]);*/
-
-		// }
-		// printf("\n"); 
-		// int32_t tempvar;//= (int32_t)temp;
-		// int32_t tempvar2;
-
-		// memcpy(&tempvar, temp, sizeof(tempvar));
-		// printf("The number is %X,%i \n",tempvar,tempvar);
-
-		// char reverse_temp[4];
-		// for (uint8_t i = 0; i <=3; i++){
-		// 	reverse_temp[i] = temp[3-i];
-		// 	printf("Index of reverse temp %i \n", i);
-		// 	printf("temp[i] after reversing: %X\n", reverse_temp[i]);
-		// }
-
-		// memcpy(&tempvar2, reverse_temp, sizeof(tempvar2));
+		printk("Row index is now %i: \n", row_index);
+		for (uint8_t i = 0; i<=10; i++){
+			thingy_matrix[row_index][i] = thingy_data[i];
+		}
 		
-    	// printf("The number after reversing is %X,%i \n",tempvar2,tempvar2);
+		printk("thingy_data at current row index: \n");
+		for (uint8_t i = 0; i<=10; i++){
+			printk(" %i, ", thingy_data[i]);
+		}
 
-		// printf("From int to array to int %i, %X \n", tempvar, tempvar);
-		// printf("From int to array to int %i, %X \n", tempvar2, tempvar2);
+		
+		// LOG_INF("event_handler(): Printing thingy_matrix for debugging:");
+		for (uint8_t row = 0; row <= row_index; row++){
+			// printk("test \n");
+			printk("\n Sample # %i: \n", row);
+			for (uint8_t col = 0; col <= 10; col++){
+				// printk("col, ");
+				printk("%i, ", thingy_matrix[row][col]);
+				// printk("%i, \n", thingy_data[col]);
+			}
+			printk("\n");	
+		}
+		row_index += 1;
+		if (row_index ==3){
+			uint8_t latest_thingy_sample[11] = {0};
+			printk("Buffer limit has been reached");
+			for (uint8_t col = 0; col <= 10; col++){
+				latest_thingy_sample[col] = thingy_matrix[row_index-1][col];
+				printk("%i, ", latest_thingy_sample[col]);
+			}
+		}
 
-        if(hub_conn){
-            LOG_INF("event_handler(): Hub is connected, sending thingy_data over nus. \n");
-            int err = bt_nus_send(hub_conn, thingy_data, 11);
+		
+		/*Test to send every third sample from 53 to 91 */
+        if(hub_conn && row_index == 3){
+			uint8_t latest_thingy_sample[11] = {0};
+			for (uint8_t col = 0; col <= 10; col++){
+				latest_thingy_sample[col] = thingy_matrix[row_index-1][col];
+				printk("%i, ", latest_thingy_sample[col]);
+			}
+            LOG_INF("event_handler(): Hub is connected, sending third sample over nus. \n");
+			int err = bt_nus_send(hub_conn, latest_thingy_sample, 11);
+            // int err = bt_nus_send(hub_conn, thingy_data, 11);
         }
-		// LOG_INF("Toggling LED 4 off after finishing Thingy Event.\n");
-		// dk_set_led_off(LED_4);
 		return false;
 		
 	}
