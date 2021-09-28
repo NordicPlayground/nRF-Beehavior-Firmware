@@ -229,19 +229,20 @@ static bool event_handler(const struct event_header *eh)
 			printk("\n");	
 		}
 		row_index += 1;
-		if (row_index ==3){
-			uint8_t latest_thingy_sample[11] = {0};
-			printk("Buffer limit has been reached");
-			for (uint8_t col = 0; col <= 10; col++){
-				latest_thingy_sample[col] = thingy_matrix[row_index-1][col];
-				printk("%i, ", latest_thingy_sample[col]);
-			}
-		}
+		// if (row_index ==3){
+		// 	uint8_t latest_thingy_sample[11] = {0};
+		// 	printk("Buffer limit has been reached");
+		// 	for (uint8_t col = 0; col <= 10; col++){
+		// 		latest_thingy_sample[col] = thingy_matrix[row_index-1][col];
+		// 		printk("%i, ", latest_thingy_sample[col]);
+		// 	}
+		// }
 
 		
 		/*Test to send every third sample from 53 to 91 */
         if(hub_conn && row_index == 3){
 			uint8_t latest_thingy_sample[11] = {0};
+			printk("Buffer limit has been reached");
 			for (uint8_t col = 0; col <= 10; col++){
 				latest_thingy_sample[col] = thingy_matrix[row_index-1][col];
 				printk("%i, ", latest_thingy_sample[col]);
