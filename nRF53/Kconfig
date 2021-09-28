@@ -5,6 +5,12 @@
 #
 
 menu "HIVE_HUB"
+
+# 
+
+config HIGH_RES_SAMPLING_THINGY
+	bool "Enable for high sample rate on Thingy52"
+	default n
 	
 config BEE_COUNTER_NAME
 	string "Name of your Bee Counter Device"
@@ -32,6 +38,29 @@ config THINGY_CONNECTIONS
 config THINGY_NAME
 	string "Name of your thingy"
 	default "Thingy"
+
+#THINGY_SAMPLE_RATE is a hack. Since we can't change the sampletime higher than 1min easy, we
+# send the average of the THINGY_SAMPLE_RATE number of prior samples instead
+# Aiming for default = 5
+config THINGY_SAMPLE_RATE 
+	int "Thingy:52 sample rate in minutes"
+	default 1 if HIGH_RES_SAMPLING_THINGY
+	default 5
+
+# default horizon: 12 = 1hour for default res sampling
+# high res horizon: 60 = 1 hour for high res sampling 
+# Aiming for default = 24 for default res sampling and 120 for high res
+config THINGY_DATA_BUFFER_SIZE
+	int "Size of Thingy data buffer- This decides the time horizon"
+	default 10 if HIGH_RES_SAMPLING_THINGY
+	default 12
+
+#For high res: 20 (every 20th minute with 1 min sample time)
+#For default res: 4 (every 20th minute with 5 min sample time)
+config THINGY_SAMPLE_TO_SEND
+	int "Send data every 20 minute"
+	default 20 if HIGH_RES_SAMPLING_THINGY
+	default 4	
 
 config BLE_TO_CLOUD_APP_VERSION
 	string "Bluetooth to cloud application firmware version"
