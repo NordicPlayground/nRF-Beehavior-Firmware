@@ -3,9 +3,7 @@
 #define MODULE central_module
 LOG_MODULE_REGISTER(MODULE, 4);
 
-/* ----------------------- Thingy declaration and initialization -------------------------
-This could probably be put in a central_module.h
-*/
+/* ----------------------- Thingy declaration and initialization -------------------------*/
 
 static K_SEM_DEFINE(ble_ready, 0, 1);
 static K_SEM_DEFINE(peripheral_done, 0, 1);
