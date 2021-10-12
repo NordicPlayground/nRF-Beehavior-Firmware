@@ -1,0 +1,6 @@
+Change Net Name : Old Net Name=+Vin New Net Name=NetL1_2
+Change Net Name : Old Net Name=+vout New Net Name=NetJ1_1
+Change Net Name : Old Net Name=-Vin New Net Name=NetL2_2
+Change Net Name : Old Net Name=-vout New Net Name=NetJ1_5
+Change Net Name : Old Net Name=CTRL New Net Name=NetPS1_3
+Change Net Name : Old Net Name=Trim New Net Name=NetPS1_5
