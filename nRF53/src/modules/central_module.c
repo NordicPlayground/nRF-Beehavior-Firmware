@@ -1216,7 +1216,7 @@ void central_module_thread_fn(void)
 		thingy_send->pressure_int = pressure_int;
 		thingy_send->pressure_float = pressure_float;
 		thingy_send->battery_charge = battery_charge;
-
+ 
 		EVENT_SUBMIT(thingy_send);
 		LOG_INF("thingy_module_thread_fn(): thingy_send event submitted. \n");
 

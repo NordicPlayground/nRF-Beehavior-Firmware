@@ -1,0 +1,5 @@
+Change Net Name : Old Net Name=NetJ1_1 New Net Name=+Vout
+Change Net Name : Old Net Name=NetJ1_5 New Net Name=-Vout
+Change Net Name : Old Net Name=NetL1_2 New Net Name=+Vin
+Change Net Name : Old Net Name=NetL2_2 New Net Name=-Vin
+Added Member To Class: ClassName=main Member=Component D1 ESDA25P35-1U1M
