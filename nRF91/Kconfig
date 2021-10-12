@@ -17,6 +17,10 @@ config BLE_TO_CLOUD_APP_VERSION_MAX_LEN
 config BOARD_THINGY91
 	bool "Set when flashing to thingy91_nrf9160ns"
 	default n
+
+config POWER_SAVING_MODE_ENABLE
+	bool "Power saving"
+	default y
 endmenu
 
 menu "Zephyr Kernel"

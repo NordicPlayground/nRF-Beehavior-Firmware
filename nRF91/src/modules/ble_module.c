@@ -68,7 +68,7 @@ BT_CONN_CTX_DEF(conns, CONFIG_BT_MAX_CONN, sizeof(struct bt_nus_client));
 
 /* UUID made for this project */
 #define BT_UUID_BEEHAVIOUR_MONITORING_VAL \
-	BT_UUID_128_ENCODE(0x6e400001, 0xb5b3, 0xf393, 0xe1a9, 0xe50e14dcea9e)
+	BT_UUID_128_ENCODE(0x6e400001, 0xb5b3, 0xf393, 0xe1a9, 0xe50e14dcea9e) //0xe50e14dcea9e
 
 #define BT_UUID_BEEHAVIOUR_MONITORING_SERVICE   BT_UUID_DECLARE_128(BT_UUID_BEEHAVIOUR_MONITORING_VAL)
 
@@ -278,8 +278,7 @@ static void discovery_complete(struct bt_gatt_dm *dm,
 				if (err) {
 					LOG_WRN("Failed to send data over BLE connection (err %d)", err);
 				} else {
-					LOG_DBG("Sent to server %d: %s",
-						nus_index, log_strdup(message));
+					LOG_DBG("Sent to server %d: %s", nus_index, log_strdup(message));
 				}
 
 				bt_conn_ctx_release(&conns_ctx_lib, (void *)ctx->data);
@@ -343,8 +342,7 @@ static void gatt_discover(struct bt_conn *conn)
 			       &discovery_cb,
 			       nus_client);
 	if (err) {
-		LOG_ERR("could not start the discovery procedure, error "
-			"code: %d", err);
+		LOG_ERR("could not start the discovery procedure, error " "code: %d", err);
 	}
 
 	bt_conn_ctx_release(&conns_ctx_lib, (void *) nus_client);
@@ -366,8 +364,7 @@ static void connected(struct bt_conn *conn, uint8_t conn_err)
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
 	if (conn_err) {
-		LOG_INF("Failed to connect to %s (%d)", log_strdup(addr),
-			conn_err);
+		LOG_INF("Failed to connect to %s (%d)", log_strdup(addr), conn_err);
 
 		if (default_conn == conn) {
 			bt_conn_unref(default_conn);
@@ -388,8 +385,7 @@ static void connected(struct bt_conn *conn, uint8_t conn_err)
 	struct bt_nus_client *nus_client = bt_conn_ctx_alloc(&conns_ctx_lib, conn);
 
 	if (!nus_client) {
-		LOG_WRN("There is no free memory to "
-			"allocate the connection context");
+		LOG_WRN("There is no free memory to allocate the connection context");
 	}
 
 	memset(nus_client, 0, bt_conn_ctx_block_size_get(&conns_ctx_lib));
@@ -421,14 +417,12 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
-	LOG_INF("Disconnected: %s (reason %u)", log_strdup(addr),
-		reason);
+	LOG_INF("Disconnected: %s (reason %u)", log_strdup(addr), reason);
 
 	err = bt_conn_ctx_free(&conns_ctx_lib, conn);
 
 	if (err) {
-		LOG_WRN("The memory was not allocated for the context of this "
-			"connection.");
+		LOG_WRN("The memory was not allocated for the context of this connection.");
 	}
 
 	bt_conn_unref(conn);
@@ -474,11 +468,9 @@ static void security_changed(struct bt_conn *conn, bt_security_t level,
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
 	if (!err) {
-		LOG_INF("Security changed: %s level %u", log_strdup(addr),
-			level);
+		LOG_INF("Security changed: %s level %u", log_strdup(addr), level);
 	} else {
-		LOG_WRN("Security failed: %s level %u err %d", log_strdup(addr),
-			level, err);
+		LOG_WRN("Security failed: %s level %u err %d", log_strdup(addr), level, err);
 	}
 
 	gatt_discover(conn);
@@ -516,8 +508,7 @@ static void scan_filter_match(struct bt_scan_device_info *device_info,
 		strcpy(name_buffer, connection_name);
 	}
 
-	LOG_INF("Filters matched. Address: %s connectable: %d",
-		log_strdup(addr), connectable);
+	LOG_INF("Filters matched. Address: %s connectable: %d", log_strdup(addr), connectable);
 }
 
 static void scan_connecting_error(struct bt_scan_device_info *device_info)
@@ -594,8 +585,7 @@ static void pairing_complete(struct bt_conn *conn, bool bonded)
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
-	LOG_INF("Pairing completed: %s, bonded: %d", log_strdup(addr),
-		bonded);
+	LOG_INF("Pairing completed: %s, bonded: %d", log_strdup(addr), bonded);
 }
 
 
@@ -606,8 +596,7 @@ static void pairing_failed(struct bt_conn *conn, enum bt_security_err reason)
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
-	LOG_WRN("Pairing failed conn: %s, reason %d", log_strdup(addr),
-		reason);
+	LOG_WRN("Pairing failed conn: %s, reason %d", log_strdup(addr), reason);
 }
 
 static struct bt_conn_auth_cb conn_auth_callbacks = {

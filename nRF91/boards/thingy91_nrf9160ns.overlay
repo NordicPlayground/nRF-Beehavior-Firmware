@@ -4,6 +4,53 @@
 	};
 };
 
+// /* leds {
+// 	compatible = "gpio-leds";
+// 	red_led: led_1 {
+// 		gpios = <&gpio0 29 0>;
+// 		label = "RGB red channel";
+// 	};
+// 	green_led: led_2 {
+// 		gpios = <&gpio0 30 0>;
+// 		label = "RGB green channel";
+// 	};
+// 	blue_led: led_3 {
+// 		gpios = <&gpio0 31 0>;
+// 		label = "RGB blue channel";
+// 	};
+// 	/delete-property/  sense_red_led;
+// 	/delete-property/ sense_green_led;
+// 	/delete-property/ sense_blue_led;
+// };*/
+
+// &pwm1 {
+// 	status = "disabled";
+// 	//ch0-pin = <28>;
+// };
+
+// // PWM2 is intended for NMOS transistor control 
+// &pwm2 {
+// 	status = "disabled";
+// 	// ch0-pin = <13>;
+// 	// ch1-pin = <14>;
+// 	// ch2-pin = <15>;
+// 	// ch3-pin = <16>;
+// };
+
+// &pwm3 {
+// 	status = "disabled";
+// };
+
+// &i2c2 {
+// 	compatible = "nordic,nrf-twim";
+// 	status = "disabled";
+// };
+
+// &spi3 {
+// 	compatible = "nordic,nrf-spim";
+// 	status = "disabled";
+// }; 
+
 &uart1 {
 	current-speed = <1000000>;
 	status = "okay";

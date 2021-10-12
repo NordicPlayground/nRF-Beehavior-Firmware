@@ -26,6 +26,13 @@
 
 #include <bluetooth/bluetooth.h>
 
+// #include <device.h>
+// #include <pm/pm.h>
+
+// const struct device *cons;
+
+// #define CONSOLE_LABEL DT_LABEL(DT_CHOSEN(zephyr_console))
+
 LOG_MODULE_REGISTER(cloud_module, CONFIG_LOG_DEFAULT_LEVEL);
 
 #if defined(CONFIG_BOARD_THINGY91)
@@ -38,21 +45,33 @@ static struct cloud_backend *cloud_backend;
 static struct k_work_delayable connect_work;
 
 static K_SEM_DEFINE(lte_connected, 0, 1);
+static K_SEM_DEFINE(cloud_connecting, 0, 1);
 
 /* Flag to signify if the cloud client is connected or not connected to cloud,
  * used to abort/allow cloud publications.
  */
 static bool cloud_connected;
 
+static bool lte_sleep;
+
 static bool first = true;
 
 static void connect_work_fn(struct k_work *work)
 {
 	int err;
-
+	LOG_DBG("Connect_work_fn");
 	if (cloud_connected) {
 		return;
 	}
+	enum lte_lc_func_mode mode;
+	LOG_INF("Check 2");
+	err = lte_lc_func_mode_get(&mode);
+	LOG_INF("Check 3, %d, %d", err, mode);
+	if(mode==LTE_LC_FUNC_MODE_OFFLINE){
+		cloud_connected = false;
+		return;
+	}
+	LOG_DBG("LTE in normal mode");
 
 	err = cloud_connect(cloud_backend);
 	if (err) {
@@ -68,6 +87,10 @@ static void connect_work_fn(struct k_work *work)
 #if defined(CONFIG_BOARD_THINGY91)
 static void cloud_update_work_fn(struct k_work *work)
 {
+	if(lte_sleep){
+		//Save percentage to send at next opportunity
+		return;
+	}
 	if (!cloud_connected) {
 		LOG_INF("Not connected to cloud, abort cloud publication");
 		k_work_reschedule(&cloud_update_work, K_SECONDS(30));
@@ -143,6 +166,7 @@ void cloud_event_handler(const struct cloud_backend *const backend,
 		 * it will exit after checking the above flag and the work will
 		 * not be scheduled again.
 		 */
+		k_sem_give(&cloud_connecting);
 		(void)k_work_cancel_delayable(&connect_work);
 		break;
 	case CLOUD_EVT_READY:
@@ -168,6 +192,7 @@ void cloud_event_handler(const struct cloud_backend *const backend,
 	case CLOUD_EVT_DISCONNECTED:
 		LOG_INF("CLOUD_EVT_DISCONNECTED");
 		cloud_connected = false;
+		k_sem_take(&cloud_connecting, K_NO_WAIT);
 		k_work_reschedule(&connect_work, K_SECONDS(30));
 		break;
 	case CLOUD_EVT_ERROR:
@@ -220,6 +245,7 @@ static void lte_handler(const struct lte_lc_evt *const evt)
 		LOG_INF("Network registration status: %s", evt->nw_reg_status == LTE_LC_NW_REG_REGISTERED_HOME ?
 			"Connected - home network" : "Connected - roaming");
 		k_sem_give(&lte_connected);
+		lte_sleep = false;
 		break;
 	case LTE_LC_EVT_PSM_UPDATE:
 		LOG_DBG("PSM parameter update: TAU: %d, Active time: %d",
@@ -299,7 +325,27 @@ static void button_handler(uint32_t button_states, uint32_t has_changed)
 {
 	/* Press Button 1 to turn of the lights to save power */
 	if (has_changed & button_states & DK_BTN1_MSK) {
+		int err;
 		dk_set_leds_state(DK_ALL_LEDS_MSK, 0);
+		LOG_INF("Check");
+		enum lte_lc_func_mode mode;
+		LOG_INF("Check 2");
+		err = lte_lc_func_mode_get(&mode);
+		LOG_INF("Check 3, %d, %d", err, mode);
+		if(mode==LTE_LC_FUNC_MODE_OFFLINE){
+			err = lte_lc_normal();
+			LOG_INF("LTE normal");
+			if(err){
+				dk_set_led_on(DK_LED2_MSK);
+			}
+		}
+		else{
+			err = lte_lc_offline();
+			LOG_INF("LTE offline");
+			if(err){
+				dk_set_led_on(DK_LED1_MSK);
+			}
+		}
 	}
 	#if defined(CONFIG_BOARD_THINGY91)
 	#else
@@ -326,6 +372,11 @@ void cloud_setup_fn(void)
 		LOG_ERR("Bluetooth init failed (err %d)", err);
 		return;
 	}
+	
+    // cons=device_get_binding(CONSOLE_LABEL);
+	
+	/* Prevent deep sleep (system off) from being entered */
+    // pm_constraint_set(PM_STATE_SOFT_OFF);
 
 	err = dk_leds_init();
 	dk_set_leds_state(DK_ALL_LEDS_MSK, 0);
@@ -371,7 +422,38 @@ static bool event_handler(const struct event_header *eh)
         int err;
         struct ble_event *event = cast_ble_event(eh);
         if(event->type==BLE_RECEIVED){
-			
+			enum lte_lc_func_mode mode;
+			LOG_INF("Check 2");
+			err = lte_lc_func_mode_get(&mode);
+			LOG_INF("Check 3, %d, %d", err, mode);
+			if(mode==LTE_LC_FUNC_MODE_OFFLINE){
+				err = lte_lc_normal();
+				LOG_INF("LTE normal");
+				if(err){
+					dk_set_led_on(DK_LED2_MSK);
+				}
+				LOG_INF("Waiting for lte");
+				k_sem_take(&lte_connected, K_FOREVER);
+				LOG_INF("LTE ready");
+				err = cloud_connect(cloud_backend);
+				if (err) {
+					LOG_ERR("cloud_connect, error: %d", err);
+				}
+				k_sem_take(&cloud_connecting, K_SECONDS(20));
+				LOG_INF("Cloud connected: %i", cloud_connected);
+				if(!cloud_connected){
+					LOG_INF("Cloud not connected");
+					k_work_reschedule(&connect_work, K_NO_WAIT);
+					if (err) {
+						LOG_ERR("cloud_connect, error: %d", err);
+					}
+					k_sem_take(&cloud_connecting, K_SECONDS(10));
+				}
+			}
+			else{
+				LOG_INF("LTE allready on");
+			}
+
 			nrf_cloud_process();
 			LOG_DBG("Size: %i", event->dyndata.size);
 			if(event->dyndata.size == 4){
@@ -422,7 +504,6 @@ static bool event_handler(const struct event_header *eh)
 				else{
 					LOG_INF("Message published succesfully.");
 				}
-				return false;
 			}
 			if(event->dyndata.size == 8){
 				LOG_DBG("Broodminder weight data is being JSON-formatted");
@@ -459,7 +540,6 @@ static bool event_handler(const struct event_header *eh)
 				else{
 					LOG_INF("Message published succesfully.");
 				}
-				return false;
 			}
 			if(event->dyndata.size == 9){
 				LOG_DBG("Thingy:52 data is being JSON-formatted");
@@ -504,6 +584,16 @@ static bool event_handler(const struct event_header *eh)
 
 				/* Send data to cloud */
 				err = cloud_send(cloud_backend, &msg);
+
+				k_sleep(K_SECONDS(1));
+
+				/* Send data to cloud */
+				err = cloud_send(cloud_backend, &msg);
+				
+				k_sleep(K_SECONDS(1));
+
+				/* Send data to cloud */
+				err = cloud_send(cloud_backend, &msg);
 				
 				if (err) {
 					LOG_ERR("cloud_send failed, error: %d", err);
@@ -511,8 +601,19 @@ static bool event_handler(const struct event_header *eh)
 				else{
 					LOG_INF("Message published succesfully");
 				}
-				return false;
 			}
+			k_sleep(K_SECONDS(10));
+			err = lte_lc_offline();
+			lte_sleep = true;
+			LOG_INF("LTE offline");
+			if(err){
+				dk_set_led_on(DK_LED1_MSK);
+			}
+			LOG_INF("1");
+			//err = pm_device_state_set(cons, PM_DEVICE_STATE_LOW_POWER,NULL,NULL); 
+			//LOG_INF("2");
+			//pm_power_state_force((struct pm_state_info){PM_STATE_SOFT_OFF, 0, 0});
+			return false;
 		}
 		/* Function to check number of connected peripherals */
 		if(event->type==BLE_STATUS){
