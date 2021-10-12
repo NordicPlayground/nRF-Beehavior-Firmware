@@ -44,41 +44,26 @@
 #include "events/bm_w_event.h"
 #include "events/bee_count_event.h"
 #include "led/led.h"
+#include "peripheral_module.h"
 
 #include <drivers/uart.h>
 
 #include <device.h>
 #include <soc.h>
 
-#define MODULE peripheral_module
-LOG_MODULE_REGISTER(MODULE);
-
 // #define STACKSIZE CONFIG_BT_NUS_THREAD_STACK_SIZE
 // #define PRIORITY 7
 
 #define DEVICE_NAME CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN	(sizeof(DEVICE_NAME) - 1)
+/*Temp bool for testing*/
+bool is_swarming = false;
 
 char id;
 uint16_t T52_Counter = 0;
 uint16_t BM_Counter = 0;
 
-// Used for thingy_event
-union tagname{
-	int a;
-	unsigned char s[4];
-};
 
-union tagname pressure_union;
-
-union tagname16{
-	uint16_t a;
-	unsigned char s[2];
-};
-uint8_t thingy_matrix[3][11] = {0};
-uint8_t row_index = 0;
-
-union tagname16 object16;
 
 static K_SEM_DEFINE(ble_init_ok, 0, 1);
 
@@ -191,9 +176,10 @@ static bool event_handler(const struct event_header *eh)
 
 		/* Organizing the sensor data in a 11 byte data message which is sent to 91-module. */
 
-		if (row_index >=3){
-			row_index = 0;
-		}
+		// This is to be replaced with matrix push and pop. FILO?
+		// if (sample_counter >= THINGY_BUFFER_SIZE){
+		// 	sample_counter = 0;
+		// }
 
         uint8_t thingy_data[11] = { (uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2]};
 
@@ -205,20 +191,35 @@ static bool event_handler(const struct event_header *eh)
 		thingy_data[9] = event->pressure_float;
 		thingy_data[10] = event->battery_charge;
 
+		/*First sample after startup is to be sent*/
+		// if(hub_conn && sample_counter == 0){
+		// 	LOG_INF("event_handler(): Hub is connected, sending bm_w_data over nus. ");
+		// 	LOG_INF("event_handler(thingy): Appending first sample after startup to buffer.");
+		// 	for (uint8_t i = 0; i<=10; i++){
+		// 		thingy_matrix[sample_counter][i] = thingy_data[i];
+		// 	}
+		// 	sample_counter += 1;		
+        //     int err = bt_nus_send(hub_conn, thingy_data, 11);
+        // }
+		// else{
+		// 	//Save untill reconnected to nrf91 TO DO
+		// }
 
-		printk("Row index is now %i: \n", row_index);
+		/*Append to buffer */
+		LOG_INF("Size of THINGY_DATA_BUFFER_SIZE: %i \n", THINGY_BUFFER_SIZE);
+		LOG_INF("Current sample number is now %i: \n", sample_counter);
+
 		for (uint8_t i = 0; i<=10; i++){
-			thingy_matrix[row_index][i] = thingy_data[i];
+			thingy_matrix[sample_counter][i] = thingy_data[i];
 		}
-		
-		printk("thingy_data at current row index: \n");
+		LOG_INF("Sample has been appended to buffer \n");
+		LOG_INF("Thingy data at current row index: \n");
 		for (uint8_t i = 0; i<=10; i++){
-			printk(" %i, ", thingy_data[i]);
+			LOG_INF(" %i, ", thingy_matrix[sample_counter][i]);
 		}
 
-		
-		// LOG_INF("event_handler(): Printing thingy_matrix for debugging:");
-		for (uint8_t row = 0; row <= row_index; row++){
+		LOG_INF("event_handler(): Printing thingy_matrix for debugging:");
+		for (uint8_t row = 0; row <= sample_counter; row++){
 			// printk("test \n");
 			printk("\n Sample # %i: \n", row);
 			for (uint8_t col = 0; col <= 10; col++){
@@ -226,32 +227,97 @@ static bool event_handler(const struct event_header *eh)
 				printk("%i, ", thingy_matrix[row][col]);
 				// printk("%i, \n", thingy_data[col]);
 			}
-			printk("\n");	
-		}
-		row_index += 1;
-		if (row_index ==3){
-			uint8_t latest_thingy_sample[11] = {0};
-			printk("Buffer limit has been reached");
-			for (uint8_t col = 0; col <= 10; col++){
-				latest_thingy_sample[col] = thingy_matrix[row_index-1][col];
-				printk("%i, ", latest_thingy_sample[col]);
-			}
+			LOG_INF("\n");	
 		}
 
+		/*Otherwise we only send samples corresponding to every 20th minute. For default with T = 5min,
+		 this means every 4th sample */
+
+		/*
+		We send "normally" to 91 from 53 whenever we've met the following conditions:
+		1) Connected to hub
+		2) The sample corresponds to every 20th minute
+
+		!sample_counter % THINGY_SAMPLE_TO_SEND should be equal to (4,8,12,16,20 or 24) % 4 for default settings
+		3) It is not swarming 
+		*/
 		
-		/*Test to send every third sample from 53 to 91 */
-        if(hub_conn && row_index == 3){
-			uint8_t latest_thingy_sample[11] = {0};
-			for (uint8_t col = 0; col <= 10; col++){
-				latest_thingy_sample[col] = thingy_matrix[row_index-1][col];
-				printk("%i, ", latest_thingy_sample[col]);
+		printk("sample_counter %% THINGY_SAMPLE_TO_SEND = %i \n", sample_counter % THINGY_SAMPLE_TO_SEND);
+        if(hub_conn && !(sample_counter % THINGY_SAMPLE_TO_SEND)){
+
+			LOG_INF("Hub is connected and sample_counter %% THINGY_SAMPLE_TO_SEND = %i \n", sample_counter % THINGY_SAMPLE_TO_SEND);
+			LOG_INF("Checking if first sample after start, or if 4th sample and swarmingstate. \n");
+			/*Clear an array with data to be sent*/
+			uint8_t latest_thingy_data[11] = {0};
+
+			if (sample_counter == 0){
+				LOG_INF("event_handler(): Hub is connected, and first sample received. Sending sample over nus. \n");
+				sample_counter += 1;
+				LOG_INF("SAMPLE_COUNTER INCREMENTED BY 1");
+				int err = bt_nus_send(hub_conn, thingy_data, 11);
 			}
-            LOG_INF("event_handler(): Hub is connected, sending third sample over nus. \n");
-			int err = bt_nus_send(hub_conn, latest_thingy_sample, 11);
-            // int err = bt_nus_send(hub_conn, thingy_data, 11);
-        }
-		return false;
-		
+			else{
+				LOG_INF("NÅ ER VI HER \n");
+				/* 
+				SEND RELEVANT INFO TO SWARM DETECTION AND RETURN IS_SWARMING
+				*/
+				/*Average 4 or 20 last measurements recieved*/
+
+				LOG_INF("Computing average of last n samples and preparing to send over NUS");
+				for (uint8_t col = 0; col <=1; col++){
+					uint8_t temp_val = 0;
+					uint8_t avg = 0;
+					for (uint8_t row = 3; row >= 0; row--){
+						temp_val += thingy_matrix[row][col];
+					}
+					avg = temp_val / THINGY_SAMPLE_TO_SEND;
+				
+					/*Append the average of the 4 or 20 last measurements to the empty vector*/ 
+					latest_thingy_data[col] = avg;
+				}
+
+				LOG_INF("\n Average of last 4 or 20 samples:\n");
+				for (uint8_t col = 0; col <= 10; col++){
+					// printk("col, ");
+					LOG_INF("%i, ", latest_thingy_data[col]);
+				}
+				LOG_INF("\n");	
+			
+				// printk("Average of the last 4 measurement are beeing sent \n");
+				// for (uint8_t col = 0; col <= 10; col++){
+				// 	latest_thingy_data[col] = thingy_matrix[row_index-1][col];
+				// 	printk("%i, ", latest_thingy_data[col]);
+				// }
+
+				IS_SWARMING = 0;
+				if (!IS_SWARMING){
+					LOG_INF("No swarming detected. Sending data as normal. \n" );
+					LOG_INF("event_handler(): Hub is connected, sending 4th sample over nus. \n");
+					/*Send latest average to 91 */
+					LOG_INF("sample_counter %% THINGY_SAMPLE_TO_SEND = %i \n", sample_counter % THINGY_SAMPLE_TO_SEND);
+					sample_counter += 1;
+					LOG_INF("SAMPLE_COUNTER INCREMENTED BY 1\n");
+					
+					int err = bt_nus_send(hub_conn, latest_thingy_data, 11);
+					// int err = bt_nus_send(hub_conn, thingy_data, 11);
+				}
+				if(IS_SWARMING){
+					LOG_INF("Swarming detected. Sending data as with a swarming flag (TODO). \n" );
+					LOG_INF("event_handler(): Hub is connected, sending 4th sample over nus. \n");
+					/*Send latest average to 91 */
+					LOG_INF("sample_counter %% THINGY_SAMPLE_TO_SEND = %i \n", sample_counter % THINGY_SAMPLE_TO_SEND);
+					sample_counter += 1;
+					LOG_INF("SAMPLE_COUNTER INCREMENTED BY 1\n");
+					
+					int err = bt_nus_send(hub_conn, latest_thingy_data, 11);
+				}
+			}
+		}
+		else{
+			LOG_INF("sample_counter %% THINGY_SAMPLE_TO_SEND = %i \n", sample_counter % THINGY_SAMPLE_TO_SEND);
+			sample_counter += 1;
+			LOG_INF("SAMPLE_COUNTER INCREMENTED BY 1\n");
+		}
 	}
 	
 	if(is_bee_count_event(eh)){
