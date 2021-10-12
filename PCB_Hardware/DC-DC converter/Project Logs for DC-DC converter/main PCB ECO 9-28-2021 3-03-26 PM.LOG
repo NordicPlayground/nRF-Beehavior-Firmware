@@ -1,0 +1,8 @@
+Change Component Footprint: Designator=C1 Old Footprint=CAPPR65-500-1250X1000X1350 New Footprint=CAPPR65-500-1250X1000X1350
+Change Net Name : Old Net Name=NetJ1_1 New Net Name=+vout
+Change Net Name : Old Net Name=NetJ1_5 New Net Name=-vout
+Change Net Name : Old Net Name=NetL1_2 New Net Name=+Vin
+Change Net Name : Old Net Name=NetL2_2 New Net Name=-Vin
+Change Net Name : Old Net Name=NetPS1_3 New Net Name=CTRL
+Change Net Name : Old Net Name=NetPS1_5 New Net Name=Trim
+Added Room: Name=main
