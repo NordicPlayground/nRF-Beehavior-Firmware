@@ -52,7 +52,7 @@ config THINGY_SAMPLE_RATE
 # Aiming for default = 24 for default res sampling and 120 for high res
 config THINGY_DATA_BUFFER_SIZE
 	int "Size of Thingy data buffer- This decides the time horizon"
-	default 10 if HIGH_RES_SAMPLING_THINGY
+	default 120 if HIGH_RES_SAMPLING_THINGY
 	default 12
 
 #For high res: 20 (every 20th minute with 1 min sample time)
