@@ -289,7 +289,6 @@ static void discovery_write_to_led_completed(struct bt_gatt_dm *disc, void *ctx)
 	struct bt_gatt_write_params params;
 	params.func = write_to_led_cb;
 	params.data = data;
-	uint16_t test = 0;
 	params.handle = desc->handle;
 	LOG_INF("Handle: %i", desc->handle);
 	params.offset = 0;
