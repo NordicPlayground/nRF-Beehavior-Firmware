@@ -301,6 +301,9 @@ static bool event_handler(const struct event_header *eh)
 				temperature_float_avg = temperature_float_sum / THINGY_SAMPLE_TO_SEND;
 				humidity_avg = humidity_sum  / THINGY_SAMPLE_TO_SEND;
 
+				pressure_avg_union.a = pressure_int_avg;
+				printk("pressure_int_avg = %i \n ", pressure_int_avg);
+
 				/* 
 					Resetting the partial sums for next batch of sampling
 				*/
@@ -310,16 +313,24 @@ static bool event_handler(const struct event_header *eh)
 				temperature_float_sum = 0;
 				humidity_sum = 0;
 
-				uint8_t avg_thingy_data[11] = { (uint8_t)'*', id-(uint8_t)'0', temperature_int_avg, temperature_float_avg, pressure_float_avg};
+				uint8_t avg_thingy_data[11] = { (uint8_t)'*', id-(uint8_t)'0', temperature_int_avg, temperature_float_avg, humidity_avg};
 
 				/*Divide the 32bit integer for pressure into 4 separate 8bit integers. This is merged back to 32 bit integer when 91 module recieves the data.  */
 				for(uint8_t i=0;  i<=3; i++){
 					avg_thingy_data[8-i] = pressure_avg_union.s[i];
 				}
 
+
 				avg_thingy_data[9] = pressure_float_avg;
 				avg_thingy_data[10] = event->battery_charge;
-			
+
+				LOG_INF("This is the average data at this time: \n");
+				for (uint8_t elem = 0; elem <= 10; elem++){
+					// printk("test \n");
+					printk("\n Average elem # %i: \n", elem);
+					printk("%i ", avg_thingy_data[elem]);
+				printk("\n");	
+				}
 
 				LOG_INF("Checking swarming event before sending average of the last 4 measurement are beeing sent \n");
 
@@ -334,7 +345,8 @@ static bool event_handler(const struct event_header *eh)
 					LOG_INF("SAMPLE_COUNTER INCREMENTED BY 1\n");
 					
 					// int err = bt_nus_send(hub_conn, avg_thingy_data, 11);
-					int err = bt_nus_send(hub_conn, thingy_data, 11);
+					// int err = bt_nus_send(hub_conn, thingy_data, 11);
+					int err = bt_nus_send(hub_conn, avg_thingy_data, 11);
 				}
 				if(IS_SWARMING){
 					LOG_INF("Swarming detected. Sending data as with a swarming flag (TODO). \n" );
