@@ -166,6 +166,11 @@ static bool event_handler(const struct event_header *eh)
 	}
 
     if (is_thingy_event(eh)) {
+
+		if (sample_counter == THINGY_BUFFER_SIZE){
+			THINGY_BUFFER_WRITABLE = false;
+			LOG_INF("THINGY_BUFFER_WRITABLE = false\n");
+		}
         LOG_INF("event_handler(): Thingy event is being handled. \n");
 
 		struct thingy_event *event = cast_thingy_event(eh);
@@ -176,7 +181,6 @@ static bool event_handler(const struct event_header *eh)
 
 		/* Organizing the sensor data in a 11 byte data message which is sent to 91-module. */
 
-		// This is to be replaced with matrix push and pop. FILO?
 		// if (sample_counter >= THINGY_BUFFER_SIZE){
 		// 	sample_counter = 0;
 		// }
@@ -193,29 +197,45 @@ static bool event_handler(const struct event_header *eh)
 		thingy_data[9] = event->pressure_float;
 		thingy_data[10] = event->battery_charge;
 
+		// k_fifo_put_list(&thingy_buffer_fifo, )
+		// k_fifo_peek_head(&thingy_buffer_fifo);
+
+		//Sjekke om thingy_data[0:10] teller som en data item
+		// k_fifo_put(&thingy_buffer_fifo, &thingy_data);
+		// k_fifo_peek_head(&thingy_buffer_fifo);
+
 		/*Append to buffer */
 		LOG_INF("Size of THINGY_DATA_BUFFER_SIZE: %i \n", THINGY_BUFFER_SIZE);
 		LOG_INF("Current sample number is now %i: \n", sample_counter);
 
 		if (!THINGY_BUFFER_WRITABLE){
-			LOG_INF("Thingy matrix is full, ejecting oldest entry and moving all entries one index down. \n");
+			// LOG_INF("Thingy matrix is full, ejecting oldest entry and moving all entries one index down. \n");
+			LOG_INF("Thingy matrix is full, clearing buffer completely (This will change) down. \n");
 			/*	Push all entries one index down. This should leave thingy_matrix[-1][] open to write
 				Maybe this can handle the former "delete element 0".
 			*/
-			for (uint8_t row = 1; row <= THINGY_BUFFER_SIZE - 1; row++){
-				for (uint8_t col = 0; col <= 10; col++){
-					thingy_matrix[row-1][col] = thingy_matrix[row][col];
-				}
+			// thingy_matrix[THINGY_BUFFER_SIZE][11] = {0};
+			for (uint8_t row = 1; row <= THINGY_BUFFER_SIZE -1 ; row++){
+				memset(thingy_matrix, 0, sizeof(thingy_matrix));
 			}
-
+			sample_counter =0;
 			THINGY_BUFFER_WRITABLE = true;
+
+			// for (uint8_t row = 1; row <= THINGY_BUFFER_SIZE - 1; row++){
+			// 	for (uint8_t col = 0; col <= 10; col++){
+			// 		thingy_matrix[row-1][col] = thingy_matrix[row][col];
+			// 	}
+			// }
+
+			// THINGY_BUFFER_WRITABLE = true;
 		}
 		/*	If there are one or more empty rows in the buffer, append the new data this row */
 
 		if (THINGY_BUFFER_WRITABLE){
-			LOG_INF("Row(s) in buffer still not filled. Appending thiny data to empty row");
+			LOG_INF("THINGY_BUFFER_WRITABLE = true\n");
 			/*If it is not the first THINGY_BUFFER_SIZE num of samples recieved, do this */
 			if(sample_counter > THINGY_BUFFER_SIZE){
+				LOG_INF("Row(s) in buffer filled, but latest row has been cleared. Appending thingy data to empty row");
 				for (uint8_t i = 0; i<=10; i++){
 					// Adding the most recent data sample to the last (and only open) row in the buffer
 					thingy_matrix[THINGY_BUFFER_SIZE][i] = thingy_data[i];
@@ -225,6 +245,7 @@ static bool event_handler(const struct event_header *eh)
 			}
 			/*Otherwise, append it to the earliest available */
 			else{
+				LOG_INF("Row(s) in buffer still not filled. Appending thingy data to empty row");
 				for (uint8_t i = 0; i<=10; i++){
 					thingy_matrix[sample_counter][i] = thingy_data[i];
 				}
@@ -255,7 +276,8 @@ static bool event_handler(const struct event_header *eh)
 		# Jallaverage oppsummering
 		*/
 
-		if (sample_counter > 0){
+		if (sample_counter >= 0 && !FIRST_SAMPLE){
+			LOG_INF("Adding sum of sample number: %i (0 may equal every 12th) \n", sample_counter);
 			pressure_int_sum += event->pressure_int;
 			pressure_float_sum += event->pressure_float;
 			temperature_int_sum += event->data_array[0];
@@ -283,10 +305,11 @@ static bool event_handler(const struct event_header *eh)
 			/* 
 				First sample received after startup and/or restart
 			*/
-			if (sample_counter == 0){
+			if (sample_counter == 0 && FIRST_SAMPLE){
 				LOG_INF("event_handler(): Hub is connected, and first sample received. Sending sample over nus. \n");
 				sample_counter += 1;
 				LOG_INF("SAMPLE_COUNTER INCREMENTED BY 1");
+				FIRST_SAMPLE = false;
 				int err = bt_nus_send(hub_conn, thingy_data, 11);
 			}
 			else{
@@ -307,6 +330,7 @@ static bool event_handler(const struct event_header *eh)
 				/* 
 					Resetting the partial sums for next batch of sampling
 				*/
+				LOG_INF("Clearing partial sums for average computing \n");
 				pressure_int_sum = 0;
 				pressure_float_sum = 0;
 				temperature_int_sum = 0;
@@ -356,8 +380,8 @@ static bool event_handler(const struct event_header *eh)
 					sample_counter += 1;
 					LOG_INF("SAMPLE_COUNTER INCREMENTED BY 1\n");
 					
-					// int err = bt_nus_send(hub_conn, avg_thingy_data, 11);
-					int err = bt_nus_send(hub_conn, thingy_data, 11);
+					// int err = bt_nus_send(hub_conn, thingy_data, 11);
+					int err = bt_nus_send(hub_conn, avg_thingy_data, 11);
 				}
 			}
 		}

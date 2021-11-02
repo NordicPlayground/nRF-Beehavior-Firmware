@@ -10,6 +10,9 @@ LOG_MODULE_REGISTER(MODULE, 4);
 #define THINGY_SAMPLE_TO_SEND CONFIG_THINGY_SAMPLE_TO_SEND
 #endif
 
+// struct k_fifo thingy_buffer_fifo;
+// k_fifo_init(&thingy_buffer_fifo);
+
 // Used for thingy_event
 union tagname{
 	int a;
@@ -54,6 +57,7 @@ uint16_t humidity_sum = 0;
 uint8_t humidity_avg = 0;
 
 bool THINGY_BUFFER_WRITABLE = true;
+bool FIRST_SAMPLE = true;
 
 
 
