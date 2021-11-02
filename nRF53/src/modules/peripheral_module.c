@@ -276,6 +276,8 @@ static bool event_handler(const struct event_header *eh)
 		# Jallaverage oppsummering
 		*/
 
+		/*If it is not the first sample, include this as the nth sample to ensure
+		that the average is divided on correct amount of elements*/
 		if (sample_counter >= 0 && !FIRST_SAMPLE){
 			LOG_INF("Adding sum of sample number: %i (0 may equal every 12th) \n", sample_counter);
 			pressure_int_sum += event->pressure_int;
