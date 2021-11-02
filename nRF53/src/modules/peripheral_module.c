@@ -296,7 +296,7 @@ static bool event_handler(const struct event_header *eh)
 				*/
 				LOG_INF("4th sample recieved. Computing average and sending \n");
 				pressure_int_avg = pressure_int_sum / THINGY_SAMPLE_TO_SEND;
-				pressure_float_avg = pressure_int_sum / THINGY_SAMPLE_TO_SEND;
+				pressure_float_avg = pressure_float_sum / THINGY_SAMPLE_TO_SEND;
 				temperature_int_avg = temperature_int_sum / THINGY_SAMPLE_TO_SEND;
 				temperature_float_avg = temperature_float_sum / THINGY_SAMPLE_TO_SEND;
 				humidity_avg = humidity_sum  / THINGY_SAMPLE_TO_SEND;
@@ -354,7 +354,7 @@ static bool event_handler(const struct event_header *eh)
 			sample_counter += 1;
 			LOG_INF("SAMPLE_COUNTER INCREMENTED BY 1\n");
 		}
-		return false;
+		// return false;
 	}
 	
 	if(is_bee_count_event(eh)){
