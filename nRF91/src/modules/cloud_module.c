@@ -12,6 +12,7 @@
 
 #include <modem/lte_lc.h>
 #include <net/cloud.h>
+#include <net/nrf_cloud.h>
 #include <net/socket.h>
 
 #include <modem/nrf_modem_lib.h>
@@ -454,7 +455,7 @@ static bool event_handler(const struct event_header *eh)
 				LOG_INF("LTE allready on");
 			}
 
-			nrf_cloud_process();
+			// nrf_cloud_process();
 			LOG_DBG("Size: %i", event->dyndata.size);
 			if(event->dyndata.size == 4){
 				LOG_DBG("Bee Counter data is being JSON-formatted");
@@ -613,6 +614,7 @@ static bool event_handler(const struct event_header *eh)
 			//err = pm_device_state_set(cons, PM_DEVICE_STATE_LOW_POWER,NULL,NULL); 
 			//LOG_INF("2");
 			//pm_power_state_force((struct pm_state_info){PM_STATE_SOFT_OFF, 0, 0});
+			
 			return false;
 		}
 		/* Function to check number of connected peripherals */
