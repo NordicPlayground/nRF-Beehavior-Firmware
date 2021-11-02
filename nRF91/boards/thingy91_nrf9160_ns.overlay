@@ -41,15 +41,15 @@
 // 	status = "disabled";
 // };
 
-// &i2c2 {
-// 	compatible = "nordic,nrf-twim";
-// 	status = "disabled";
-// };
+&i2c2 {
+	compatible = "nordic,nrf-twim";
+	status = "disabled";
+};
 
-// &spi3 {
-// 	compatible = "nordic,nrf-spim";
-// 	status = "disabled";
-// }; 
+&spi3 {
+	compatible = "nordic,nrf-spim";
+	status = "disabled";
+}; 
 
 &uart1 {
 	current-speed = <1000000>;
