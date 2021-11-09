@@ -10,10 +10,23 @@ LOG_MODULE_REGISTER(MODULE, 4);
 #define THINGY_SAMPLE_TO_SEND CONFIG_THINGY_SAMPLE_TO_SEND
 #endif
 
-// struct k_fifo thingy_buffer_fifo;
-// k_fifo_init(&thingy_buffer_fifo);
+// K_FIFO_DEFINE(thingy_buffer_fifo);
 
-// Used for thingy_event
+// // static K_FIFO_DEFINE(fifo_uart_tx_data);
+// // static K_FIFO_DEFINE(fifo_uart_rx_data);
+
+// /* Do we need this?
+// */
+// // Payload buffer element size. 
+// #define THINGY_DATA_SIZE 11
+
+// //Create a data item
+// struct thingy_data_t {
+// 	void *fifo_reserved;
+// 	uint8_t  thingy_data[THINGY_DATA_SIZE];
+// 	// uint16_t len; //?
+// };
+
 union tagname{
 	int a;
 	unsigned char s[4];
@@ -57,6 +70,7 @@ uint16_t humidity_sum = 0;
 uint8_t humidity_avg = 0;
 
 bool THINGY_BUFFER_WRITABLE = true;
+bool INSERT_AT_LAST_ROW = false;
 bool FIRST_SAMPLE = true;
 
 
