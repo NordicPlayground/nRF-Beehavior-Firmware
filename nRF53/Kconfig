@@ -58,9 +58,10 @@ config THINGY_DATA_BUFFER_SIZE
 #For high res: 20 (every 20th minute with 1 min sample time)
 #For default res: 4 (every 20th minute with 5 min sample time)
 config THINGY_SAMPLE_TO_SEND
-	int "Send data every 20 minute"
+	int "Send data every nth minute"
 	default 20 if HIGH_RES_SAMPLING_THINGY
-	default 4	
+	default 4
+	# default 1	
 
 config BLE_TO_CLOUD_APP_VERSION
 	string "Bluetooth to cloud application firmware version"
