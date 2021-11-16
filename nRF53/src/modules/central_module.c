@@ -289,7 +289,6 @@ static void discovery_write_to_led_completed(struct bt_gatt_dm *disc, void *ctx)
 	struct bt_gatt_write_params params;
 	params.func = write_to_led_cb;
 	params.data = data;
-	uint16_t test = 0;
 	params.handle = desc->handle;
 	LOG_INF("Handle: %i", desc->handle);
 	params.offset = 0;
@@ -338,7 +337,8 @@ static void discovery_write_completed(struct bt_gatt_dm *disc, void *ctx){
 	//Write to Thingy to update configuration
 
 	char data[12] = { 0x60,0xEA,0x60,0xEA,0x60,0xEA,0x10,0x27,0x03,0xFF,0x00,0x00};
-
+	// char data[12] = { 0x10,0x27,0x10,0x27,0x10,0x27,0x10,0x27,0x03,0xFF,0x00,0x00}; //10s
+	// char data[12] = { 0x88,0x13,0x88,0x13,0x88,0x13,0x88,0x13,0x03,0xFF,0x00,0x00}; //5s
 	LOG_INF("%d", data[0]);
 
 	const struct bt_gatt_dm_attr *chrc;
