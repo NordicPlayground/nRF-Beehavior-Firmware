@@ -63,7 +63,7 @@ char id;
 uint16_t T52_Counter = 0;
 uint16_t BM_Counter = 0;
 
-K_FIFO_DEFINE(thingy_buffer_fifo);
+
 
 // static K_FIFO_DEFINE(fifo_uart_tx_data);
 // static K_FIFO_DEFINE(fifo_uart_rx_data);
@@ -73,14 +73,13 @@ K_FIFO_DEFINE(thingy_buffer_fifo);
 // Payload buffer element size. 
 #define THINGY_DATA_SIZE 11
 
+K_FIFO_DEFINE(thingy_buffer_fifo);
 //Create a data item
 struct thingy_data_t {
 	void *fifo_reserved;
 	uint8_t thingy_data[THINGY_DATA_SIZE];
 	// uint16_t len; //?
 };
-
-
 
 static K_SEM_DEFINE(ble_init_ok, 0, 1);
 
@@ -183,7 +182,7 @@ static bool event_handler(const struct event_header *eh)
 	}
 
     if (is_thingy_event(eh)) {
-		struct thingy_data_t *thingy_data; 
+		// struct thingy_data_t *thingy_data_struct; 
 
 		if (sample_counter == THINGY_BUFFER_SIZE){
 			THINGY_BUFFER_WRITABLE = false;
@@ -199,20 +198,28 @@ static bool event_handler(const struct event_header *eh)
 
 		/* Organizing the sensor data in a 11 byte data message which is sent to 91-module. */
 		// uint8_t thingy_data[11];
-		thingy_data->thingy_data[0] = (uint8_t)'*';
-		thingy_data->thingy_data[1] = id-(uint8_t)'0';
-		thingy_data->thingy_data[2] = event->data_array[0];
-		thingy_data->thingy_data[3] = event->data_array[1];
-		thingy_data->thingy_data[4] = event->data_array[2];
-        // uint8_t thingy_data[11] = {(uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2]};
+		// thingy_data_struct->thingy_data[0] = (uint8_t)'*';
+		// thingy_data_struct->thingy_data[1] = id-(uint8_t)'0';
+		// thingy_data_struct->thingy_data[2] = event->data_array[0];
+		// thingy_data_struct->thingy_data[3] = event->data_array[1];
+		// thingy_data_struct->thingy_data[4] = event->data_array[2];
+        uint8_t thingy_data[11] = {(uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2]};
 	
 		/*Divide the 32bit integer for pressure into 4 separate 8bit integers. This is merged back to 32 bit integer when 91 module recieves the data.  */
+		// for(uint8_t i=0;  i<=3; i++){
+		// 	thingy_data_struct->thingy_data[8-i] = (uint8_t)pressure_union.s[i];
+		// }
+
+
 		for(uint8_t i=0;  i<=3; i++){
-			thingy_data->thingy_data[8-i] = (uint8_t)pressure_union.s[i];
+			thingy_data[8-i] = (uint8_t)pressure_union.s[i];
 		}
 
-		thingy_data->thingy_data[9] = event->pressure_float;
-		thingy_data->thingy_data[10] = event->battery_charge;
+		// thingy_data_struct->thingy_data[9] = event->pressure_float;
+		// thingy_data_struct->thingy_data[10] = event->battery_charge;
+
+		thingy_data[9] = event->pressure_float;
+		thingy_data[10] = event->battery_charge;
 
 		/*Append to buffer */
 		LOG_INF("Size of THINGY_DATA_BUFFER_SIZE: %i \n", THINGY_BUFFER_SIZE);
@@ -221,13 +228,14 @@ static bool event_handler(const struct event_header *eh)
 		for (uint8_t elem = 0; elem <= 10; elem++){
 			// printk("test \n");
 			printk("\n Current sample elem # %i: \n", elem);
-			printk("%i ", thingy_data->thingy_data[elem]);
+			printk("%i ", thingy_data[elem]);
+			// printk("%i ", thingy_data_struct->thingy_data[elem]);
 		printk("\n");	
 		}
 
 		if (!THINGY_BUFFER_WRITABLE){
 			// LOG_INF("Thingy matrix is full, ejecting oldest entry and moving all entries one index down. \n");
-			LOG_INF("Thingy matrix is full, clearing buffer completely (This will change). \n");
+			// LOG_INF("Thingy matrix is full, clearing buffer completely (This will change). \n");
 			/*	Push all entries one index down. This should leave thingy_matrix[-1][] open to write
 				Maybe this can handle the former "delete element 0".
 			*/
@@ -248,15 +256,9 @@ static bool event_handler(const struct event_header *eh)
 			THINGY_BUFFER_WRITABLE = true;
 		}
 
-
 		/*	If there are one or more empty rows in the buffer, append the new data this row */
 		if (THINGY_BUFFER_WRITABLE){
 			LOG_INF("THINGY_BUFFER_WRITABLE = true\n");
-
-			// LOG_INF("Row(s) in buffer still not filled. Appending thingy data to empty row");
-			// for (uint8_t i = 0; i<=10; i++){
-			// 	thingy_matrix[sample_counter][i] = thingy_data->thingy_data[i];
-			// }
 			LOG_INF("Buffer still not full. Adding samples to queue:\n");
 			// k_fifo_put(&thingy_buffer_fifo, thingy_data->thingy_data);	
 			LOG_INF("Sample has been appended to buffer \n");
@@ -325,11 +327,15 @@ static bool event_handler(const struct event_header *eh)
 				for (uint8_t elem = 0; elem <= 10; elem++){
 					// printk("test \n");
 					printk("\n Current sample elem # %i: \n", elem);
-					printk("%i ", thingy_data->thingy_data[elem]);
+					// printk("%i ", thingy_data_struct->thingy_data[elem]);
+					printk("%i ", thingy_data[elem]);
 				printk("\n");	
 				}
 				uint8_t first_sample[11];
-				memcpy(first_sample, thingy_data -> thingy_data,11);
+				// memcpy(first_sample, thingy_data_struct -> thingy_data,11);
+				//Overflødig. Kunne bare brukt "thingy_data" som datamelding å sende, men dette gir
+				//kanskje litt tid til å sende før neste måling går gjennom
+				memcpy(first_sample, thingy_data,11);
 
 				printk("First sample: %i", sample_counter);
 				for (uint8_t elem = 0; elem <= 10; elem++){
@@ -339,8 +345,8 @@ static bool event_handler(const struct event_header *eh)
 				printk("\n");	
 				}
 
-				int err = bt_nus_send(hub_conn, &thingy_data, 11);
-				// int err = bt_nus_send(hub_conn, &first_sample, 11);
+				// int err = bt_nus_send(hub_conn, thingy_data, 11);
+				int err = bt_nus_send(hub_conn, first_sample, 11);
 				LOG_INF("First sample: No fatal crash when sending");
 				sample_counter += 1;
 				LOG_INF("SAMPLE_COUNTER INCREMENTED BY 1");
