@@ -5,8 +5,7 @@
 #include "events/bee_count_event.h"
 #include <stdlib.h>
 #include "peripheral_module.h"
-#include <stdio.h>
-#include <stdlib.h>
+
 
 #define TEMPTHRESH 30 //this is not correct, but will be adjusted for
 #define MOISTTHRESH 30 //Moisture levels constantly dropping may be indicator if swarming
@@ -21,43 +20,10 @@ Notes about swarming:
 
 */
 
-struct float_queue{
-    float *arr;
-    size_t size;
-    int len;
-    float first_elem;
-};
+struct k_fifo data_fifo;
 
-void init_float_queue(struct float_queue *queue, size_t nelems)
-{
-    queue->arr = malloc(nelems*sizeof(int));
-    queue->first_elem = 0;
-    queue->len = 0;
-    queue->size = nelems;
-}
+k_fifo_init(&my_fifo);
 
-
-void destroy_float_queue(struct float_queue *queue)
-{
-    free(queue->arr);
-}
-
-void push_float(struct float_queue *queue, float new_val)
-{
-    queue->arr[(queue->first_elem + (queue->len)++) % queue->size] = new_val;
-    if (queue->len > queue->size){
-        queue->len--;
-        queue->first_elem++;
-        queue->first_elem %= queue->size;
-    }
-}
-
-float get_float(struct float_queue *queue, int index)
-{
-    // note does not handle the case for index out of bounds
-    // wraps around for overflow
-    return queue->arr[(queue->first_elem + index) % queue->size];
-}
 
 
 int beecount_func(uint8_t out){ //Algorithms for when swarming happens has not been developed yet...
@@ -69,17 +35,14 @@ int weight_func(float bm_w_data[2]){
 	//float weight_data = atof(thingy_data[0]) + (atof(thingy_data[1])/100)
 }
 
-void k_queue_init(struct k_queue *queue)
 
 static bool event_handler(const struct event_header *eh)
 {
     if (is_thingy_event(eh)) {
-		struct int_queue temp_array;
-		init_int_queue(&queue, 20);
 		for (int i = 0; i < THINGY_BUFFER_SIZE; i++){
 				float temp_data = atof(thingy_data[0]) + (atof(thingy_data[1])/100);
 				float humidity_data = atof(thingy_data[2]);
-				push_int(&queue, )
+				
 		}
 		/*
 	    struct thingy_event *event = cast_thingy_event(eh);
