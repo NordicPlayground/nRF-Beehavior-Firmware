@@ -1,0 +1,1009 @@
+nrf52840
+2021-Nov-09 08:19:10  --------------------------------------------------------------------------------
+2021-Nov-09 08:19:10  C:\Program Files (x86)\Nordic Semiconductor\nrf-command-line-tools\bin\nrfjprog.exe --sectorerase --log 
+2021-Nov-09 08:19:10  nrfjprog version 10.9.0 
+2021-Nov-09 08:19:10  --------------------------------------------------------------------------------
+2021-Nov-09 08:19:10  nRF_logger_open
+2021-Nov-09 08:19:10  nRF_logger_open:	nRFJProg logger opened to callback at address 0X890900
+2021-Nov-09 08:19:10  nRF_open_dll
+2021-Nov-09 08:19:10  nRF_open_dll:	Load library at "C:\\Program Files (x86)\\Nordic Semiconductor\\nrf-command-line-tools\\bin\\JLINKARM_UNKNOWN_NRFJPROG.dll".
+
+2021-Nov-09 08:19:10  . nRFXX_logger_open
+2021-Nov-09 08:19:10  . nRFXX_logger_open:	nRFJProg logger opened to callback at address 0X5F0CB850
+2021-Nov-09 08:19:10  . . Segger_logger_open
+2021-Nov-09 08:19:10  . . Segger_logger_open:	nRFJProg logger opened to callback at address 0X5F08E1A0
+2021-Nov-09 08:19:10  . . Segger_open_dll
+2021-Nov-09 08:19:10  . . Segger_open_dll:	No J-Link DLL path was provided. Attempting to auto detect.
+
+2021-Nov-09 08:19:10  . . Segger_open_dll:	Load library at "C:\\Program Files (x86)\\SEGGER\\JLink\\JLinkARM.dll".
+
+2021-Nov-09 08:19:10  . . . Segger_dll_version
+2021-Nov-09 08:19:10  . . Segger_set_core_data
+2021-Nov-09 08:19:10  nRF_enum_emu_snr
+2021-Nov-09 08:19:10  . nRFXX_enum_emu_snr
+2021-Nov-09 08:19:10  . . Segger_enum_emu_snr
+2021-Nov-09 08:19:10  . . . Segger_enum_emu_snr
+2021-Nov-09 08:19:10  . . . . Segger_get_num_emus
+2021-Nov-09 08:19:10  nRF_connect_to_emu_with_snr
+2021-Nov-09 08:19:10  . nRFXX_connect_to_emu_with_snr
+2021-Nov-09 08:19:10  . . Segger_connect_to_emu_with_snr
+2021-Nov-09 08:19:10  . . . Segger_is_connected_to_emu
+2021-Nov-09 08:19:10  . . . Segger_enum_emu_snr
+2021-Nov-09 08:19:10  . . . . Segger_get_num_emus
+2021-Nov-09 08:19:10  . . . Segger_connect_to_emu_with_snr
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	Segger logging enabled with callback at 0x1594418480.
+
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:017.105   
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	Firmware: J-Link OB-K22-NordicSemi compiled Jan 21 2020 17:33:01
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:017.875   
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	Decompressing FW timestamp took 135 us
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:031.675   
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	Hardware: V1.00
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:032.496   
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	S/N: 960005831
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:033.418   
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	OEM: SEGGER
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:034.191   
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	Feature(s): RDI, FlashBP, FlashDL, JFlash, GDB
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:036.092   
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	TELNET listener socket opened on port 19021
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:036.838   
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	WEBSRV Starting webserver
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:037.488   
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	WEBSRV Webserver running on local port 19080
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:038.012 
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 25.226ms returns "O.K."  
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:038.539 
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:039.053 
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_GetHWStatus(...)  
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:039.708 
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 0.918ms returns 0  
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:040.219 
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:040.761 
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_ExecCommand("SetRestartOnClose = 0", ...).   
+2021-Nov-09 08:19:10  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:041.467 
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 0.406ms returns 0x01  
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:042.188 
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:042.786 
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_ExecCommand("DisableFlashDL", ...).   
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:043.466 
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 0.410ms returns 0x00  
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:044.130 
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:044.822 
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_ExecCommand("ExcludeFlashCacheRange 0x0-0xFFFFFFFF", ...).   
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:045.338 
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 0.527ms returns 0x00  
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:046.263 
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:046.808 
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_SetHookUnsecureDialog  
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:047.391   
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_SetHookUnsecureDialog(...)
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:048.033 
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 1.456ms returns 0  
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:048.493 
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:048.967 
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_TIF_Select(JLINKARM_TIF_SWD)  
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:049.967 
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 1.257ms returns 0x00  
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:050.490 
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:051.017 
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_SetSpeed(2000)  
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:051.595 
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 0.832ms  
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:052.132 
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:052.702 
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_GetSN()  
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:053.258 
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 0.833ms returns 960005831  
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T3814 000:053.812 
+2021-Nov-09 08:19:11  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:11  . . . . . Segger_load_core_data
+2021-Nov-09 08:19:11  . . . . . Segger_load_core_data:	JLink INFO	T3814 000:054.505 
+2021-Nov-09 08:19:11  . . . . . Segger_load_core_data:	JLink INFO	JLINK_ExecCommand("CORESIGHT_SetIndexAHBAPToUse = 0", ...).   
+2021-Nov-09 08:19:11  . . . . . Segger_load_core_data:	JLink INFO	T3814 000:054.957 
+2021-Nov-09 08:19:11  . . . . . Segger_load_core_data:	JLink INFO	- 0.225ms returns 0x00  
+2021-Nov-09 08:19:11  . . . . . Segger_load_core_data:	JLink INFO	T3814 000:055.397 
+2021-Nov-09 08:19:11  . . . . . Segger_load_core_data:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:11  . . . . . Segger_load_core_data:	JLink INFO	T3814 000:055.835 
+2021-Nov-09 08:19:11  . . . . . Segger_load_core_data:	JLink INFO	JLINK_ExecCommand("device = Cortex-M4", ...).   
+2021-Nov-09 08:19:11  . . . . . Segger_load_core_data:	JLink INFO	T3814 000:062.637   
+2021-Nov-09 08:19:11  . . . . . Segger_load_core_data:	JLink INFO	XML file found at: C:\Program Files (x86)\SEGGER\JLink\JLinkDevices.xml 
+2021-Nov-09 08:19:11  . . . . . Segger_load_core_data:	JLink INFO	T3814 000:063.827   
+2021-Nov-09 08:19:11  . . . . . Segger_load_core_data:	JLink INFO	C:\Program Files (x86)\SEGGER\JLink\JLinkDevices.xml evaluated successfully. 
+2021-Nov-09 08:19:11  . . . . . Segger_load_core_data:	JLink INFO	T3814 000:097.224   
+2021-Nov-09 08:19:11  . . . . . Segger_load_core_data:	JLink INFO	Device "CORTEX-M4" selected.
+2021-Nov-09 08:19:11  . . . . . Segger_load_core_data:	JLink INFO	T3814 000:100.008 
+2021-Nov-09 08:19:11  . . . . . Segger_load_core_data:	JLink INFO	- 43.999ms returns 0x00  
+2021-Nov-09 08:19:11  . . . . . Segger_load_core_data:	JLink INFO	T3814 000:100.553 
+2021-Nov-09 08:19:11  . . . . . Segger_load_core_data:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:11  nRF_read_connected_emu_snr
+2021-Nov-09 08:19:11  . nRFXX_read_connected_emu_snr
+2021-Nov-09 08:19:11  . . Segger_read_connected_emu_snr
+2021-Nov-09 08:19:11  . . . Segger_is_connected_to_emu
+2021-Nov-09 08:19:11  . . . Segger_is_connected_to_emu:	JLink INFO	T3814 000:102.273 
+2021-Nov-09 08:19:11  . . . Segger_is_connected_to_emu:	JLink INFO	JLINK_IsOpen()  
+2021-Nov-09 08:19:11  . . . Segger_is_connected_to_emu:	JLink INFO	T3814 000:102.825 
+2021-Nov-09 08:19:11  . . . Segger_is_connected_to_emu:	JLink INFO	- 0.840ms returns 0x01  
+2021-Nov-09 08:19:11  . . . Segger_is_connected_to_emu:	JLink INFO	T3814 000:103.425 
+2021-Nov-09 08:19:11  . . . Segger_is_connected_to_emu:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:11  nRF_read_device_family
+2021-Nov-09 08:19:11  . nRFXX_read_device_family
+2021-Nov-09 08:19:11  . . Segger_is_connected_to_emu
+2021-Nov-09 08:19:11  . . Segger_is_connected_to_emu:	JLink INFO	T3814 000:104.855 
+2021-Nov-09 08:19:11  . . Segger_is_connected_to_emu:	JLink INFO	JLINK_IsOpen()  
+2021-Nov-09 08:19:11  . . Segger_is_connected_to_emu:	JLink INFO	T3814 000:105.421 
+2021-Nov-09 08:19:11  . . Segger_is_connected_to_emu:	JLink INFO	- 0.836ms returns 0x01  
+2021-Nov-09 08:19:11  . . Segger_is_connected_to_emu:	JLink INFO	T3814 000:105.933 
+2021-Nov-09 08:19:11  . . Segger_is_connected_to_emu:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:11  . . :	JLink INFO	T3814 000:106.416 
+2021-Nov-09 08:19:11  . . :	JLink INFO	JLINK_Lock()  
+2021-Nov-09 08:19:11  . . Segger_read_debug_port_idr
+2021-Nov-09 08:19:11  . . . Segger_read_debug_port_register
+2021-Nov-09 08:19:11  . . . . Segger_read_debug_port_register
+2021-Nov-09 08:19:11  . . . . . Segger_coresight_configure
+2021-Nov-09 08:19:11  . . . . . Segger_coresight_configure:	JLink INFO	T3814 000:107.684 
+2021-Nov-09 08:19:11  . . . . . Segger_coresight_configure:	JLink INFO	JLINK_CORESIGHT_Configure()  
+2021-Nov-09 08:19:11  . . . . . Segger_coresight_configure:	JLink INFO	T3814 000:209.396 
+2021-Nov-09 08:19:11  . . . . . Segger_coresight_configure:	JLink INFO	- 102.100ms returns 0  
+2021-Nov-09 08:19:11  . . . . . Segger_coresight_configure:	JLink INFO	T3814 000:210.082 
+2021-Nov-09 08:19:11  . . . . . Segger_coresight_configure:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:11  . . . . Segger_read_debug_port_register:	JLink INFO	T3814 000:210.559 
+2021-Nov-09 08:19:11  . . . . Segger_read_debug_port_register:	JLink INFO	JLINK_CORESIGHT_ReadAPDPReg(DP reg 0x00)  
+2021-Nov-09 08:19:11  . . . . Segger_read_debug_port_register:	JLink INFO	T3814 000:211.534   
+2021-Nov-09 08:19:11  . . . . Segger_read_debug_port_register:	JLink INFO	failed
+2021-Nov-09 08:19:11  . . . . Segger_read_debug_port_register:	JLink INFO	T3814 000:212.142 
+2021-Nov-09 08:19:11  . . . . Segger_read_debug_port_register:	JLink INFO	- 1.820ms returns -1  
+2021-Nov-09 08:19:11  . . . . Segger_read_debug_port_register:	JLink INFO	T3814 000:212.612 
+2021-Nov-09 08:19:11  . . . . Segger_read_debug_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:11  . . . . Segger_read_debug_port_register:	JLinkARM.dll reported "-1", an unknown error.
+
+2021-Nov-09 08:19:11  . . . . . Segger_abort_debug_action
+2021-Nov-09 08:19:11  . . . . . Segger_abort_debug_action:	Attempting to clear any configuration errors in debug port before closing connection. 
+
+2021-Nov-09 08:19:11  . . . . . Segger_abort_debug_action:	JLink INFO	T3814 000:213.792 
+2021-Nov-09 08:19:11  . . . . . Segger_abort_debug_action:	JLink INFO	JLINK_CORESIGHT_WriteAPDPReg(DP reg 0x00, 0x0000001F)  
+2021-Nov-09 08:19:11  . . . . . Segger_abort_debug_action:	JLink INFO	T3814 000:214.770 
+2021-Nov-09 08:19:11  . . . . . Segger_abort_debug_action:	JLink INFO	- 1.263ms returns -1  
+2021-Nov-09 08:19:11  . . . . . Segger_abort_debug_action:	JLink INFO	T3814 000:215.291 
+2021-Nov-09 08:19:11  . . . . . Segger_abort_debug_action:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:11  . . . . . Segger_abort_debug_action:	JLinkARM.dll reported "-1", an unknown error.
+
+2021-Nov-09 08:19:11  . . :	JLink INFO	T3814 000:215.977 
+2021-Nov-09 08:19:11  . . :	JLink INFO	- 0.908ms  
+2021-Nov-09 08:19:11  nRF_close_dll
+2021-Nov-09 08:19:11  . nRFXX_close_dll
+2021-Nov-09 08:19:11  . . Segger_close
+2021-Nov-09 08:19:11  . . . Segger_disconnect_from_emu
+2021-Nov-09 08:19:11  . . . . Segger_is_connected_to_emu
+2021-Nov-09 08:19:11  . . . . Segger_is_connected_to_emu:	JLink INFO	T3814 000:217.511 
+2021-Nov-09 08:19:11  . . . . Segger_is_connected_to_emu:	JLink INFO	JLINK_IsOpen()  
+2021-Nov-09 08:19:11  . . . . Segger_is_connected_to_emu:	JLink INFO	T3814 000:217.951 
+2021-Nov-09 08:19:11  . . . . Segger_is_connected_to_emu:	JLink INFO	- 0.657ms returns 0x01  
+2021-Nov-09 08:19:11  . . . . Segger_is_connected_to_emu:	JLink INFO	T3814 000:218.395 
+2021-Nov-09 08:19:11  . . . . Segger_is_connected_to_emu:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:11  . . . . Segger_disconnect_from_emu
+2021-Nov-09 08:19:11  . . . . . Segger_is_connected_to_device
+2021-Nov-09 08:19:11  . . . . . Segger_is_connected_to_device:	JLink INFO	T3814 000:219.298 
+2021-Nov-09 08:19:11  . . . . . Segger_is_connected_to_device:	JLink INFO	JLINK_IsConnected()  
+2021-Nov-09 08:19:11  . . . . . Segger_is_connected_to_device:	JLink INFO	T3814 000:219.758 
+2021-Nov-09 08:19:11  . . . . . Segger_is_connected_to_device:	JLink INFO	- 0.680ms returns FALSE  
+2021-Nov-09 08:19:11  . . . . . Segger_is_connected_to_device:	JLink INFO	T3814 000:220.200 
+2021-Nov-09 08:19:11  . . . . . Segger_is_connected_to_device:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:11  . . . . . Segger_is_debug_region_powered
+2021-Nov-09 08:19:11  . . . . . . Segger_read_debug_port_register
+2021-Nov-09 08:19:11  . . . . . . . Segger_is_connected_to_emu
+2021-Nov-09 08:19:11  . . . . . . . Segger_is_connected_to_emu:	JLink INFO	T3814 000:221.278 
+2021-Nov-09 08:19:11  . . . . . . . Segger_is_connected_to_emu:	JLink INFO	JLINK_IsOpen()  
+2021-Nov-09 08:19:11  . . . . . . . Segger_is_connected_to_emu:	JLink INFO	T3814 000:221.762 
+2021-Nov-09 08:19:11  . . . . . . . Segger_is_connected_to_emu:	JLink INFO	- 0.747ms returns 0x01  
+2021-Nov-09 08:19:11  . . . . . . . Segger_is_connected_to_emu:	JLink INFO	T3814 000:222.291 
+2021-Nov-09 08:19:11  . . . . . . . Segger_is_connected_to_emu:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:11  . . . . . . Segger_read_debug_port_register:	JLink INFO	T3814 000:222.782 
+2021-Nov-09 08:19:11  . . . . . . Segger_read_debug_port_register:	JLink INFO	JLINK_Lock()  
+2021-Nov-09 08:19:11  . . . . . . . Segger_write_debug_port_register
+2021-Nov-09 08:19:11  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T3814 000:223.460 
+2021-Nov-09 08:19:11  . . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_CORESIGHT_WriteAPDPReg(DP reg 0x02, 0x00000000)  
+2021-Nov-09 08:19:11  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T3814 000:224.507 
+2021-Nov-09 08:19:11  . . . . . . . Segger_write_debug_port_register:	JLink INFO	- 1.293ms returns -1  
+2021-Nov-09 08:19:11  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T3814 000:224.941 
+2021-Nov-09 08:19:11  . . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:11  . . . . . . . Segger_write_debug_port_register:	JLinkARM.dll reported "-1", an unknown error.
+
+2021-Nov-09 08:19:11  . . . . . . . . Segger_abort_debug_action
+2021-Nov-09 08:19:11  . . . . . . . . Segger_abort_debug_action:	Attempting to clear any configuration errors in debug port before closing connection. 
+
+2021-Nov-09 08:19:11  . . . . . . . . Segger_abort_debug_action:	JLink INFO	T3814 000:225.855 
+2021-Nov-09 08:19:11  . . . . . . . . Segger_abort_debug_action:	JLink INFO	JLINK_CORESIGHT_WriteAPDPReg(DP reg 0x00, 0x0000001F)  
+2021-Nov-09 08:19:11  . . . . . . . . Segger_abort_debug_action:	JLink INFO	T3814 000:226.807 
+2021-Nov-09 08:19:11  . . . . . . . . Segger_abort_debug_action:	JLink INFO	- 1.154ms returns -1  
+2021-Nov-09 08:19:11  . . . . . . . . Segger_abort_debug_action:	JLink INFO	T3814 000:227.198 
+2021-Nov-09 08:19:11  . . . . . . . . Segger_abort_debug_action:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:19:11  . . . . . . . . Segger_abort_debug_action:	JLinkARM.dll reported "-1", an unknown error.
+
+2021-Nov-09 08:19:11  . . . . . . Segger_read_debug_port_register:	JLink INFO	T3814 000:227.749 
+2021-Nov-09 08:19:11  . . . . . . Segger_read_debug_port_register:	JLink INFO	- 0.728ms  
+2021-Nov-09 08:19:11  . . . . Segger_disconnect_from_emu:	JLink INFO	T3814 000:240.480 
+2021-Nov-09 08:19:11  . . . . Segger_disconnect_from_emu:	JLink INFO	JLINK_Close()  
+2021-Nov-09 08:19:11  . . Segger_close:	Freeing Library.
+
+2021-Nov-09 08:19:11  nRF_close_dll:	Freeing Library.
+
+2021-Nov-09 08:27:18  --------------------------------------------------------------------------------
+2021-Nov-09 08:27:18  C:\Program Files (x86)\Nordic Semiconductor\nrf-command-line-tools\bin\nrfjprog.exe --sectorerase --log 
+2021-Nov-09 08:27:18  nrfjprog version 10.9.0 
+2021-Nov-09 08:27:18  --------------------------------------------------------------------------------
+2021-Nov-09 08:27:18  nRF_logger_open
+2021-Nov-09 08:27:18  nRF_logger_open:	nRFJProg logger opened to callback at address 0X5A0900
+2021-Nov-09 08:27:18  nRF_open_dll
+2021-Nov-09 08:27:18  nRF_open_dll:	Load library at "C:\\Program Files (x86)\\Nordic Semiconductor\\nrf-command-line-tools\\bin\\JLINKARM_UNKNOWN_NRFJPROG.dll".
+
+2021-Nov-09 08:27:18  . nRFXX_logger_open
+2021-Nov-09 08:27:18  . nRFXX_logger_open:	nRFJProg logger opened to callback at address 0X5067B850
+2021-Nov-09 08:27:18  . . Segger_logger_open
+2021-Nov-09 08:27:18  . . Segger_logger_open:	nRFJProg logger opened to callback at address 0X5063E1A0
+2021-Nov-09 08:27:18  . . Segger_open_dll
+2021-Nov-09 08:27:18  . . Segger_open_dll:	No J-Link DLL path was provided. Attempting to auto detect.
+
+2021-Nov-09 08:27:18  . . Segger_open_dll:	Load library at "C:\\Program Files (x86)\\SEGGER\\JLink\\JLinkARM.dll".
+
+2021-Nov-09 08:27:18  . . . Segger_dll_version
+2021-Nov-09 08:27:18  . . Segger_set_core_data
+2021-Nov-09 08:27:18  nRF_enum_emu_snr
+2021-Nov-09 08:27:18  . nRFXX_enum_emu_snr
+2021-Nov-09 08:27:18  . . Segger_enum_emu_snr
+2021-Nov-09 08:27:18  . . . Segger_enum_emu_snr
+2021-Nov-09 08:27:18  . . . . Segger_get_num_emus
+2021-Nov-09 08:27:18  nRF_connect_to_emu_with_snr
+2021-Nov-09 08:27:18  . nRFXX_connect_to_emu_with_snr
+2021-Nov-09 08:27:18  . . Segger_connect_to_emu_with_snr
+2021-Nov-09 08:27:18  . . . Segger_is_connected_to_emu
+2021-Nov-09 08:27:18  . . . Segger_enum_emu_snr
+2021-Nov-09 08:27:18  . . . . Segger_get_num_emus
+2021-Nov-09 08:27:18  . . . Segger_connect_to_emu_with_snr
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	Segger logging enabled with callback at 0x1348724016.
+
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:019.297   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	Firmware: J-Link OB-SAM3U128-V2-NordicSemi compiled Feb  2 2021 16:47:20
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:021.112   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	Hardware: V1.00
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:021.736   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	S/N: 683395276
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:022.246   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	OEM: SEGGER
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:022.717   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	Feature(s): RDI, FlashBP, FlashDL, JFlash, GDB
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:023.973   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	TELNET listener socket opened on port 19021
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:024.644   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	WEBSRV Starting webserver
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:025.252   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	WEBSRV Webserver running on local port 19080
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:025.714 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 10.880ms returns "O.K."  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:026.239 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:026.697 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_GetHWStatus(...)  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:027.337 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 0.895ms returns 0  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:027.838 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:028.338 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_ExecCommand("SetRestartOnClose = 0", ...).   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:028.837 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 0.277ms returns 0x01  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:029.369 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:029.835 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_ExecCommand("DisableFlashDL", ...).   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:030.300 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 0.226ms returns 0x00  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:030.745 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:031.191 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_ExecCommand("ExcludeFlashCacheRange 0x0-0xFFFFFFFF", ...).   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:031.671 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 0.244ms returns 0x00  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:032.129 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:032.702 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_SetHookUnsecureDialog  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:033.222   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_SetHookUnsecureDialog(...)
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:033.728 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 1.321ms returns 0  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:034.297 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:034.821 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_TIF_Select(JLINKARM_TIF_SWD)  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:035.733 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 1.145ms returns 0x00  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:036.159 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:036.507 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_SetSpeed(2000)  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:036.926 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 0.617ms  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:037.306 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:037.689 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_GetSN()  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:038.040 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 0.525ms returns 683395276  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:038.413 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:038.929 
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	JLINK_ExecCommand("CORESIGHT_SetIndexAHBAPToUse = 0", ...).   
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:039.270 
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	- 0.170ms returns 0x00  
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:039.602 
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:039.945 
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	JLINK_ExecCommand("device = Cortex-M4", ...).   
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:046.818   
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	XML file found at: C:\Program Files (x86)\SEGGER\JLink\JLinkDevices.xml 
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:047.910   
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	C:\Program Files (x86)\SEGGER\JLink\JLinkDevices.xml evaluated successfully. 
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:074.690   
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	Device "CORTEX-M4" selected.
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:076.930 
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	- 36.849ms returns 0x00  
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:077.335 
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  nRF_read_connected_emu_snr
+2021-Nov-09 08:27:18  . nRFXX_read_connected_emu_snr
+2021-Nov-09 08:27:18  . . Segger_read_connected_emu_snr
+2021-Nov-09 08:27:18  . . . Segger_is_connected_to_emu
+2021-Nov-09 08:27:18  . . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:078.756 
+2021-Nov-09 08:27:18  . . . Segger_is_connected_to_emu:	JLink INFO	JLINK_IsOpen()  
+2021-Nov-09 08:27:18  . . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:079.186 
+2021-Nov-09 08:27:18  . . . Segger_is_connected_to_emu:	JLink INFO	- 0.636ms returns 0x01  
+2021-Nov-09 08:27:18  . . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:079.649 
+2021-Nov-09 08:27:18  . . . Segger_is_connected_to_emu:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  nRF_read_device_family
+2021-Nov-09 08:27:18  . nRFXX_read_device_family
+2021-Nov-09 08:27:18  . . Segger_is_connected_to_emu
+2021-Nov-09 08:27:18  . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:080.722 
+2021-Nov-09 08:27:18  . . Segger_is_connected_to_emu:	JLink INFO	JLINK_IsOpen()  
+2021-Nov-09 08:27:18  . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:081.108 
+2021-Nov-09 08:27:18  . . Segger_is_connected_to_emu:	JLink INFO	- 0.596ms returns 0x01  
+2021-Nov-09 08:27:18  . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:081.485 
+2021-Nov-09 08:27:18  . . Segger_is_connected_to_emu:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . :	JLink INFO	T42FC 000:081.816 
+2021-Nov-09 08:27:18  . . :	JLink INFO	JLINK_Lock()  
+2021-Nov-09 08:27:18  . . Segger_read_debug_port_idr
+2021-Nov-09 08:27:18  . . . Segger_read_debug_port_register
+2021-Nov-09 08:27:18  . . . . Segger_read_debug_port_register
+2021-Nov-09 08:27:18  . . . . . Segger_coresight_configure
+2021-Nov-09 08:27:18  . . . . . Segger_coresight_configure:	JLink INFO	T42FC 000:082.833 
+2021-Nov-09 08:27:18  . . . . . Segger_coresight_configure:	JLink INFO	JLINK_CORESIGHT_Configure()  
+2021-Nov-09 08:27:18  . . . . . Segger_coresight_configure:	JLink INFO	T42FC 000:084.109 
+2021-Nov-09 08:27:18  . . . . . Segger_coresight_configure:	JLink INFO	- 1.486ms returns 0  
+2021-Nov-09 08:27:18  . . . . . Segger_coresight_configure:	JLink INFO	T42FC 000:084.495 
+2021-Nov-09 08:27:18  . . . . . Segger_coresight_configure:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . Segger_read_debug_port_register:	JLink INFO	T42FC 000:084.829 
+2021-Nov-09 08:27:18  . . . . Segger_read_debug_port_register:	JLink INFO	JLINK_CORESIGHT_ReadAPDPReg(DP reg 0x00)  
+2021-Nov-09 08:27:18  . . . . Segger_read_debug_port_register:	JLink INFO	T42FC 000:085.338   
+2021-Nov-09 08:27:18  . . . . Segger_read_debug_port_register:	JLink INFO	Value=0x2BA01477
+2021-Nov-09 08:27:18  . . . . Segger_read_debug_port_register:	JLink INFO	T42FC 000:085.712 
+2021-Nov-09 08:27:18  . . . . Segger_read_debug_port_register:	JLink INFO	- 1.056ms returns 0  
+2021-Nov-09 08:27:18  . . . . Segger_read_debug_port_register:	JLink INFO	T42FC 000:086.058 
+2021-Nov-09 08:27:18  . . . . Segger_read_debug_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . nRFXX_read_device_family:	Discovered device from family NRF52.
+
+2021-Nov-09 08:27:18  . . :	JLink INFO	T42FC 000:086.796 
+2021-Nov-09 08:27:18  . . :	JLink INFO	- 0.904ms  
+2021-Nov-09 08:27:18  nRF_close_dll
+2021-Nov-09 08:27:18  . nRFXX_close_dll
+2021-Nov-09 08:27:18  . . Segger_close
+2021-Nov-09 08:27:18  . . . Segger_disconnect_from_emu
+2021-Nov-09 08:27:18  . . . . Segger_is_connected_to_emu
+2021-Nov-09 08:27:18  . . . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:087.997 
+2021-Nov-09 08:27:18  . . . . Segger_is_connected_to_emu:	JLink INFO	JLINK_IsOpen()  
+2021-Nov-09 08:27:18  . . . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:088.325 
+2021-Nov-09 08:27:18  . . . . Segger_is_connected_to_emu:	JLink INFO	- 0.491ms returns 0x01  
+2021-Nov-09 08:27:18  . . . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:088.655 
+2021-Nov-09 08:27:18  . . . . Segger_is_connected_to_emu:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . Segger_disconnect_from_emu
+2021-Nov-09 08:27:18  . . . . . Segger_is_connected_to_device
+2021-Nov-09 08:27:18  . . . . . Segger_is_connected_to_device:	JLink INFO	T42FC 000:089.350 
+2021-Nov-09 08:27:18  . . . . . Segger_is_connected_to_device:	JLink INFO	JLINK_IsConnected()  
+2021-Nov-09 08:27:18  . . . . . Segger_is_connected_to_device:	JLink INFO	T42FC 000:089.680 
+2021-Nov-09 08:27:18  . . . . . Segger_is_connected_to_device:	JLink INFO	- 0.492ms returns FALSE  
+2021-Nov-09 08:27:18  . . . . . Segger_is_connected_to_device:	JLink INFO	T42FC 000:090.007 
+2021-Nov-09 08:27:18  . . . . . Segger_is_connected_to_device:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . . Segger_is_debug_region_powered
+2021-Nov-09 08:27:18  . . . . . . Segger_read_debug_port_register
+2021-Nov-09 08:27:18  . . . . . . . Segger_is_connected_to_emu
+2021-Nov-09 08:27:18  . . . . . . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:090.813 
+2021-Nov-09 08:27:18  . . . . . . . Segger_is_connected_to_emu:	JLink INFO	JLINK_IsOpen()  
+2021-Nov-09 08:27:18  . . . . . . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:091.137 
+2021-Nov-09 08:27:18  . . . . . . . Segger_is_connected_to_emu:	JLink INFO	- 0.485ms returns 0x01  
+2021-Nov-09 08:27:18  . . . . . . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:091.463 
+2021-Nov-09 08:27:18  . . . . . . . Segger_is_connected_to_emu:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . . . Segger_read_debug_port_register:	JLink INFO	T42FC 000:091.789 
+2021-Nov-09 08:27:18  . . . . . . Segger_read_debug_port_register:	JLink INFO	JLINK_Lock()  
+2021-Nov-09 08:27:18  . . . . . . . Segger_write_debug_port_register
+2021-Nov-09 08:27:18  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:092.311 
+2021-Nov-09 08:27:18  . . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_CORESIGHT_WriteAPDPReg(DP reg 0x02, 0x00000000)  
+2021-Nov-09 08:27:18  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:092.855 
+2021-Nov-09 08:27:18  . . . . . . . Segger_write_debug_port_register:	JLink INFO	- 0.730ms returns 0  
+2021-Nov-09 08:27:18  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:093.220 
+2021-Nov-09 08:27:18  . . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . . . Segger_read_debug_port_register:	JLink INFO	T42FC 000:093.570 
+2021-Nov-09 08:27:18  . . . . . . Segger_read_debug_port_register:	JLink INFO	JLINK_CORESIGHT_ReadAPDPReg(DP reg 0x01)  
+2021-Nov-09 08:27:18  . . . . . . Segger_read_debug_port_register:	JLink INFO	T42FC 000:094.089   
+2021-Nov-09 08:27:18  . . . . . . Segger_read_debug_port_register:	JLink INFO	Value=0xF0000040
+2021-Nov-09 08:27:18  . . . . . . Segger_read_debug_port_register:	JLink INFO	T42FC 000:094.565 
+2021-Nov-09 08:27:18  . . . . . . Segger_read_debug_port_register:	JLink INFO	- 1.220ms returns 0  
+2021-Nov-09 08:27:18  . . . . . . Segger_read_debug_port_register:	JLink INFO	T42FC 000:095.005 
+2021-Nov-09 08:27:18  . . . . . . Segger_read_debug_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . . . Segger_read_debug_port_register:	JLink INFO	T42FC 000:095.454 
+2021-Nov-09 08:27:18  . . . . . . Segger_read_debug_port_register:	JLink INFO	- 0.707ms  
+2021-Nov-09 08:27:18  . . . . . Segger_unpower_debug_and_system_regions
+2021-Nov-09 08:27:18  . . . . . . Segger_write_debug_port_register
+2021-Nov-09 08:27:18  . . . . . . . Segger_is_connected_to_emu
+2021-Nov-09 08:27:18  . . . . . . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:096.714 
+2021-Nov-09 08:27:18  . . . . . . . Segger_is_connected_to_emu:	JLink INFO	JLINK_IsOpen()  
+2021-Nov-09 08:27:18  . . . . . . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:097.134 
+2021-Nov-09 08:27:18  . . . . . . . Segger_is_connected_to_emu:	JLink INFO	- 0.611ms returns 0x01  
+2021-Nov-09 08:27:18  . . . . . . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:097.573 
+2021-Nov-09 08:27:18  . . . . . . . Segger_is_connected_to_emu:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:098.022 
+2021-Nov-09 08:27:18  . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_Lock()  
+2021-Nov-09 08:27:18  . . . . . . . Segger_write_debug_port_register
+2021-Nov-09 08:27:18  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:098.652 
+2021-Nov-09 08:27:18  . . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_CORESIGHT_WriteAPDPReg(DP reg 0x02, 0x00000000)  
+2021-Nov-09 08:27:18  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:099.399 
+2021-Nov-09 08:27:18  . . . . . . . Segger_write_debug_port_register:	JLink INFO	- 0.951ms returns 0  
+2021-Nov-09 08:27:18  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:099.834 
+2021-Nov-09 08:27:18  . . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:100.274 
+2021-Nov-09 08:27:18  . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_CORESIGHT_WriteAPDPReg(DP reg 0x01, 0x00000000)  
+2021-Nov-09 08:27:18  . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:100.987 
+2021-Nov-09 08:27:18  . . . . . . Segger_write_debug_port_register:	JLink INFO	- 0.960ms returns 0  
+2021-Nov-09 08:27:18  . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:101.450 
+2021-Nov-09 08:27:18  . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:101.992 
+2021-Nov-09 08:27:18  . . . . . . Segger_write_debug_port_register:	JLink INFO	- 0.791ms  
+2021-Nov-09 08:27:18  . . . . Segger_disconnect_from_emu:	JLink INFO	T42FC 000:112.171 
+2021-Nov-09 08:27:18  . . . . Segger_disconnect_from_emu:	JLink INFO	JLINK_Close()  
+2021-Nov-09 08:27:18  . . Segger_close:	Freeing Library.
+
+2021-Nov-09 08:27:18  nRF_close_dll:	Freeing Library.
+
+2021-Nov-09 08:27:18  nRF_logger_open
+2021-Nov-09 08:27:18  nRF_logger_open:	nRFJProg logger opened to callback at address 0X5A0900
+2021-Nov-09 08:27:18  nRF_open_dll
+2021-Nov-09 08:27:18  nRF_open_dll:	Load library at "C:\\Program Files (x86)\\Nordic Semiconductor\\nrf-command-line-tools\\bin\\JLINKARM_NRF52_NRFJPROG.dll".
+
+2021-Nov-09 08:27:18  . nRF52_logger_open
+2021-Nov-09 08:27:18  . nRF52_logger_open:	nRFJProg logger opened to callback at address 0X5067B850
+2021-Nov-09 08:27:18  . nRF52_open
+2021-Nov-09 08:27:18  . . Segger_logger_open
+2021-Nov-09 08:27:18  . . Segger_logger_open:	nRFJProg logger opened to callback at address 0X50618AE0
+2021-Nov-09 08:27:18  . . Segger_open_dll
+2021-Nov-09 08:27:18  . . Segger_open_dll:	No J-Link DLL path was provided. Attempting to auto detect.
+
+2021-Nov-09 08:27:18  . . Segger_open_dll:	Load library at "C:\\Program Files (x86)\\SEGGER\\JLink\\JLinkARM.dll".
+
+2021-Nov-09 08:27:18  . . . Segger_dll_version
+2021-Nov-09 08:27:18  nRF_connect_to_emu_with_snr
+2021-Nov-09 08:27:18  . nRF52_connect_to_emu_with_snr
+2021-Nov-09 08:27:18  . . Segger_is_connected_to_emu
+2021-Nov-09 08:27:18  . . Segger_connect_to_emu_with_snr
+2021-Nov-09 08:27:18  . . . Segger_is_connected_to_emu
+2021-Nov-09 08:27:18  . . . Segger_enum_emu_snr
+2021-Nov-09 08:27:18  . . . . Segger_get_num_emus
+2021-Nov-09 08:27:18  . . . Segger_connect_to_emu_with_snr
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	Segger logging enabled with callback at 0x1348686672.
+
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:010.435   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	Firmware: J-Link OB-SAM3U128-V2-NordicSemi compiled Feb  2 2021 16:47:20
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:012.061   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	Hardware: V1.00
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:012.610   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	S/N: 683395276
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:013.099   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	OEM: SEGGER
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:013.574   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	Feature(s): RDI, FlashBP, FlashDL, JFlash, GDB
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:014.842   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	TELNET listener socket opened on port 19021
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:015.582   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	WEBSRV Starting webserver
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:016.253   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	WEBSRV Webserver running on local port 19080
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:016.747 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 9.233ms returns "O.K."  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:017.251 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:017.849 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_Lock()  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:018.641 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_GetHWStatus(...)  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:019.286 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 0.905ms returns 0  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:019.789 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:020.260 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_ExecCommand("SetRestartOnClose = 0", ...).   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:020.732 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 0.238ms returns 0x01  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:021.187 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:021.635 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_ExecCommand("DisableFlashDL", ...).   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:022.081 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 0.226ms returns 0x00  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:022.525 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:023.062 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_ExecCommand("ExcludeFlashCacheRange 0x0-0xFFFFFFFF", ...).   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:023.549 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 0.226ms returns 0x00  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:023.990 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:024.427 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_SetHookUnsecureDialog  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:024.860   
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_SetHookUnsecureDialog(...)
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:025.341 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 1.125ms returns 0  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:025.767 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:026.245 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_TIF_Select(JLINKARM_TIF_SWD)  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:027.204 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 1.202ms returns 0x00  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:027.689 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:028.174 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_SetSpeed(2000)  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:028.646 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 0.702ms  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:029.102 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:029.578 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_GetSN()  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:030.008 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	- 0.686ms returns 683395276  
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	T42FC 000:030.595 
+2021-Nov-09 08:27:18  . . . . Segger_connect_to_emu_without_snr:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:031.240 
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	JLINK_ExecCommand("CORESIGHT_SetIndexAHBAPToUse = 0", ...).   
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:031.674 
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	- 0.216ms returns 0x00  
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:032.100 
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:032.535 
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	JLINK_ExecCommand("device = nRF52", ...).   
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:039.428   
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	XML file found at: C:\Program Files (x86)\SEGGER\JLink\JLinkDevices.xml 
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:040.507   
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	C:\Program Files (x86)\SEGGER\JLink\JLinkDevices.xml evaluated successfully. 
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:067.070   
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	Device "NRF52" selected.
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:069.760 
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	- 37.079ms returns 0x00  
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:070.333 
+2021-Nov-09 08:27:18  . . . . . Segger_load_core_data:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:18  . . Segger_read_debug_port_idr
+2021-Nov-09 08:27:18  . . . Segger_read_debug_port_register
+2021-Nov-09 08:27:18  . . . . Segger_read_debug_port_register
+2021-Nov-09 08:27:18  . . . . . Segger_coresight_configure
+2021-Nov-09 08:27:18  . . . . . Segger_coresight_configure:	JLink INFO	T42FC 000:072.005 
+2021-Nov-09 08:27:18  . . . . . Segger_coresight_configure:	JLink INFO	JLINK_CORESIGHT_Configure()  
+2021-Nov-09 08:27:19  . . . . . Segger_coresight_configure:	JLink INFO	T42FC 000:073.596 
+2021-Nov-09 08:27:19  . . . . . Segger_coresight_configure:	JLink INFO	- 1.857ms returns 0  
+2021-Nov-09 08:27:19  . . . . . Segger_coresight_configure:	JLink INFO	T42FC 000:074.191 
+2021-Nov-09 08:27:19  . . . . . Segger_coresight_configure:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . Segger_read_debug_port_register:	JLink INFO	T42FC 000:074.681 
+2021-Nov-09 08:27:19  . . . . Segger_read_debug_port_register:	JLink INFO	JLINK_CORESIGHT_ReadAPDPReg(DP reg 0x00)  
+2021-Nov-09 08:27:19  . . . . Segger_read_debug_port_register:	JLink INFO	T42FC 000:075.440   
+2021-Nov-09 08:27:19  . . . . Segger_read_debug_port_register:	JLink INFO	Value=0x2BA01477
+2021-Nov-09 08:27:19  . . . . Segger_read_debug_port_register:	JLink INFO	T42FC 000:075.986 
+2021-Nov-09 08:27:19  . . . . Segger_read_debug_port_register:	JLink INFO	- 1.561ms returns 0  
+2021-Nov-09 08:27:19  . . . . Segger_read_debug_port_register:	JLink INFO	T42FC 000:076.512 
+2021-Nov-09 08:27:19  . . . . Segger_read_debug_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . :	JLink INFO	T42FC 000:077.012 
+2021-Nov-09 08:27:19  . . :	JLink INFO	- 0.769ms  
+2021-Nov-09 08:27:19  nRF_read_device_version
+2021-Nov-09 08:27:19  . nRF52_read_device_info
+2021-Nov-09 08:27:19  . . Segger_is_connected_to_emu
+2021-Nov-09 08:27:19  . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:078.306 
+2021-Nov-09 08:27:19  . . Segger_is_connected_to_emu:	JLink INFO	JLINK_IsOpen()  
+2021-Nov-09 08:27:19  . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:078.777 
+2021-Nov-09 08:27:19  . . Segger_is_connected_to_emu:	JLink INFO	- 0.706ms returns 0x01  
+2021-Nov-09 08:27:19  . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:079.278 
+2021-Nov-09 08:27:19  . . Segger_is_connected_to_emu:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . :	JLink INFO	T42FC 000:079.750 
+2021-Nov-09 08:27:19  . . :	JLink INFO	JLINK_Lock()  
+2021-Nov-09 08:27:19  . . nRF52_read_device_version
+2021-Nov-09 08:27:19  . . . nRF52_readback_status
+2021-Nov-09 08:27:19  . . . . nRF52_is_ctrl_ap_available
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register
+2021-Nov-09 08:27:19  . . . . . . . Segger_is_debug_region_powered
+2021-Nov-09 08:27:19  . . . . . . . . Segger_read_debug_port_register
+2021-Nov-09 08:27:19  . . . . . . . . . Segger_write_debug_port_register
+2021-Nov-09 08:27:19  . . . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:082.250 
+2021-Nov-09 08:27:19  . . . . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_CORESIGHT_WriteAPDPReg(DP reg 0x02, 0x00000000)  
+2021-Nov-09 08:27:19  . . . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:082.979 
+2021-Nov-09 08:27:19  . . . . . . . . . Segger_write_debug_port_register:	JLink INFO	- 1.037ms returns 0  
+2021-Nov-09 08:27:19  . . . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:083.578 
+2021-Nov-09 08:27:19  . . . . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . . . . . Segger_read_debug_port_register:	JLink INFO	T42FC 000:084.106 
+2021-Nov-09 08:27:19  . . . . . . . . Segger_read_debug_port_register:	JLink INFO	JLINK_CORESIGHT_ReadAPDPReg(DP reg 0x01)  
+2021-Nov-09 08:27:19  . . . . . . . . Segger_read_debug_port_register:	JLink INFO	T42FC 000:084.891   
+2021-Nov-09 08:27:19  . . . . . . . . Segger_read_debug_port_register:	JLink INFO	Value=0xF0000040
+2021-Nov-09 08:27:19  . . . . . . . . Segger_read_debug_port_register:	JLink INFO	T42FC 000:085.626 
+2021-Nov-09 08:27:19  . . . . . . . . Segger_read_debug_port_register:	JLink INFO	- 1.870ms returns 0  
+2021-Nov-09 08:27:19  . . . . . . . . Segger_read_debug_port_register:	JLink INFO	T42FC 000:086.328 
+2021-Nov-09 08:27:19  . . . . . . . . Segger_read_debug_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:087.323 
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_CORESIGHT_WriteAPDPReg(DP reg 0x02, 0x010000F0)  
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:088.081 
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	- 1.074ms returns 0  
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:088.698 
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:089.212 
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	JLINK_CORESIGHT_ReadAPDPReg(AP reg 0x03)  
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:089.938   
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	Value=0x02880000
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:090.409 
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	- 1.377ms returns 0  
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:090.789 
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:091.853 
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_CORESIGHT_WriteAPDPReg(DP reg 0x02, 0x010000F0)  
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:092.713 
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	- 1.107ms returns 0  
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:093.262 
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:093.760 
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	JLINK_CORESIGHT_ReadAPDPReg(AP reg 0x03)  
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:094.417   
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	Value=0x02880000
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:094.846 
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	- 1.299ms returns 0  
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:095.307 
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:096.286 
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_CORESIGHT_WriteAPDPReg(DP reg 0x02, 0x010000F0)  
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:097.002 
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	- 0.913ms returns 0  
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:097.455 
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:097.904 
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	JLINK_CORESIGHT_ReadAPDPReg(AP reg 0x03)  
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:098.604   
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	Value=0x02880000
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:099.022 
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	- 1.341ms returns 0  
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:099.530 
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:100.757 
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_CORESIGHT_WriteAPDPReg(DP reg 0x02, 0x010000F0)  
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:101.373 
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	- 0.814ms returns 0  
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:101.835 
+2021-Nov-09 08:27:19  . . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:102.296 
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	JLINK_CORESIGHT_ReadAPDPReg(AP reg 0x03)  
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:103.084   
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	Value=0x02880000
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:103.501 
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	- 1.487ms returns 0  
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:104.033 
+2021-Nov-09 08:27:19  . . . . . . Segger_read_access_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . Segger_read_access_port_register
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:105.172 
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_CORESIGHT_WriteAPDPReg(DP reg 0x02, 0x01000000)  
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:105.771 
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	- 0.812ms returns 0  
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:106.210 
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:106.634 
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	JLINK_CORESIGHT_ReadAPDPReg(AP reg 0x03)  
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:107.272   
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	Value=0x00000001
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:107.756 
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	- 1.359ms returns 0  
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:108.284 
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . Segger_read_access_port_register
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:109.535 
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_CORESIGHT_WriteAPDPReg(DP reg 0x02, 0x01000000)  
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:110.147 
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	- 0.813ms returns 0  
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:110.590 
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:111.066 
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	JLINK_CORESIGHT_ReadAPDPReg(AP reg 0x03)  
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:111.791   
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	Value=0x00000001
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:112.267 
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	- 1.477ms returns 0  
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:112.754 
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . Segger_read_access_port_register
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:113.754 
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_CORESIGHT_WriteAPDPReg(DP reg 0x02, 0x01000000)  
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:114.375 
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	- 0.884ms returns 0  
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:114.838 
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:115.258 
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	JLINK_CORESIGHT_ReadAPDPReg(AP reg 0x03)  
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:115.937   
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	Value=0x00000001
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:116.378 
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	- 1.407ms returns 0  
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:116.867 
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . Segger_read_access_port_register
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:118.029 
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_CORESIGHT_WriteAPDPReg(DP reg 0x02, 0x01000000)  
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:118.752 
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	- 0.991ms returns 0  
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	T42FC 000:119.274 
+2021-Nov-09 08:27:19  . . . . . . Segger_write_debug_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:119.733 
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	JLINK_CORESIGHT_ReadAPDPReg(AP reg 0x03)  
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:120.564   
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	Value=0x00000001
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:120.977 
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	- 1.439ms returns 0  
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	T42FC 000:121.379 
+2021-Nov-09 08:27:19  . . . . . Segger_read_access_port_register:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . nRF52_readback_status:	Protection status read as NONE
+
+2021-Nov-09 08:27:19  . . . Segger_read_u32
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device
+2021-Nov-09 08:27:19  . . . . . Segger_is_connected_to_device
+2021-Nov-09 08:27:19  . . . . . Segger_is_connected_to_device:	JLink INFO	T42FC 000:122.647 
+2021-Nov-09 08:27:19  . . . . . Segger_is_connected_to_device:	JLink INFO	JLINK_IsConnected()  
+2021-Nov-09 08:27:19  . . . . . Segger_is_connected_to_device:	JLink INFO	T42FC 000:123.127 
+2021-Nov-09 08:27:19  . . . . . Segger_is_connected_to_device:	JLink INFO	- 0.708ms returns FALSE  
+2021-Nov-09 08:27:19  . . . . . Segger_is_connected_to_device:	JLink INFO	T42FC 000:123.538 
+2021-Nov-09 08:27:19  . . . . . Segger_is_connected_to_device:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . . Segger_load_core_data
+2021-Nov-09 08:27:19  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:124.146 
+2021-Nov-09 08:27:19  . . . . . Segger_load_core_data:	JLink INFO	JLINK_ExecCommand("CORESIGHT_SetIndexAHBAPToUse = 0", ...).   
+2021-Nov-09 08:27:19  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:124.536 
+2021-Nov-09 08:27:19  . . . . . Segger_load_core_data:	JLink INFO	- 0.179ms returns 0x00  
+2021-Nov-09 08:27:19  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:124.925 
+2021-Nov-09 08:27:19  . . . . . Segger_load_core_data:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:125.402 
+2021-Nov-09 08:27:19  . . . . . Segger_load_core_data:	JLink INFO	JLINK_ExecCommand("device = nRF52", ...).   
+2021-Nov-09 08:27:19  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:126.179   
+2021-Nov-09 08:27:19  . . . . . Segger_load_core_data:	JLink INFO	Device "NRF52" selected.
+2021-Nov-09 08:27:19  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:126.768 
+2021-Nov-09 08:27:19  . . . . . Segger_load_core_data:	JLink INFO	- 1.129ms returns 0x00  
+2021-Nov-09 08:27:19  . . . . . Segger_load_core_data:	JLink INFO	T42FC 000:127.155 
+2021-Nov-09 08:27:19  . . . . . Segger_load_core_data:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:127.548 
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	JLINK_Connect()  
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:128.154   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	InitTarget() start
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:128.534   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	 J-Link Script File: Executing InitTarget() 
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:131.229   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	InitTarget() end
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:132.169   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	Found SW-DP with ID 0x2BA01477
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:134.272   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	DPIDR: 0x2BA01477
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:134.699   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	AP map detection skipped. Manually configured AP map found.
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:135.129   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	AP[0]: AHB-AP (IDR: Not set)
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:136.460   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	AP[0]: Core found
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:136.886   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	AP[0]: AHB-AP ROM base: 0xE00FF000
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:137.764   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	CPUID register: 0x410FC241. Implementer code: 0x41 (ARM)
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:138.264   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	Found Cortex-M4 r0p1, Little endian.
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:240.316   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	-- Max. mem block: 0x00004720
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:242.079   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	CPU_ReadMem(4 bytes @ 0xE000EDF0)
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:244.666   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	CPU_WriteMem(4 bytes @ 0xE000EDF0)
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:246.491   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	CPU_ReadMem(4 bytes @ 0xE0002000)
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:248.272   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	FPUnit: 6 code (BP) slots and 2 literal slots
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:249.412   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	CPU_ReadMem(4 bytes @ 0xE000EDFC)
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:250.794   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	CPU_WriteMem(4 bytes @ 0xE000EDFC)
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:252.335   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	CPU_ReadMem(4 bytes @ 0xE0001000)
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:253.794   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	CPU_WriteMem(4 bytes @ 0xE0001000)
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:255.390   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	CPU_ReadMem(4 bytes @ 0xE000ED88)
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:256.699   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	CPU_WriteMem(4 bytes @ 0xE000ED88)
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:258.023   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	CPU_ReadMem(4 bytes @ 0xE000ED88)
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:259.421   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	CPU_WriteMem(4 bytes @ 0xE000ED88)
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:260.712   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	CoreSight components:
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:261.463   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	ROMTbl[0] @ E00FF000
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:262.262   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	CPU_ReadMem(64 bytes @ 0xE00FF000)
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:264.242   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	CPU_ReadMem(32 bytes @ 0xE000EFE0)
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:265.771   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	ROMTbl[0][0]: E000E000, CID: B105E00D, PID: 000BB00C SCS-M7
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:266.511   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	CPU_ReadMem(32 bytes @ 0xE0001FE0)
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:268.032   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	ROMTbl[0][1]: E0001000, CID: B105E00D, PID: 003BB002 DWT
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:268.965   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	CPU_ReadMem(32 bytes @ 0xE0002FE0)
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:270.437   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	ROMTbl[0][2]: E0002000, CID: B105E00D, PID: 002BB003 FPB
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:271.186   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	CPU_ReadMem(32 bytes @ 0xE0000FE0)
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:272.623   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	ROMTbl[0][3]: E0000000, CID: B105E00D, PID: 003BB001 ITM
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:273.169   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	CPU_ReadMem(32 bytes @ 0xE0040FE0)
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:274.535   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	ROMTbl[0][4]: E0040000, CID: B105900D, PID: 000BB9A1 TPIU
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:275.037   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	CPU_ReadMem(32 bytes @ 0xE0041FE0)
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:276.502   
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	ROMTbl[0][5]: E0041000, CID: B105900D, PID: 000BB925 ETM
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:277.061 
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	- 149.823ms returns 0x00  
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:277.601 
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:278.191 
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	JLINK_CORE_GetFound()  
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	T42FC 000:278.666 
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device:	JLink INFO	- 0.713ms returns 0xE0000FF  
+2021-Nov-09 08:27:19  . . . . Segger_read_u32
+2021-Nov-09 08:27:19  . . . . . Segger_invalidate_cache
+2021-Nov-09 08:27:19  . . . . . Segger_invalidate_cache:	JLink INFO	T42FC 000:279.602 
+2021-Nov-09 08:27:19  . . . . . Segger_invalidate_cache:	JLink INFO	JLINK_ExecCommand("InvalidateCache", ...).   
+2021-Nov-09 08:27:19  . . . . . Segger_invalidate_cache:	JLink INFO	T42FC 000:280.189 
+2021-Nov-09 08:27:19  . . . . . Segger_invalidate_cache:	JLink INFO	- 0.282ms returns 0x00  
+2021-Nov-09 08:27:19  . . . . . Segger_invalidate_cache:	JLink INFO	T42FC 000:280.694 
+2021-Nov-09 08:27:19  . . . . . Segger_invalidate_cache:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . Segger_read_u32:	JLink INFO	T42FC 000:281.215 
+2021-Nov-09 08:27:19  . . . . Segger_read_u32:	JLink INFO	JLINK_ReadMemU32(0x10000130, 0x1 Items)  
+2021-Nov-09 08:27:19  . . . . Segger_read_u32:	JLink INFO	T42FC 000:281.858   
+2021-Nov-09 08:27:19  . . . . Segger_read_u32:	JLink INFO	CPU_ReadMem(4 bytes @ 0x10000130)
+2021-Nov-09 08:27:19  . . . . Segger_read_u32:	JLink INFO	T42FC 000:282.997   
+2021-Nov-09 08:27:19  . . . . Segger_read_u32:	JLink INFO	Data:  06 00 00 00
+2021-Nov-09 08:27:19  . . . . Segger_read_u32:	JLink INFO	T42FC 000:283.647 
+2021-Nov-09 08:27:19  . . . . Segger_read_u32:	JLink INFO	- 2.795ms returns 1 (0x1)  
+2021-Nov-09 08:27:19  . . . . Segger_read_u32:	JLink INFO	T42FC 000:284.394 
+2021-Nov-09 08:27:19  . . . . Segger_read_u32:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . Segger_read_u32
+2021-Nov-09 08:27:19  . . . . Segger_connect_to_device
+2021-Nov-09 08:27:19  . . . . Segger_read_u32
+2021-Nov-09 08:27:19  . . . . . Segger_invalidate_cache
+2021-Nov-09 08:27:19  . . . . . Segger_invalidate_cache:	JLink INFO	T42FC 000:286.603 
+2021-Nov-09 08:27:19  . . . . . Segger_invalidate_cache:	JLink INFO	JLINK_ExecCommand("InvalidateCache", ...).   
+2021-Nov-09 08:27:19  . . . . . Segger_invalidate_cache:	JLink INFO	T42FC 000:287.240 
+2021-Nov-09 08:27:19  . . . . . Segger_invalidate_cache:	JLink INFO	- 0.326ms returns 0x00  
+2021-Nov-09 08:27:19  . . . . . Segger_invalidate_cache:	JLink INFO	T42FC 000:287.807 
+2021-Nov-09 08:27:19  . . . . . Segger_invalidate_cache:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . Segger_read_u32:	JLink INFO	T42FC 000:288.383 
+2021-Nov-09 08:27:19  . . . . Segger_read_u32:	JLink INFO	JLINK_ReadMemU32(0x10000134, 0x1 Items)  
+2021-Nov-09 08:27:19  . . . . Segger_read_u32:	JLink INFO	T42FC 000:288.938   
+2021-Nov-09 08:27:19  . . . . Segger_read_u32:	JLink INFO	CPU_ReadMem(4 bytes @ 0x10000134)
+2021-Nov-09 08:27:19  . . . . Segger_read_u32:	JLink INFO	T42FC 000:290.041   
+2021-Nov-09 08:27:19  . . . . Segger_read_u32:	JLink INFO	Data:  06 00 00 00
+2021-Nov-09 08:27:19  . . . . Segger_read_u32:	JLink INFO	T42FC 000:290.594 
+2021-Nov-09 08:27:19  . . . . Segger_read_u32:	JLink INFO	- 2.486ms returns 1 (0x1)  
+2021-Nov-09 08:27:19  . . . . Segger_read_u32:	JLink INFO	T42FC 000:291.147 
+2021-Nov-09 08:27:19  . . . . Segger_read_u32:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . nRF52_decode_device_version
+2021-Nov-09 08:27:19  . . . . Segger_read_u32
+2021-Nov-09 08:27:19  . . . . . Segger_connect_to_device
+2021-Nov-09 08:27:19  . . . . . Segger_read_u32
+2021-Nov-09 08:27:19  . . . . . . Segger_invalidate_cache
+2021-Nov-09 08:27:19  . . . . . . Segger_invalidate_cache:	JLink INFO	T42FC 000:293.262 
+2021-Nov-09 08:27:19  . . . . . . Segger_invalidate_cache:	JLink INFO	JLINK_ExecCommand("InvalidateCache", ...).   
+2021-Nov-09 08:27:19  . . . . . . Segger_invalidate_cache:	JLink INFO	T42FC 000:293.775 
+2021-Nov-09 08:27:19  . . . . . . Segger_invalidate_cache:	JLink INFO	- 0.387ms returns 0x00  
+2021-Nov-09 08:27:19  . . . . . . Segger_invalidate_cache:	JLink INFO	T42FC 000:294.497 
+2021-Nov-09 08:27:19  . . . . . . Segger_invalidate_cache:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . . Segger_read_u32:	JLink INFO	T42FC 000:295.137 
+2021-Nov-09 08:27:19  . . . . . Segger_read_u32:	JLink INFO	JLINK_ReadMemU32(0x10000110, 0x1 Items)  
+2021-Nov-09 08:27:19  . . . . . Segger_read_u32:	JLink INFO	T42FC 000:295.667   
+2021-Nov-09 08:27:19  . . . . . Segger_read_u32:	JLink INFO	CPU_ReadMem(4 bytes @ 0x10000110)
+2021-Nov-09 08:27:19  . . . . . Segger_read_u32:	JLink INFO	T42FC 000:296.683   
+2021-Nov-09 08:27:19  . . . . . Segger_read_u32:	JLink INFO	Data:  00 02 00 00
+2021-Nov-09 08:27:19  . . . . . Segger_read_u32:	JLink INFO	T42FC 000:297.164 
+2021-Nov-09 08:27:19  . . . . . Segger_read_u32:	JLink INFO	- 2.287ms returns 1 (0x1)  
+2021-Nov-09 08:27:19  . . . . . Segger_read_u32:	JLink INFO	T42FC 000:297.699 
+2021-Nov-09 08:27:19  . . . . . Segger_read_u32:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . :	JLink INFO	T42FC 000:298.154 
+2021-Nov-09 08:27:19  . . :	JLink INFO	- 0.727ms  
+2021-Nov-09 08:27:19  nRF_close_dll
+2021-Nov-09 08:27:19  . nRF52_close
+2021-Nov-09 08:27:19  . . Segger_is_connected_to_emu
+2021-Nov-09 08:27:19  . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:301.047 
+2021-Nov-09 08:27:19  . . Segger_is_connected_to_emu:	JLink INFO	JLINK_IsOpen()  
+2021-Nov-09 08:27:19  . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:301.654 
+2021-Nov-09 08:27:19  . . Segger_is_connected_to_emu:	JLink INFO	- 0.995ms returns 0x01  
+2021-Nov-09 08:27:19  . . Segger_is_connected_to_emu:	JLink INFO	T42FC 000:302.485 
+2021-Nov-09 08:27:19  . . Segger_is_connected_to_emu:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . :	JLink INFO	T42FC 000:303.316 
+2021-Nov-09 08:27:19  . . :	JLink INFO	JLINK_Lock()  
+2021-Nov-09 08:27:19  . . Segger_close
+2021-Nov-09 08:27:19  . . . Segger_disconnect_from_emu
+2021-Nov-09 08:27:19  . . . . Segger_disconnect_from_emu
+2021-Nov-09 08:27:19  . . . . . Segger_is_connected_to_device
+2021-Nov-09 08:27:19  . . . . . Segger_is_connected_to_device:	JLink INFO	T42FC 000:304.952 
+2021-Nov-09 08:27:19  . . . . . Segger_is_connected_to_device:	JLink INFO	JLINK_IsConnected()  
+2021-Nov-09 08:27:19  . . . . . Segger_is_connected_to_device:	JLink INFO	T42FC 000:305.624 
+2021-Nov-09 08:27:19  . . . . . Segger_is_connected_to_device:	JLink INFO	- 0.947ms returns TRUE  
+2021-Nov-09 08:27:19  . . . . . Segger_is_connected_to_device:	JLink INFO	T42FC 000:306.166 
+2021-Nov-09 08:27:19  . . . . . Segger_is_connected_to_device:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . Segger_disconnect_from_emu:	Disable trace before closing connection.
+
+2021-Nov-09 08:27:19  . . . . . Segger_write_u32
+2021-Nov-09 08:27:19  . . . . . Segger_write_u32:	JLink INFO	T42FC 000:307.239 
+2021-Nov-09 08:27:19  . . . . . Segger_write_u32:	JLink INFO	JLINK_WriteU32_64(0xE000EDFC, 0x00000000)  
+2021-Nov-09 08:27:19  . . . . . Segger_write_u32:	JLink INFO	T42FC 000:307.766   
+2021-Nov-09 08:27:19  . . . . . Segger_write_u32:	JLink INFO	Debug reg: DEMCR
+2021-Nov-09 08:27:19  . . . . . Segger_write_u32:	JLink INFO	T42FC 000:308.561   
+2021-Nov-09 08:27:19  . . . . . Segger_write_u32:	JLink INFO	CPU is running
+2021-Nov-09 08:27:19  . . . . . Segger_write_u32:	JLink INFO	T42FC 000:309.338   
+2021-Nov-09 08:27:19  . . . . . Segger_write_u32:	JLink INFO	CPU_WriteMem(4 bytes @ 0xE000EDFC)
+2021-Nov-09 08:27:19  . . . . . Segger_write_u32:	JLink INFO	T42FC 000:310.534 
+2021-Nov-09 08:27:19  . . . . . Segger_write_u32:	JLink INFO	- 3.658ms returns 0 (0x00000000)  
+2021-Nov-09 08:27:19  . . . . . Segger_write_u32:	JLink INFO	T42FC 000:311.119 
+2021-Nov-09 08:27:19  . . . . . Segger_write_u32:	JLink INFO	JLINK_HasError()  
+2021-Nov-09 08:27:19  . . . . Segger_disconnect_from_emu:	JLink INFO	T42FC 000:311.809 
+2021-Nov-09 08:27:19  . . . . Segger_disconnect_from_emu:	JLink INFO	- 0.907ms  
+2021-Nov-09 08:27:19  . . . . Segger_disconnect_from_emu:	JLink INFO	T42FC 000:316.431 
+2021-Nov-09 08:27:19  . . . . Segger_disconnect_from_emu:	JLink INFO	JLINK_Close()  
+2021-Nov-09 08:27:19  . . Segger_close:	Freeing Library.
+
+2021-Nov-09 08:27:19  nRF_close_dll:	Freeing Library.
+
