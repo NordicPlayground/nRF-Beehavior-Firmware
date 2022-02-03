@@ -185,16 +185,16 @@ static bool event_handler(const struct event_header *eh)
 			LOG_INF("THINGY_BUFFER_full = false\n");
 		}
 	    
-        LOG_INF("event_handler(): Thingy event is being handled. \n");
+        	LOG_INF("event_handler(): Thingy event is being handled. \n");
 		struct thingy_event *event = cast_thingy_event(eh);
 		LOG_INF("event_handler(thingy_event): Temperature [C]: %i,%i, Humidity [%%]: %i, Air pressure [hPa]: %d,%i, Battery charge [%%]: %i, ID: %i,\n", event->data_array[0], \
 				event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, event->battery_charge, id-(uint8_t)'0');
 
 		pressure_union.a = event->pressure_int;
 
-	/* Organizing the sensor data in a 11 byte data message which is sent to 91-module. *
+		/* Organizing the sensor data in a 11 byte data message which is sent to 91-module. *
 	    
-        uint8_t thingy_data[11] = {(uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2]};
+        	uint8_t thingy_data[11] = {(uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2]};
 	
 		/*Divide the 32bit integer for pressure into 4 separate 8bit integers. This is merged back to 32 bit integer when 91 module recieves the data.  */
 
