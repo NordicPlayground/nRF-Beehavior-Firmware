@@ -24,6 +24,7 @@ int32_t pressure_float;
 uint8_t battery_charge;
 
 static struct bt_conn *thingy_conn;
+// static struct bt_conn *auth_conn;
 #endif
 
 #if defined(CONFIG_BEE_COUNTER_ENABLE)
@@ -297,9 +298,9 @@ static void pairing_confirm(struct bt_conn *conn);
 static void pairing_complete(struct bt_conn *conn, bool bonded);
 static void pairing_failed(struct bt_conn *conn, enum bt_security_err reason);
 
-// static struct bt_conn_auth_cb conn_auth_callbacks = {
-// 	.cancel = auth_cancel,
-// 	.pairing_confirm = pairing_confirm,
-// 	.pairing_complete = pairing_complete,
-// 	.pairing_failed = pairing_failed
-// };	
+static struct bt_conn_auth_cb conn_auth_callbacks = {
+	.cancel = auth_cancel,
+	.pairing_confirm = pairing_confirm,
+	.pairing_complete = pairing_complete,
+	.pairing_failed = pairing_failed
+};	
