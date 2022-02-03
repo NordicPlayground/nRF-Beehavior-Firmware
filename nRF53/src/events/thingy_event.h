@@ -5,7 +5,7 @@ struct thingy_event {
         // enum thingy_event_type type;
 
         /* Custom data fields. */
-        uint8_t data_array[3]; /* Temperature and humidity */
+        uint8_t data_array[3]; /* 2 first bytes are temperature ([integer],[decimal]) and last byte is relative humidity */
 
         int32_t pressure_int; /*Integer part of the air pressure */
         uint8_t pressure_float; /*Decimal part of the air pressure */
