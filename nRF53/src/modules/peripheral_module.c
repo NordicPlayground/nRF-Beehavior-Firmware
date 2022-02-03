@@ -192,7 +192,7 @@ static bool event_handler(const struct event_header *eh)
 
 		pressure_union.a = event->pressure_int;
 
-		/* Organizing the sensor data in a 11 byte data message which is sent to 91-module. *
+		/* Organizing the sensor data in a 11 byte data message which is sent to 91-module. */
 	    
         	uint8_t thingy_data[11] = {(uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2]};
 	
