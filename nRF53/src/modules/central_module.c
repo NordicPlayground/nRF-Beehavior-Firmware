@@ -160,14 +160,13 @@ static uint8_t on_received_temperature(struct bt_conn *conn,
 			const void *data, uint16_t length)
 {
 	if (length > 0) {	
-		LOG_INF("Length: %i", length);
 		if(configured){
 			data_array[0] = ((uint8_t *)data)[0];
 			data_array[1] = ((uint8_t *)data)[1];
 			k_sem_give(&temperature_received);
 			LOG_INF("K give temperature");
-			LOG_INF("Temperature [Celsius]: %d,%d, \n", ((uint8_t *)data)[0], ((uint8_t *)data)[1]);
 		}
+		LOG_INF("Temperature [Celsius]: %d,%d, \n", ((uint8_t *)data)[0], ((uint8_t *)data)[1]);
 
 	} else {
 		LOG_INF("Temperature notification with 0 length\n");
@@ -184,8 +183,8 @@ static uint8_t on_received_humidity(struct bt_conn *conn,
 			data_array[2] = ((uint8_t *)data)[0];
 			k_sem_give(&humidity_received);
 			LOG_INF("K give humidity");
-			LOG_INF("Relative humidity [%%]: %d,%d \n", ((uint8_t *)data)[0], ((uint8_t *)data)[1]);
 		}
+		LOG_INF("Relative humidity [%%]: %d \n", ((uint8_t *)data)[0]);
 
 	} else {
 		LOG_INF("Humidity notification with 0 length\n");
@@ -200,12 +199,12 @@ static uint8_t on_received_air_pressure(struct bt_conn *conn,
 	if (length > 0) {
 		if(configured){
 			pressure_int = ((int32_t *)data)[0];
-			pressure_float = ((int32_t *)data)[1]; 
+			pressure_float = ((uint8_t *)data)[1];
 			k_sem_give(&air_pressure_received);
 			LOG_INF("K give air");
-			LOG_INF("Air Pressure [kPa]: %d,%d \n", pressure_int, pressure_float);
 		}
-		// LOG_INF("Air Pressure [hPa]: %d,%d \n", ((int32_t *)data)[0], ((uint8_t *)data)[1]);
+		LOG_INF("Air Pressure [hPa]: %d,%d \n", ((int32_t *)data)[0], ((uint8_t *)data)[1]);
+		// LOG_INF("Air Pressure [hPa]: %d,%d \n", pressure_int, pressure_float);
 
 	} else {
 		LOG_INF("Air Pressure notification with 0 length\n");
@@ -231,9 +230,9 @@ static uint8_t on_received_battery(struct bt_conn *conn,
 			struct bt_gatt_subscribe_params *params,
 			const void *data, uint16_t length)
 {
-	LOG_INF("%i", params->value);
+
 	if (length > 0) {
-		LOG_INF("on_received_battery(): Length: %d, Battery charge: %d %%\n", length, ((uint8_t *)data)[0]);
+		LOG_INF("on_received_battery(): Battery charge: %i %%\n", ((uint8_t *)data)[0]);
 		battery_charge = ((uint8_t *)data)[0];
 
 	} else {
@@ -246,7 +245,7 @@ static uint8_t on_received_battery(struct bt_conn *conn,
 void write_to_led_cb (struct bt_conn *conn, uint8_t err, struct bt_gatt_write_params *params){
 	LOG_INF("Write callback started, %i, length: %i, offset: %i, handle: %i", err, params->length, params->offset, params->handle);
 
-	// configured = true;
+	configured = true;
 
     struct ble_event *thingy_ready = new_ble_event();
 
@@ -337,20 +336,20 @@ void write_cb (struct bt_conn *conn, uint8_t err, struct bt_gatt_write_params *p
 static void discovery_write_completed(struct bt_gatt_dm *disc, void *ctx){
 	//Write to Thingy to update configuration
 
-	char data[12] = { 0x0A,0xEA,0x60,0xEA,0x60,0xEA,0x10,0x27,0x03,0xFF,0x00,0x00};
-	// char data[12] = { 0x10,0x27,0x10,0x27,0x10,0x27,0x10,0x27,0x03,0xFF,0x00,0x00}; //10s
-	// char data[12] = { 0x88,0x13,0x88,0x13,0x88,0x13,0x88,0x13,0x03,0xFF,0x00,0x00}; //5s
+	// char data[12] = { 0x60,0xEA,0x60,0xEA,0x60,0xEA,0x10,0x27,0x03,0xFF,0x00,0x00}; //60s
+	char data[12] = { 0x10,0x27,0x10,0x27,0x10,0x27,0x10,0x27,0x03,0xFF,0x00,0x00}; //10s
+
 	LOG_INF("%d", data[0]);
 
 	const struct bt_gatt_dm_attr *chrc;
 	const struct bt_gatt_dm_attr *desc;
 
-	chrc = bt_gatt_dm_char_by_uuid(disc, BT_UUID_WRITE);
+	chrc = bt_gatt_dm_char_by_uuid(disc, BT_UUID_TECC);
 	if (!chrc) {
 		LOG_INF("Missing Thingy configuration characteristic\n");
 	}
 
-	desc = bt_gatt_dm_desc_by_uuid(disc, chrc, BT_UUID_WRITE);
+	desc = bt_gatt_dm_desc_by_uuid(disc, chrc, BT_UUID_TECC);
 	if (!desc) {
 	 	LOG_INF("Missing Thingy configuration char value descriptor\n");
 	}
@@ -372,7 +371,7 @@ static void discovery_write_completed(struct bt_gatt_dm *disc, void *ctx){
 	if (err) {
 		LOG_INF("Could not release humidity discovery data, err: %d\n", err);
 	}
-	// write_to_led_gattp(bt_gatt_dm_conn_get(disc));
+	write_to_led_gattp(bt_gatt_dm_conn_get(disc));
 
 }
 static void discovery_write_service_not_found(struct bt_conn *conn, void *ctx)
@@ -390,7 +389,7 @@ static void write_to_characteristic_gattp(struct bt_conn *conn){
 
 	// ----------------------- Write to Thingy ---------------------------
     LOG_INF("Entering TES service bt_gatt_dm_start;\n");
-	err = bt_gatt_dm_start(conn, BT_UUID_BEES, &discovery_write_cb, NULL);
+	err = bt_gatt_dm_start(conn, BT_UUID_TES, &discovery_write_cb, NULL);
 	if (err) {
 		LOG_INF("Could not start write service discovery, err %d\n", err);
 	}
@@ -413,13 +412,13 @@ static void discovery_temperature_completed(struct bt_gatt_dm *disc, void *ctx)
 	const struct bt_gatt_dm_attr *chrc;
 	const struct bt_gatt_dm_attr *desc;
 
-	chrc = bt_gatt_dm_char_by_uuid(disc, BT_UUID_BTC);
+	chrc = bt_gatt_dm_char_by_uuid(disc, BT_UUID_TTC);
 	if (!chrc) {
 		LOG_INF("Missing Thingy temperature characteristic\n");
 		goto release;
 	}
 
-	desc = bt_gatt_dm_desc_by_uuid(disc, chrc, BT_UUID_BTC);
+	desc = bt_gatt_dm_desc_by_uuid(disc, chrc, BT_UUID_TTC);
 	if (!desc) {
 		LOG_INF("Missing Thingy temperature char value descriptor\n");
 		goto release;
@@ -480,13 +479,13 @@ static void discovery_humidity_completed(struct bt_gatt_dm *disc, void *ctx)
 	const struct bt_gatt_dm_attr *chrc;
 	const struct bt_gatt_dm_attr *desc;
 
-	chrc = bt_gatt_dm_char_by_uuid(disc, BT_UUID_HUMID);
+	chrc = bt_gatt_dm_char_by_uuid(disc, BT_UUID_THC);
 	if (!chrc) {
 		LOG_INF("Missing Thingy humidity characteristic\n");
 		goto release;
 	}
 
-	desc = bt_gatt_dm_desc_by_uuid(disc, chrc, BT_UUID_HUMID);
+	desc = bt_gatt_dm_desc_by_uuid(disc, chrc, BT_UUID_THC);
 	if (!desc) {
 		LOG_INF("Missing Thingy humidity char value descriptor\n");
 		goto release;
@@ -541,13 +540,13 @@ static void discovery_air_pressure_completed(struct bt_gatt_dm *disc, void *ctx)
 	const struct bt_gatt_dm_attr *chrc;
 	const struct bt_gatt_dm_attr *desc;
 
-	chrc = bt_gatt_dm_char_by_uuid(disc, BT_UUID_PRESSURE);
+	chrc = bt_gatt_dm_char_by_uuid(disc, BT_UUID_TPC);
 	if (!chrc) {
 		LOG_INF("Missing Thingy air pressrue characteristic\n");
 		goto release;
 	}
 
-	desc = bt_gatt_dm_desc_by_uuid(disc, chrc, BT_UUID_PRESSURE);
+	desc = bt_gatt_dm_desc_by_uuid(disc, chrc, BT_UUID_TPC);
 	if (!desc) {
 		LOG_INF("Missing Thingy air pressure char value descriptor\n");
 		goto release;
@@ -576,9 +575,7 @@ release:
 	if (err) {
 		LOG_INF("Could not release air pressure discovery data, err: %d\n", err);
 	}
-	configured = true;
-	// write_to_characteristic_gattp(bt_gatt_dm_conn_get(disc));
-	discover_battery_gattp(bt_gatt_dm_conn_get(disc));
+	discover_orientation_gattp(bt_gatt_dm_conn_get(disc));
 }
 
 static void discovery_air_pressure_service_not_found(struct bt_conn *conn, void *ctx)
@@ -678,13 +675,13 @@ static void discovery_battery_completed(struct bt_gatt_dm *disc, void *ctx)
 	const struct bt_gatt_dm_attr *chrc;
 	const struct bt_gatt_dm_attr *desc;
 
-	chrc = bt_gatt_dm_char_by_uuid(disc, BT_UUID_BATTERY);
+	chrc = bt_gatt_dm_char_by_uuid(disc, BT_UUID_TBC);
 	if (!chrc) {
 		LOG_INF("Missing Thingy battery characteristic\n");
 		goto release;
 	}
 
-	desc = bt_gatt_dm_desc_by_uuid(disc, chrc, BT_UUID_BATTERY);
+	desc = bt_gatt_dm_desc_by_uuid(disc, chrc, BT_UUID_TBC);
 	if (!desc) {
 		LOG_INF("Missing Thingy battery char value descriptor\n");
 		goto release;
@@ -746,7 +743,7 @@ static void discover_temperature_gattp(struct bt_conn *conn)
 	int err;
 
     LOG_INF("Entering TES service bt_gatt_dm_start;\n");
-	err = bt_gatt_dm_start(conn, BT_UUID_BEES, &discovery_temperature_cb, NULL);
+	err = bt_gatt_dm_start(conn, BT_UUID_TES, &discovery_temperature_cb, NULL);
 	if (err) {
 		LOG_INF("Could not start temperature service discovery, err %d\n", err);
 	}
@@ -758,7 +755,7 @@ static void discover_humidity_gattp(struct bt_conn *conn)
 	int err;
 
     LOG_INF("Entering TES service bt_gatt_dm_start;\n");
-	err = bt_gatt_dm_start(conn, BT_UUID_BEES, &discovery_humidity_cb, NULL);
+	err = bt_gatt_dm_start(conn, BT_UUID_TES, &discovery_humidity_cb, NULL);
 	if (err) {
 		LOG_INF("Could not start humidity service discovery, err %d\n", err);
 	}
@@ -770,7 +767,7 @@ static void discover_air_pressure_gattp(struct bt_conn *conn)
 	int err;
 
     LOG_INF("Entering TES service bt_gatt_dm_start;\n");
-	err = bt_gatt_dm_start(conn, BT_UUID_BEES, &discovery_air_pressure_cb, NULL);
+	err = bt_gatt_dm_start(conn, BT_UUID_TES, &discovery_air_pressure_cb, NULL);
 	if (err) {
 		LOG_INF("Could not start air pressure service discovery, err %d\n", err);
 	}
@@ -795,7 +792,7 @@ static void discover_battery_gattp(struct bt_conn *conn)
 	int err;
 
     LOG_INF("Entering battery service bt_gatt_dm_start;\n");
-	err = bt_gatt_dm_start(conn, BT_UUID_BEES, &discovery_battery_cb, NULL);
+	err = bt_gatt_dm_start(conn, BT_UUID_TBS, &discovery_battery_cb, NULL);
 	if (err) {
 		LOG_INF("Could not start battery service discovery, err %d\n", err);
 	}
@@ -1117,11 +1114,11 @@ void central_module_thread_fn(void)
     k_sem_take(&ble_ready, K_FOREVER);
     LOG_INF("thingy_module_thread_fn(): ble_ready. \n");
 	
-	// err = bt_conn_auth_cb_register(&conn_auth_callbacks);
-	// if (err) {
-	// 	LOG_ERR("thingy_module_thread_fn(): Failed to register authorization callbacks. \n");
-	// 	return;
-	// }
+	err = bt_conn_auth_cb_register(&conn_auth_callbacks);
+	if (err) {
+		LOG_ERR("thingy_module_thread_fn(): Failed to register authorization callbacks. \n");
+		return;
+	}
 
 	bt_conn_cb_register(&conn_callbacks);
 	
