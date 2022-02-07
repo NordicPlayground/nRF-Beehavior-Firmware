@@ -226,10 +226,9 @@ static bool event_handler(const struct event_header *eh)
 			*/
 			
 			/* The following lines empties and resets all entries in the databuffer (a way that gets us 40% there)*/
-			 thingy_matrix[THINGY_BUFFER_SIZE][11] = {0};
-			 for (uint8_t row = 1; row <= THINGY_BUFFER_SIZE -1 ; row++){
+			for (uint8_t row = 1; row <= THINGY_BUFFER_SIZE -1 ; row++){
 				memset(thingy_matrix, 0, sizeof(thingy_matrix));
-			 }
+			}
 			/* 
 			Reset the counter to avoid overflow. 
 			If it is desired to send this data to also include number of samples. Remember to increase the bitsize in the header to avoid overflow
@@ -240,11 +239,11 @@ static bool event_handler(const struct event_header *eh)
 		}
 
 	    
-	/*	
-	
-	If there are one or more empty rows in the buffer, append the new data this row 
-	
-	*/
+		/*	
+		
+		If there are one or more empty rows in the buffer, append the new data this row 
+		
+		*/
 		if (THINGY_BUFFER_WRITABLE){
 			LOG_INF("THINGY_BUFFER_WRITABLE = true\n");
 			LOG_INF("Buffer still not full. Adding samples to queue:\n");
@@ -263,7 +262,8 @@ static bool event_handler(const struct event_header *eh)
 			
 			// Adds dataelement elem from thingy_data to the current
 			for (uint8_t elem = 0; elem <= 10; elem++){
-				thingy_matrix[sample_counter][elem] = thingy_data[elem]
+				thingy_matrix[sample_counter][elem] = thingy_data[elem];
+			}
 
 			LOG_INF("Sample has been appended to buffer \n");
 
@@ -280,16 +280,15 @@ static bool event_handler(const struct event_header *eh)
 				temperature_float_sum += event->data_array[1];
 				humidity_sum += event->data_array[2];
 			}
-
 		}
 
 
-		// The two following prints are used for debugging to check if we have aligned our data correct
-	    	/* 
-		
-		Prints out the latest thingy_data array (the latest measurement)
-		
-		*/
+			// The two following prints are used for debugging to check if we have aligned our data correct
+				/* 
+			
+			Prints out the latest thingy_data array (the latest measurement)
+			
+			*/
 		LOG_INF("Current sample number is now %i: \n", sample_counter);
 		printk("Current sample: %i", sample_counter);
 		for (uint8_t elem = 0; elem <= 10; elem++){
@@ -455,8 +454,8 @@ static bool event_handler(const struct event_header *eh)
 					sample_counter += 1;
 					LOG_INF("SAMPLE_COUNTER INCREMENTED BY 1\n");
 
-					// int err = bt_nus_send(hub_conn, thingy_data, 11);
-					int err = bt_nus_send(hub_conn, avg_thingy_data, 11);
+					int err = bt_nus_send(hub_conn, thingy_data, 11);
+					// int err = bt_nus_send(hub_conn, avg_thingy_data, 11);
 					LOG_INF("Nth sample: No fatal crash when sending");
 				}
 				
@@ -469,8 +468,8 @@ static bool event_handler(const struct event_header *eh)
 					LOG_INF("SAMPLE_COUNTER INCREMENTED BY 1\n");
 					
 					
-					// int err = bt_nus_send(hub_conn, thingy_data, 11);
-					int err = bt_nus_send(hub_conn, avg_thingy_data, 11);
+					int err = bt_nus_send(hub_conn, thingy_data, 11);
+					// int err = bt_nus_send(hub_conn, avg_thingy_data, 11);
 					LOG_INF("Nth sample: No fatal crash when sending");
 				}
 			}
