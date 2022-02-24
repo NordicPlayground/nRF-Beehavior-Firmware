@@ -24,6 +24,7 @@ uint8_t pressure_float;
 uint8_t battery_charge;
 
 static struct bt_conn *thingy_conn;
+// static struct bt_conn *auth_conn;
 #endif
 
 #if defined(CONFIG_BEE_COUNTER_ENABLE)

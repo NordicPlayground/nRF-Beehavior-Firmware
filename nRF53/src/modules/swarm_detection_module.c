@@ -36,9 +36,10 @@ int weight_func(float bm_w_data[2]){
 }
 
 
+
 static bool event_handler(const struct event_header *eh)
 {
-    if (is_thingy_event(eh)) {
+    if (is_thingy_matrix_event(eh)) {
 		for (int i = 0; i < THINGY_BUFFER_SIZE; i++){
 				float temp_data = atof(thingy_data[0]) + (atof(thingy_data[1])/100);
 				float humidity_data = atof(thingy_data[2]);
@@ -56,8 +57,6 @@ static bool event_handler(const struct event_header *eh)
 
 		struct bee_count_event *event = cast_bee_count_event(eh);
 		uint16_t out = event->out;
-
-
 
 		return false;
 	}

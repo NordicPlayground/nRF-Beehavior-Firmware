@@ -190,6 +190,7 @@ AT+RUNIMPULSECONT - Run the impulse continuously
 ## Further work
 
 * Field testing
+* Make a control program: Make a program that can turn on/off the ML algoritm. Possibly from another dev.kit (in progress see ML_master)
 * Create a more robust model if necessary (would then possibly be an idea to collect more woodpecker data)
 * Merge with rest of beehive monitoring system
 * Energy consumption optimization
