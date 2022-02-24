@@ -129,6 +129,38 @@ static struct bt_nus_cb nus_cb = {
 	.received = bt_receive_cb,
 };
 
+static uint8_t thingy_event_add_to_data_message(struct thingy_event *event)
+{
+/* 
+	Takes in latest measurement and appends the data to uint8_t thingy_data[11]
+
+	thingy_data bites are represented as:
+
+	[0] 	: (uint8_t)'*'
+	[1] 	: id-(uint8_t)'0'
+	[2] 	: event->data_array[0]
+	[3] 	: event->data_array[1]
+	[4] 	: event->data_array[2]
+	[5-8] 	: integer part of relative air pressure in union-representation
+	[9] 	: part of relative air pressure
+	[10] 	: battery charge  
+
+	returns 0 if successfull, 1 if error has occured
+
+
+ */
+	LOG_INF("thingy_event_add_to_data_message(thingy_event): Testing appending through function call instead of normal data_append. \n");
+	LOG_INF("thingy_event_add_to_data_message(thingy_event): Temperature [C]: %i,%i, Humidity [%%]: %i, Air pressure [hPa]: %d,%i, Battery charge [%%]: %i, ID: %i,\n", event->data_array[0], \
+				event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, event->battery_charge, id-(uint8_t)'0');
+
+	
+	return 0;  
+}
+
+// static bool thingy_event_clear_buffer();
+// static bool thingy_event_append_to_buffer();
+// static bool thingy_event_compute_average();
+
 void peripheral_module_thread_fn(void)
 {
     /* Don't go any further until BLE is initialized */
@@ -184,9 +216,15 @@ static bool event_handler(const struct event_header *eh)
 			THINGY_BUFFER_WRITABLE = false;
 			LOG_INF("THINGY_BUFFER_full = false\n");
 		}
+
+		
+
 	    
-        	LOG_INF("event_handler(): Thingy event is being handled. \n");
+		LOG_INF("event_handler(): Thingy event is being handled. \n");
 		struct thingy_event *event = cast_thingy_event(eh);
+		
+		thingy_event_add_to_data_message(event);
+
 		LOG_INF("event_handler(thingy_event): Temperature [C]: %i,%i, Humidity [%%]: %i, Air pressure [hPa]: %d,%i, Battery charge [%%]: %i, ID: %i,\n", event->data_array[0], \
 				event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, event->battery_charge, id-(uint8_t)'0');
 
