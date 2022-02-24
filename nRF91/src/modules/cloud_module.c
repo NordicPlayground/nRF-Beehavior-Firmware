@@ -171,23 +171,23 @@ void cloud_event_handler(const struct cloud_backend *const backend,
 		(void)k_work_cancel_delayable(&connect_work);
 		break;
 	case CLOUD_EVT_READY:
-		err = dk_set_led_off(DK_LED1);
-		err = dk_set_led_on(DK_LED3);
-		LOG_INF("CLOUD_EVT_READY, led: %i", err);
-		struct cloud_event_abbr *cloud_event_ready = new_cloud_event_abbr(strlen("Cloud ready"));
+		// err = dk_set_led_off(DK_LED1);
+		// err = dk_set_led_on(DK_LED3);
+		// LOG_INF("CLOUD_EVT_READY, led: %i", err);
+		// struct cloud_event_abbr *cloud_event_ready = new_cloud_event_abbr(strlen("Cloud ready"));
 
-		/* If it's the first time connected to cloud, disconnect to scan for peripheral units */
-        if(first){
-			dk_set_led_on(DK_LED1);
-			cloud_disconnect(cloud_backend);
-			first = false;
-		}
+		// /* If it's the first time connected to cloud, disconnect to scan for peripheral units */
+        // if(first){
+		// 	dk_set_led_on(DK_LED1);
+		// 	cloud_disconnect(cloud_backend);
+		// 	first = false;
+		// }
 
-		cloud_event_ready->type = CLOUD_CONNECTED;
+		// cloud_event_ready->type = CLOUD_CONNECTED;
 
-        memcpy(cloud_event_ready->dyndata.data, log_strdup("Cloud ready"), strlen("Cloud ready"));
+        // memcpy(cloud_event_ready->dyndata.data, log_strdup("Cloud ready"), strlen("Cloud ready"));
 
-        EVENT_SUBMIT(cloud_event_ready);
+        // EVENT_SUBMIT(cloud_event_ready);
 
 		break;
 	case CLOUD_EVT_DISCONNECTED:
@@ -280,6 +280,20 @@ static void lte_handler(const struct lte_lc_evt *const evt)
 			 evt->lte_mode == LTE_LC_LTE_MODE_NBIOT ? "NB-IoT" :
 			 "Unknown");
 		break;
+	case LTE_LC_EVT_MODEM_EVENT:
+		LOG_INF("Modem domain event, type: %s",
+			evt->modem_evt == LTE_LC_MODEM_EVT_LIGHT_SEARCH_DONE ?
+				"Light search done" :
+			evt->modem_evt == LTE_LC_MODEM_EVT_SEARCH_DONE ?
+				"Search done" :
+			evt->modem_evt == LTE_LC_MODEM_EVT_RESET_LOOP ?
+				"Reset loop detected" :
+			evt->modem_evt == LTE_LC_MODEM_EVT_BATTERY_LOW ?
+				"Low battery" :
+			evt->modem_evt == LTE_LC_MODEM_EVT_OVERHEATED ?
+				"Modem is overheated" :
+				"Unknown");
+		break;
 	default:
 		break;
 	}
@@ -308,6 +322,13 @@ static void modem_configure(void)
 
 		LOG_INF("PSM mode requested");
 #endif
+		err = lte_lc_modem_events_enable();
+		if (err) {
+			LOG_ERR("lte_lc_modem_events_enable failed, error: %d",
+				err);
+			return;
+		}
+
 		err = lte_lc_init_and_connect_async(lte_handler);
 		if (err) {
 			LOG_ERR("Modem could not be configured, error: %d",
@@ -421,7 +442,7 @@ void cloud_setup_fn(void)
 			enum lte_lc_func_mode mode;
 			err = lte_lc_func_mode_get(&mode);
 			LOG_INF("Check 3, %d, %d", err, mode);
-			if(mode!=LTE_LC_FUNC_MODE_OFFLINE){
+			if(cloud_connected){
 				// cloud_connected = false;
 		
 				LOG_DBG("Bee Counter data is being JSON-formatted");
@@ -450,7 +471,7 @@ void cloud_setup_fn(void)
 				LOG_DBG("Time: %d", ts);
 
 				/* Format to JSON-string */
-				uint16_t len = snprintk(message, 100, "{\"appID\":\"BEE-CNT\",\"OUT\":\"%i\",\"IN\":\"%i\",\"TIME\":\"%lld\",\"NAME\":Test}" \
+				uint16_t len = snprintk(message, 100, "{\"appID\":\"BEE-CNT\",\"OUT\":\"%i\",\"IN\":\"%i\",\"TIME\":\"%lld\",\"NAME\":\"Test\"}" \
 					, totalOut, totalIn, ts);
 				LOG_INF("Message formatted: %s, length: %i", message, len);
 			
