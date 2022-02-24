@@ -134,7 +134,7 @@ static uint8_t thingy_event_add_to_data_message(struct thingy_event *event)
 /* 
 	Takes in latest measurement and appends the data to uint8_t thingy_data[11]
 
-	thingy_data bites are represented as:
+	thingy_data bits are represented as:
 
 	[0] 	: (uint8_t)'*'
 	[1] 	: id-(uint8_t)'0'
@@ -321,12 +321,12 @@ static bool event_handler(const struct event_header *eh)
 		}
 
 
-			// The two following prints are used for debugging to check if we have aligned our data correct
-				/* 
-			
-			Prints out the latest thingy_data array (the latest measurement)
-			
-			*/
+		// The two following prints are used for debugging to check if we have aligned our data correct
+		/* 
+		
+		Prints out the latest thingy_data array (the latest measurement)
+		
+		*/
 		LOG_INF("Current sample number is now %i: \n", sample_counter);
 		printk("Current sample: %i", sample_counter);
 		for (uint8_t elem = 0; elem <= 10; elem++){

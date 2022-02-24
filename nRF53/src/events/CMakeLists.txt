@@ -7,6 +7,10 @@
 target_sources(app PRIVATE
 		   ${CMAKE_CURRENT_SOURCE_DIR}/thingy_event.c
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+		   #${CMAKE_CURRENT_SOURCE_DIR}/thingy_matrix_event.c
+>>>>>>> remotes/origin/kim
 =======
 		#    ${CMAKE_CURRENT_SOURCE_DIR}/thingy_matrix_event.c
 >>>>>>> master
