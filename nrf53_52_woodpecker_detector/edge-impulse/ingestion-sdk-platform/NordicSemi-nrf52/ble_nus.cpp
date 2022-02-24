@@ -1,4 +1,5 @@
 #include "ble_nus.h"
+#include "ei_classifier_porting.h"
 
 bool ei_ble_rcv_cmd_flag = false;
 char ei_ble_rcv_cmd_buffer[50] = {0};
@@ -363,6 +364,7 @@ static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
 {
     int err;
     char addr[BT_ADDR_LE_STR_LEN] = {0};
+    ei_printf("%.*s", len, data);
 
     bt_addr_le_to_str(bt_conn_get_dst(conn), addr, ARRAY_SIZE(addr));
 

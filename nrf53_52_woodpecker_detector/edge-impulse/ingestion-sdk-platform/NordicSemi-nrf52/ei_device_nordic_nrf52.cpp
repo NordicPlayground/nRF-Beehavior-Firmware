@@ -393,7 +393,6 @@ void ei_printf_float(float f)
 void ei_command_line_handle(void)
 {
     char data = uart_getchar();
-
     while(data != 0xFF) {
         rx_callback(data);
         data = uart_getchar();
