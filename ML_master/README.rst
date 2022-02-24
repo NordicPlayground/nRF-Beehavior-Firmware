@@ -7,7 +7,8 @@ ML_master
    :local:
    :depth: 2
 
-ML_master is a copy of the central_uart program in nrf.
+ML_master is a copy of the central_uart program in nrf. The goal of this program is to make a state machine that can control a another nrf53_52 flashed with the nrf53_52_woodpecker_detector program.
+
 The Central UART sample demonstrates how to use the :ref:`nus_client_readme`.
 It uses the NUS Client to send data back and forth between a UART connection and a Bluetooth LE connection, emulating a serial port over Bluetooth LE.
 
