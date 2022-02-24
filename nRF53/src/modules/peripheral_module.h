@@ -15,7 +15,7 @@ The union is used for splitting a 32bit variable into 4 separate 8 bit variables
 of the 32 bit variable and writes that in to the first 8bit variable and repeats this for the rest. This was the simplest way to 
 allocate the 32+8 bit air pressure measurement reading to the Bluetooth data message which we send from the nRF5340 to the nRF9160
 
-Example: int32_t  (in binary) = [11110000 11110000 11110000] becomes [11110000],[11110000],[11110000],[11110000] = 4x8bit elements
+Example: int32_t  (in binary) = [11110000 11110000 11110000 11110000] becomes [11110000],[11110000],[11110000],[11110000] = 4x8bit elements
 after using the union. 
 
 */

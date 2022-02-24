@@ -416,6 +416,63 @@ void cloud_setup_fn(void)
 	#if defined(CONFIG_BOARD_THINGY91)
 	k_work_reschedule(&cloud_update_work, K_NO_WAIT);
 	#endif
+	while(true){
+			k_sleep(K_SECONDS(30));
+			enum lte_lc_func_mode mode;
+			err = lte_lc_func_mode_get(&mode);
+			LOG_INF("Check 3, %d, %d", err, mode);
+			if(mode!=LTE_LC_FUNC_MODE_OFFLINE){
+				// cloud_connected = false;
+		
+				LOG_DBG("Bee Counter data is being JSON-formatted");
+
+				/* Logic to turn two bytes into one uint16_t*/
+				// char out_arr[2] = {0x15, 0x25};
+				// char in_arr[2]= {0x35, 0x45};
+				// for (uint8_t i = 0; i < 2; i++){
+				// 	out_arr[i] = event->dyndata.data[1-i];
+				// 	in_arr[i] = event->dyndata.data[3-i];	
+				// }
+				uint16_t totalOut = 0x1623;
+				uint16_t totalIn = 0x1234;
+
+				// memcpy(&totalOut, out_arr, sizeof(totalOut));
+				// memcpy(&totalIn, in_arr, sizeof(totalIn));
+
+				char message[100]; 
+
+				/* Get timestamp */
+				int64_t unix_time_ms = k_uptime_get();
+				err = date_time_now(&unix_time_ms);
+				int64_t divide = 1000;
+				int64_t ts = unix_time_ms / divide;
+
+				LOG_DBG("Time: %d", ts);
+
+				/* Format to JSON-string */
+				uint16_t len = snprintk(message, 100, "{\"appID\":\"BEE-CNT\",\"OUT\":\"%i\",\"IN\":\"%i\",\"TIME\":\"%lld\",\"NAME\":Test}" \
+					, totalOut, totalIn, ts);
+				LOG_INF("Message formatted: %s, length: %i", message, len);
+			
+				struct cloud_msg msg = {
+					.qos = CLOUD_QOS_AT_MOST_ONCE,
+					.buf = message,
+					.len = len
+				};
+				
+				msg.endpoint.type = CLOUD_EP_MSG; 
+				
+				/* Send data to cloud */
+				err = cloud_send(cloud_backend, &msg);
+				
+				if (err) {
+					LOG_ERR("cloud_send failed, error: %d", err);
+				}
+				else{
+					LOG_INF("Message published succesfully.");
+				}		
+			}
+	}
 }
 static bool event_handler(const struct event_header *eh)
 {
