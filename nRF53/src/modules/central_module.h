@@ -20,7 +20,7 @@ bool configured = false;
 uint8_t data_array[3];
 
 int32_t pressure_int;
-int32_t pressure_float;
+uint8_t pressure_float;
 uint8_t battery_charge;
 
 static struct bt_conn *thingy_conn;
@@ -59,25 +59,6 @@ K_SEM_DEFINE(service_ready, 0, 1)
 #define BT_UUID_TES                                                            \
 	BT_UUID_DECLARE_128(0x42, 0x00, 0x74, 0xA9, 0xFF, 0x52, 0x10, 0x9B,    \
 			    0x33, 0x49, 0x35, 0x9B, 0x00, 0x02, 0x68, 0xEF)
-#define BT_UUID_BEE 0x0bee
-
-#define BT_UUID_BEES                                                            \
-	BT_UUID_DECLARE_16(0x0BEE)
-
-#define BT_UUID_BTC																\
-	BT_UUID_DECLARE_16(0X1BEE)
-
-#define BT_UUID_HUMID																\
-	BT_UUID_DECLARE_16(0X2BEE)
-
-#define BT_UUID_PRESSURE																\
-	BT_UUID_DECLARE_16(0X3BEE)
-
-#define BT_UUID_BATTERY																\
-	BT_UUID_DECLARE_16(0X4BEE)
-
-#define BT_UUID_WRITE																\
-	BT_UUID_DECLARE_16(0X5BEE)
 
 /*				Thingy Temperature characteristic UUID		*/
 #define BT_UUID_TTC                                                            \
