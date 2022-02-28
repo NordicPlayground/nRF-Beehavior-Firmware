@@ -36,7 +36,7 @@ union tagname_avg pressure_avg_union;
 Some declarations of variables used in thingy_event
 */
 uint8_t thingy_matrix[THINGY_BUFFER_SIZE][11] = {0};
-uint8_t sample_counter = 0;
+// uint8_t sample_counter = 0;
 
 //The temprorary sum variables are larger to acommodate for the accumulated sums. 20x32bit becomes larger than what 32bit can represent
 int64_t pressure_int_sum = 0;
@@ -56,8 +56,6 @@ uint8_t humidity_avg = 0;
 //Control parameter that states if there are any available slots in the data buffer
 bool THINGY_BUFFER_WRITABLE = true;
 
-//Not sure if this is necessary
-bool INSERT_AT_LAST_ROW = false;
 
 /*Control parameter that states that this is the first sample we receive after start up. This is used to avoid having to wait until a
 Average reading has been received (i.e not having to wait 20 samples before we send something to the 91.*/

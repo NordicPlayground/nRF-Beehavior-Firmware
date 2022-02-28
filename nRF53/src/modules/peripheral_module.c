@@ -62,7 +62,8 @@
 bool is_swarming = false;
 
 char id;
-uint16_t T52_Counter = 0;
+uint16_t sample_counter = 0;
+uint8_t buffer_index = 0;
 uint16_t BM_Counter = 0;
 
 
@@ -129,7 +130,7 @@ static struct bt_nus_cb nus_cb = {
 	.received = bt_receive_cb,
 };
 
-static uint8_t thingy_event_add_to_data_message(struct thingy_event *event)
+static uint8_t * thingy_event_add_to_data_message(struct thingy_event *event)
 {
 /* 
 	Takes in latest measurement and appends the data to uint8_t thingy_data[11]
@@ -152,13 +153,104 @@ static uint8_t thingy_event_add_to_data_message(struct thingy_event *event)
 	LOG_INF("thingy_event_add_to_data_message(thingy_event): Testing appending through function call instead of normal data_append. \n");
 	LOG_INF("thingy_event_add_to_data_message(thingy_event): Temperature [C]: %i,%i, Humidity [%%]: %i, Air pressure [hPa]: %d,%i, Battery charge [%%]: %i, ID: %i,\n", event->data_array[0], \
 				event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, event->battery_charge, id-(uint8_t)'0');
+	pressure_union.a = event->pressure_int;
 
+	/* Organizing the sensor data in a 11 byte data message which is sent to 91-module. */
+
+	uint8_t data_message[11] = {(uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2]};
+
+	/*Divide the 32bit integer for pressure into 4 separate 8bit integers. This is merged back to 32 bit integer when 91 module recieves the data.  */
+
+	for(uint8_t i=0;  i<=3; i++){
+		data_message[8-i] = (uint8_t)pressure_union.s[i];
+	}
+
+	data_message[9] = event->pressure_float;
+	data_message[10] = event->battery_charge;
+
+	printk("Testing to print data_message INSIDE of function call \n");
+	for (uint8_t elem = 0; elem <= 10; elem++){
+		// printk("test \n");
+		printk("\n Current sample elem # %i: \n", elem);
+		// printk("%i ", thingy_data_struct->thingy_data[elem]);
+		printk("data_message [%i] ", data_message[elem]);
+		printk("\n");	
+	}
 	
-	return 0;  
+	return data_message;  
 }
 
-// static bool thingy_event_clear_buffer();
-// static bool thingy_event_append_to_buffer();
+static bool thingy_event_push_buffer(uint8_t thingy_matrix){
+	/*TO DO: Create an algorithm (or use a built in function) that ejects the oldest measurement
+	in the buffer, and pushes all remaining measurements one index down, freeing up the latest index to add 
+	the newest measurement.
+	
+	This part could be done in a function call.
+	
+	Pseudocode for algorithm
+	if (buffer full) do:
+		* Delete thingy_matrix[0][11] i.e delete the measurement at time point k = 0 // or thingy_matrix[-1][11] depending on if you fill 
+		the matrix up from the bottom and up of from the top down
+		
+		* Push all elements one index down // or up, such that the measurement at time point k = 1 is now the
+		oldest
+		
+		* Set THINGY_BUFFER_WRITABLE = true	
+	*/
+	
+	/* The following lines empties and resets all entries in the databuffer (a way that gets us 40% there)*/
+	for (uint8_t row = 1; row <= THINGY_BUFFER_SIZE -1 ; row++){
+		memset(thingy_matrix, 0, sizeof(thingy_matrix));
+	}
+	/* 
+	Reset the counter to avoid overflow. 
+	If it is desired to send this data to also include number of samples. Remember to increase the bitsize in the header to avoid overflow
+	and add it to the data message. */
+	sample_counter = 0;
+/* 	buffer_index -=1;
+	LOG_INF("Buffer has been popped, buffer index decremented") */
+
+	THINGY_BUFFER_WRITABLE = true;
+
+	return false;
+}
+
+static bool thingy_event_append_to_buffer(uint8_t thingy_data[11], uint8_t thingy_matrix[THINGY_BUFFER_SIZE][11], uint8_t buffer_index){
+	/* 
+	
+	TODO: THIS WAS FOR SOME REASON MISSING (03.02.22)???
+	Append the measurement to the current available row
+	
+	pseudocode that is written on the fly and should be verified if works
+	
+	for (uint8_t elem = 0; elem <= 10; elem++){
+		thingy_matrix[sample_counter][elem] = thingy_data[elem]
+
+	*/
+	
+	// Adds dataelement elem from thingy_data to the current
+	for (uint8_t elem = 0; elem <= 10; elem++){
+		thingy_matrix[buffer_index][elem] = thingy_data[elem];
+	}
+	buffer_index +=1;
+	LOG_INF("Sample has been appended to buffer, buffer index incremented \n");
+
+	return false;
+}
+
+static bool thingy_event_compute_average_temp(struct thingy_event *event){
+	
+	if (sample_counter >= 0 && !FIRST_SAMPLE){
+		LOG_INF("Adding sum of sample number: %i (0 may equal every 12th) \n", sample_counter);
+		pressure_int_sum += event->pressure_int;
+		pressure_float_sum += event->pressure_float;
+		temperature_int_sum += event->data_array[0];
+		temperature_float_sum += event->data_array[1];
+		humidity_sum += event->data_array[2];
+
+	}
+	return false;
+}
 // static bool thingy_event_compute_average();
 
 void peripheral_module_thread_fn(void)
@@ -216,125 +308,80 @@ static bool event_handler(const struct event_header *eh)
 			THINGY_BUFFER_WRITABLE = false;
 			LOG_INF("THINGY_BUFFER_full = false\n");
 		}
-
-		
-
-	    
+   
 		LOG_INF("event_handler(): Thingy event is being handled. \n");
 		struct thingy_event *event = cast_thingy_event(eh);
 		
-		thingy_event_add_to_data_message(event);
+		/* 
 
-		LOG_INF("event_handler(thingy_event): Temperature [C]: %i,%i, Humidity [%%]: %i, Air pressure [hPa]: %d,%i, Battery charge [%%]: %i, ID: %i,\n", event->data_array[0], \
-				event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, event->battery_charge, id-(uint8_t)'0');
+		Add thingy measurement to thingy_data message
+		
+		 */
 
-		pressure_union.a = event->pressure_int;
+		uint8_t *thingy_data[11];
+		thingy_data[11] = thingy_event_add_to_data_message(event);
 
-		/* Organizing the sensor data in a 11 byte data message which is sent to 91-module. */
-	    
-        	uint8_t thingy_data[11] = {(uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2]};
-	
-		/*Divide the 32bit integer for pressure into 4 separate 8bit integers. This is merged back to 32 bit integer when 91 module recieves the data.  */
-
-		for(uint8_t i=0;  i<=3; i++){
-			thingy_data[8-i] = (uint8_t)pressure_union.s[i];
+		printk("Testing to print data_message outside of function call \n");
+	/* 	for (uint8_t elem = 0; elem <= 10; elem++){
+			// printk("test \n");
+			printk("\n Current sample elem # %i: \n", elem);
+			// printk("%i ", thingy_data_struct->thingy_data[elem]);
+			printk("%i ", thingy_data[elem]);
+			printk("\n");	
+		} */
+		for (uint8_t i = 0; i < 10; i++ ) {
+			printf( "*(thingy_data + %i) : %i\n", i, *(thingy_data + i));
 		}
+		/*	
+		
+		If there are no empty rows in buffer, delete the oldest entry and move the rest
+		Also set flag that the buffer is writable
+		Subtract one from sample_counter (Dette finnes det bedre løsninger til)
 
-
-		thingy_data[9] = event->pressure_float;
-		thingy_data[10] = event->battery_charge;
-
+		*/
 
 		if (!THINGY_BUFFER_WRITABLE){
-			/*TO DO: Create an algorithm (or use a built in function) that ejects the oldest measurement
-			in the buffer, and pushes all remaining measurements one index down, freeing up the latest index to add 
-			the newest measurement.
-			
-			This part could be done in a function call.
-			
-			Pseudocode for algorithm
-			if (buffer full) do:
-				* Delete thingy_matrix[0][11] i.e delete the measurement at time point k = 0 // or thingy_matrix[-1][11] depending on if you fill 
-				the matrix up from the bottom and up of from the top down
-				
-				* Push all elements one index down // or up, such that the measurement at time point k = 1 is now the
-				oldest
-				
-				* Set THINGY_BUFFER_WRITABLE = true	
-			*/
-			
-			/* The following lines empties and resets all entries in the databuffer (a way that gets us 40% there)*/
-			for (uint8_t row = 1; row <= THINGY_BUFFER_SIZE -1 ; row++){
-				memset(thingy_matrix, 0, sizeof(thingy_matrix));
-			}
-			/* 
-			Reset the counter to avoid overflow. 
-			If it is desired to send this data to also include number of samples. Remember to increase the bitsize in the header to avoid overflow
-			and add it to the data message. */
-			sample_counter = 0;
 
-			THINGY_BUFFER_WRITABLE = true;
+		/* 	err = thingy_event_push_buffer(thingy_matrix);
+			if (err){
+				LOG_ERR("thingy_event_push_buffer(): Buffer push pop failed (err %d) \n", err);
+				return;1
+			} */
 		}
 
-	    
 		/*	
 		
 		If there are one or more empty rows in the buffer, append the new data this row 
 		
 		*/
+
 		if (THINGY_BUFFER_WRITABLE){
 			LOG_INF("THINGY_BUFFER_WRITABLE = true\n");
 			LOG_INF("Buffer still not full. Adding samples to queue:\n");
-			
-			/* 
-			
-			TODO: THIS WAS FOR SOME REASON MISSING (03.02.22)???
-			Append the measurement to the current available row
-			
-			pseudocode that is written on the fly and should be verified if works
-			
-			for (uint8_t elem = 0; elem <= 10; elem++){
-				thingy_matrix[sample_counter][elem] = thingy_data[elem]
-		
-			*/
-			
-			// Adds dataelement elem from thingy_data to the current
-			for (uint8_t elem = 0; elem <= 10; elem++){
-				thingy_matrix[sample_counter][elem] = thingy_data[elem];
-			}
-
-			LOG_INF("Sample has been appended to buffer \n");
-
-			/*
-			
-			If it is not the first sample, sum up the nth sample for the average
-			
-			*/
-			if (sample_counter >= 0 && !FIRST_SAMPLE){
-				LOG_INF("Adding sum of sample number: %i (0 may equal every 12th) \n", sample_counter);
-				pressure_int_sum += event->pressure_int;
-				pressure_float_sum += event->pressure_float;
-				temperature_int_sum += event->data_array[0];
-				temperature_float_sum += event->data_array[1];
-				humidity_sum += event->data_array[2];
-			}
+/* 			err = thingy_event_append_to_buffer(thingy_data, thingy_matrix, buffer_index);
+			if(err){
+				LOG_ERR("thingy_event_append_to_buffer(): Buffer writing failed (err %d) \n", err);
+				return;
+			} */
 		}
 
+		
+		/* 
+		
+		The two following prints are used for debugging to check if we have aligned our data correct
+		
+		Prints out the latest thingy_data array (the latest measurement)
+		
+		*/
 
-			// The two following prints are used for debugging to check if we have aligned our data correct
-				/* 
-			
-			Prints out the latest thingy_data array (the latest measurement)
-			
-			*/
 		LOG_INF("Current sample number is now %i: \n", sample_counter);
-		printk("Current sample: %i", sample_counter);
+/* 		printk("Current sample: %i", sample_counter);
 		for (uint8_t elem = 0; elem <= 10; elem++){
 			printk("\n Current sample elem # %i: \n", elem);
 			printk("%i ", thingy_data[elem]);
 
 		printk("\n");	
-		}
+		} */
 	    
 		/* 
 		
@@ -352,6 +399,7 @@ static bool event_handler(const struct event_header *eh)
 		 	printk("\n");	
 		 }
 		
+
 		/*
 		We send "normally" to 91 from 53 whenever we've met the following conditions:
 		1) Connected to hub
@@ -378,19 +426,21 @@ static bool event_handler(const struct event_header *eh)
 				LOG_INF("event_handler(): Hub is connected, and first sample received. Sending sample over nus. \n");
 				LOG_INF("Current sample number is now %i: \n", sample_counter);
 				printk("Current sample: %i", sample_counter);
-				for (uint8_t elem = 0; elem <= 10; elem++){
+/* 				for (uint8_t elem = 0; elem <= 10; elem++){
 					// printk("test \n");
 					printk("\n Current sample elem # %i: \n", elem);
 					// printk("%i ", thingy_data_struct->thingy_data[elem]);
 					printk("%i ", thingy_data[elem]);
-				printk("\n");	
-				}
+					printk("\n");	
+				} */
 				
 				uint8_t first_sample[11];
 				
 				/*
+
 				Overflødig. Kunne bare brukt "thingy_data" som datamelding å sende, men dette gir
 				kanskje litt tid til å sende før neste måling går gjennom
+				
 				*/
 				
 				memcpy(first_sample, thingy_data,11);
