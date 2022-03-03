@@ -202,35 +202,35 @@ static ssize_t write_conf(struct bt_conn *conn, const struct bt_gatt_attr *attr,
 BT_GATT_SERVICE_DEFINE(sensor_svc,
 	BT_GATT_PRIMARY_SERVICE(BT_UUID_BEE),
 	BT_GATT_CHARACTERISTIC(BT_UUID_TEMP_SENSOR,
-					BT_GATT_CHRC_NOTIFY,
-					BT_GATT_PERM_READ,
+					BT_GATT_CHRC_READ | BT_GATT_CHRC_NOTIFY,
+					BT_GATT_PERM_READ_ENCRYPT,
 					NULL, NULL, &sens_val),
 	BT_GATT_CCC(sens_ccc,
-		    BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
+		    BT_GATT_PERM_READ_ENCRYPT | BT_GATT_PERM_WRITE_ENCRYPT),
 	BT_GATT_CHARACTERISTIC(BT_UUID_HUMID_SENSOR,
 					BT_GATT_CHRC_NOTIFY,
-			       	BT_GATT_PERM_READ,
+			       	BT_GATT_PERM_READ_ENCRYPT,
 			       	NULL, NULL, &humid_val),
 	BT_GATT_CCC(humid_ccc,
-		    BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
+		    BT_GATT_PERM_READ_ENCRYPT | BT_GATT_PERM_WRITE_ENCRYPT),
 	BT_GATT_CHARACTERISTIC(BT_UUID_PRESSURE_SENSOR,
 					BT_GATT_CHRC_NOTIFY,
-			       	BT_GATT_PERM_READ,
+			       	BT_GATT_PERM_READ_ENCRYPT,
 			       	NULL, NULL, &pres_val),
 	BT_GATT_CCC(pres_ccc,
-		    BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
+		    BT_GATT_PERM_READ_ENCRYPT | BT_GATT_PERM_WRITE_ENCRYPT),
 	BT_GATT_CHARACTERISTIC(BT_UUID_BATTERY,
 					BT_GATT_CHRC_NOTIFY,
-			       	BT_GATT_PERM_READ,
+			       	BT_GATT_PERM_READ_ENCRYPT,
 			       	NULL, NULL, &bat_val),
 	BT_GATT_CCC(bat_ccc,
-		    BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
+		    BT_GATT_PERM_READ_ENCRYPT | BT_GATT_PERM_WRITE_ENCRYPT),
 	BT_GATT_CHARACTERISTIC(BT_UUID_WRITE,
 					BT_GATT_CHRC_READ,
-			       	BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
+			       	BT_GATT_PERM_READ_ENCRYPT | BT_GATT_PERM_WRITE_ENCRYPT,
 			       	NULL, write_conf, NULL),
 	BT_GATT_CCC(write_ccc,
-		    BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
+		    BT_GATT_PERM_READ_ENCRYPT | BT_GATT_PERM_WRITE_ENCRYPT),
 );
 
 static const struct bt_data ad[] = {
@@ -279,6 +279,39 @@ static struct bt_conn_cb conn_callbacks = {
 	.disconnected = disconnected,
 };
 
+void mtu_updated(struct bt_conn *conn, uint16_t tx, uint16_t rx)
+{
+	printk("Updated MTU: TX: %d RX: %d bytes\n", tx, rx);
+}
+
+static struct bt_gatt_cb gatt_callbacks = {
+	.att_mtu_updated = mtu_updated
+};
+
+static void auth_passkey_display(struct bt_conn *conn, unsigned int passkey)
+{
+	char addr[BT_ADDR_LE_STR_LEN];
+
+	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
+
+	printk("Passkey for %s: %06u\n", addr, passkey);
+}
+
+static void auth_cancel(struct bt_conn *conn)
+{
+	char addr[BT_ADDR_LE_STR_LEN];
+
+	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
+
+	printk("Pairing cancelled: %s\n", addr);
+}
+
+static struct bt_conn_auth_cb auth_cb_display = {
+	.passkey_display = auth_passkey_display,
+	.passkey_entry = NULL,
+	.cancel = auth_cancel,
+};
+
 void main(void)
 {
 	int blink_status = 0;
@@ -295,8 +328,9 @@ void main(void)
 	// dk_set_led_on(DK_LED1);
 
 	// // dk_set_leds_state(DK_ALL_LEDS_MSK, 0);
-
+	bt_gatt_cb_register(&gatt_callbacks);
 	bt_conn_cb_register(&conn_callbacks);
+	bt_conn_auth_cb_register(&auth_cb_display);
 	
 	// dk_set_leds_state(DK_ALL_LEDS_MSK, 0);
 
@@ -324,8 +358,6 @@ void main(void)
 		LOG_ERR("Advertising failed to start (err %d)", err);
 		return;
 	}
-	
-	k_sem_give(&ble_init_ok);
 
 	int rc = battery_measure_enable(true);
 
@@ -334,6 +366,8 @@ void main(void)
 	}
 	
 	// dk_set_leds_state(DK_ALL_LEDS_MSK, 0);
+	
+	k_sem_give(&ble_init_ok);
 
 	for (;;) {
 		// dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);

@@ -849,6 +849,14 @@ static void connected(struct bt_conn *conn, uint8_t conn_err)
 			thingy_conn = bt_conn_ref(conn);
 			LOG_INF("Setting LED 1 Status for successful connection with T:52. \n");
 			dk_set_led_on(LED_1);
+
+			// err = bt_conn_set_security(conn, BT_SECURITY_L1);
+			// if (err) {
+			// 	LOG_WRN("Failed to set security: %d", err);
+			// }
+			//Add security stuff
+			//Should Central or Peripheral send request?
+
 			LOG_INF("connected(): Starting Thingy:52 service discovery chain. \n");
 			LOG_INF("connected(): Discovering temperature service: "); /* Starts the service discovery chain*/
 			discover_temperature_gattp(conn);
@@ -1121,6 +1129,8 @@ void central_module_thread_fn(void)
 	}
 
 	bt_conn_cb_register(&conn_callbacks);
+
+	//Trying to fix security, did not work last time. Not yet implemented on Thingy52
 	
 	#if defined(CONFIG_THINGY_ENABLE)
 	err = scan_init(true);

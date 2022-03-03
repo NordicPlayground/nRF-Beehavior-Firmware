@@ -29,6 +29,8 @@ void main(void)
 	if(event_manager_init()){
 		LOG_ERR("Event manager failed to initialize");
 		//Restart manually somehow
+		// k_sleep(K_SECONDS(5));
+		// sys_reboot();
 	}
 	else{
 		LOG_DBG("Event manager initalized");

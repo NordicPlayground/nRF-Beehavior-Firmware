@@ -135,7 +135,7 @@ uint8_t *thingy_event_add_to_data_message(struct thingy_event *event)
 /* 
 	Takes in latest measurement and appends the data to uint8_t thingy_data[11]
 
-	thingy_data bites are represented as:
+	thingy_data bits are represented as:
 
 	[0] 	: (uint8_t)'*'
 	[1] 	: id-(uint8_t)'0'
@@ -337,6 +337,7 @@ static bool event_handler(const struct event_header *eh)
 			If everything is done correct, then this should work. NB there are no error catch. 
 			This should probably be handled.
 
+
 			The following lines should be in its own function, so feel free to fix it if desired.
 			*/
 			int err;
@@ -357,6 +358,7 @@ static bool event_handler(const struct event_header *eh)
 				LOG_INF("Partial sums has been added");
 			}
 		}	
+
 	    
 	    // Print code to check contents of thingy_buffer at this given time
 
