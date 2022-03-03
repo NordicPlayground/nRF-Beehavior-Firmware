@@ -62,7 +62,8 @@
 bool is_swarming = false;
 
 char id;
-uint16_t T52_Counter = 0;
+static uint16_t sample_counter = 0;
+static uint8_t thingy_buf_idx = 0;
 uint16_t BM_Counter = 0;
 
 
@@ -129,7 +130,7 @@ static struct bt_nus_cb nus_cb = {
 	.received = bt_receive_cb,
 };
 
-static uint8_t thingy_event_add_to_data_message(struct thingy_event *event)
+uint8_t *thingy_event_add_to_data_message(struct thingy_event *event)
 {
 /* 
 	Takes in latest measurement and appends the data to uint8_t thingy_data[11]
@@ -147,19 +148,84 @@ static uint8_t thingy_event_add_to_data_message(struct thingy_event *event)
 
 	returns 0 if successfull, 1 if error has occured
 
-
  */
 	LOG_INF("thingy_event_add_to_data_message(thingy_event): Testing appending through function call instead of normal data_append. \n");
 	LOG_INF("thingy_event_add_to_data_message(thingy_event): Temperature [C]: %i,%i, Humidity [%%]: %i, Air pressure [hPa]: %d,%i, Battery charge [%%]: %i, ID: %i,\n", event->data_array[0], \
 				event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, event->battery_charge, id-(uint8_t)'0');
+	pressure_union.a = event->pressure_int;
 
+	/* 
 	
-	return 0;  
+	Organizing the sensor data in a 11 byte data message which is sent to 91-module.
+	A change here is that data_message is a static opposed to uint8_t data_message[11] = {(uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2]};
+	*/
+	static uint8_t data_message[11];
+	data_message[0] = (uint8_t)'*';
+	data_message[1] = id-(uint8_t)'0';
+	data_message[2] = event->data_array[0];
+	data_message[3] = event->data_array[1];
+	data_message[4] = event->data_array[2];
+
+	/*Divide the 32bit integer for pressure into 4 separate 8bit integers. This is merged back to 32 bit integer when 91 module recieves the data.  */
+	/*Data message elements number 5,6,7 and 8 */
+	for(uint8_t i=0;  i<=3; i++){
+		data_message[8-i] = (uint8_t)pressure_union.s[i];
+	}
+
+	data_message[9] = event->pressure_float;
+	data_message[10] = event->battery_charge;
+	
+	return data_message;  
 }
 
-// static bool thingy_event_clear_buffer();
-// static bool thingy_event_append_to_buffer();
-// static bool thingy_event_compute_average();
+static int thingy_event_push_buffer(){
+	/*
+	Pseudocode for algorithm
+	if (buffer full) do:
+		* Push all rows one index down
+
+		* Clear the row with highest index, i.e thingy_matrix[buf_size - 1]
+
+		* Check if the latest row is all zeroes
+
+		* If it is all zeroes, return err = 0
+		
+	*/
+	int err;
+
+	//Move all rows one index down
+	for (uint8_t i = 1; i < THINGY_BUFFER_SIZE; i++){
+		memcpy(thingy_matrix[i-1], thingy_matrix[i], sizeof(thingy_matrix[i]));
+	} 
+
+	//Clear the latest row
+	memset(thingy_matrix[THINGY_BUFFER_SIZE-1], 0, sizeof(thingy_matrix[0]));
+
+	// If the last row in the buffer is 0, then we've cleared the row
+ 	if (strlen(thingy_matrix[THINGY_BUFFER_SIZE - 1]) == 0) { 
+		// LOG_INF("thingy_event_push_buffer(): Thingy_buffer[THINGY_BUFFER_SIZE] is zeroed \n");
+        err = 0;
+    } 
+    else { 
+		// LOG_INF("thingy_event_push_buffer(): Thingy_buffer[THINGY_BUFFER_SIZE] is has non-zero elements \n");
+	    err = 1;
+    }
+	return err;
+}
+
+// struct temp_sums_for_avg *temp_sums,
+int *thingy_event_compute_temp_sums( struct thingy_event *event ){
+
+		LOG_INF("Adding sum of sample number: %i (0 may equal every 12th) \n", sample_counter);
+		temp_sums.pressure_int_sum += event->pressure_int;
+		temp_sums.pressure_float_sum += event->pressure_float;
+		temp_sums.temperature_int_sum += event->data_array[0];
+		temp_sums.temperature_float_sum += event->data_array[1];
+		temp_sums.humidity_sum += event->data_array[2];
+
+	return 0;
+}
+
 
 void peripheral_module_thread_fn(void)
 {
@@ -210,140 +276,93 @@ static bool event_handler(const struct event_header *eh)
 	}
 
     if (is_thingy_event(eh)) {
-
-		/*Check if the data buffer is full */
-		if (sample_counter == THINGY_BUFFER_SIZE){
-			THINGY_BUFFER_WRITABLE = false;
-			LOG_INF("THINGY_BUFFER_full = false\n");
-		}
-
-		
-
-	    
+   
 		LOG_INF("event_handler(): Thingy event is being handled. \n");
 		struct thingy_event *event = cast_thingy_event(eh);
 		
-		thingy_event_add_to_data_message(event);
-
-		LOG_INF("event_handler(thingy_event): Temperature [C]: %i,%i, Humidity [%%]: %i, Air pressure [hPa]: %d,%i, Battery charge [%%]: %i, ID: %i,\n", event->data_array[0], \
-				event->data_array[1], event->data_array[2], event->pressure_int, event->pressure_float, event->battery_charge, id-(uint8_t)'0');
-
-		pressure_union.a = event->pressure_int;
-
-		/* Organizing the sensor data in a 11 byte data message which is sent to 91-module. */
-	    
-        	uint8_t thingy_data[11] = {(uint8_t)'*', id-(uint8_t)'0', event->data_array[0], event->data_array[1], event->data_array[2]};
-	
-		/*Divide the 32bit integer for pressure into 4 separate 8bit integers. This is merged back to 32 bit integer when 91 module recieves the data.  */
-
-		for(uint8_t i=0;  i<=3; i++){
-			thingy_data[8-i] = (uint8_t)pressure_union.s[i];
-		}
-
-
-		thingy_data[9] = event->pressure_float;
-		thingy_data[10] = event->battery_charge;
-
-
-		if (!THINGY_BUFFER_WRITABLE){
-			/*TO DO: Create an algorithm (or use a built in function) that ejects the oldest measurement
-			in the buffer, and pushes all remaining measurements one index down, freeing up the latest index to add 
-			the newest measurement.
-			
-			This part could be done in a function call.
-			
-			Pseudocode for algorithm
-			if (buffer full) do:
-				* Delete thingy_matrix[0][11] i.e delete the measurement at time point k = 0 // or thingy_matrix[-1][11] depending on if you fill 
-				the matrix up from the bottom and up of from the top down
-				
-				* Push all elements one index down // or up, such that the measurement at time point k = 1 is now the
-				oldest
-				
-				* Set THINGY_BUFFER_WRITABLE = true	
-			*/
-			
-			/* The following lines empties and resets all entries in the databuffer (a way that gets us 40% there)*/
-			for (uint8_t row = 1; row <= THINGY_BUFFER_SIZE -1 ; row++){
-				memset(thingy_matrix, 0, sizeof(thingy_matrix));
-			}
-			/* 
-			Reset the counter to avoid overflow. 
-			If it is desired to send this data to also include number of samples. Remember to increase the bitsize in the header to avoid overflow
-			and add it to the data message. */
-			sample_counter = 0;
-
+		/* 
+		Step 1:
+		Add thingy measurement to thingy_data message
+		
+		*/
+		if (FIRST_SAMPLE){
 			THINGY_BUFFER_WRITABLE = true;
 		}
 
-	    
+		uint8_t thingy_data[11];
+		memcpy(thingy_data, thingy_event_add_to_data_message(event),sizeof(thingy_data));
+
+		/* 
+		%%%%%%%%%	Print check to check contents of thingy_data at this time	%%%%%%%%%
+		*/
+
+		// printk("Testing to print data_message OUTSIDE of function call. \n This should be same values as INSIDE print \n");
+		// for ( uint8_t i = 0; i < 10; i++ ) {
+        //     printf( "*(thingy_data + %d) : %d\n", i, *(thingy_data + i));
+		// }
+		
 		/*	
 		
-		If there are one or more empty rows in the buffer, append the new data this row 
+		Step 2: Check if buffer matrix is writable i.e not full
+		
+		Step 2a): 
+		If there are no empty rows in buffer, move all rows one index down, 
+		and clear the row with highest index
 		
 		*/
-		if (THINGY_BUFFER_WRITABLE){
-			LOG_INF("THINGY_BUFFER_WRITABLE = true\n");
-			LOG_INF("Buffer still not full. Adding samples to queue:\n");
-			
-			/* 
-			
-			TODO: THIS WAS FOR SOME REASON MISSING (03.02.22)???
-			Append the measurement to the current available row
-			
-			pseudocode that is written on the fly and should be verified if works
-			
-			for (uint8_t elem = 0; elem <= 10; elem++){
-				thingy_matrix[sample_counter][elem] = thingy_data[elem]
-		
-			*/
-			
-			// Adds dataelement elem from thingy_data to the current
-			for (uint8_t elem = 0; elem <= 10; elem++){
-				thingy_matrix[sample_counter][elem] = thingy_data[elem];
-			}
+		if (THINGY_BUFFER_WRITABLE == false){
+			LOG_INF("Thingy_buffer is full, clearing room for new sample \n");
 
-			LOG_INF("Sample has been appended to buffer \n");
+			int err = thingy_event_push_buffer();
+			if (!err){
+				thingy_buf_idx -= 1;
+				LOG_INF("thingy_buf_idx decremented, thingy_buf_idx = %i \n", thingy_buf_idx);
+				THINGY_BUFFER_WRITABLE = true;
+				LOG_INF("THINGY_BUFFER_WRITABLE set to true, THINGY_BUFFER_WRITABLE = %i \n", THINGY_BUFFER_WRITABLE);
+			}
+			
+		}
+			
+
+		/*	
+		Step 2b): Append the latest sample to the buffer
+		*/
+		if (THINGY_BUFFER_WRITABLE == true){
+
+			LOG_INF("Thingy_buffer not full. Adding latest sample to buffer\n");
+			
+			memcpy(thingy_matrix[thingy_buf_idx], thingy_data, sizeof(thingy_data));
 
 			/*
-			
-			If it is not the first sample, sum up the nth sample for the average
-			
+			If everything is done correct, then this should work. NB there are no error catch. 
+			This should probably be handled.
+
+
+			The following lines should be in its own function, so feel free to fix it if desired.
 			*/
-			if (sample_counter >= 0 && !FIRST_SAMPLE){
-				LOG_INF("Adding sum of sample number: %i (0 may equal every 12th) \n", sample_counter);
-				pressure_int_sum += event->pressure_int;
-				pressure_float_sum += event->pressure_float;
-				temperature_int_sum += event->data_array[0];
-				temperature_float_sum += event->data_array[1];
-				humidity_sum += event->data_array[2];
+			int err;
+			if (memcmp(thingy_matrix[thingy_buf_idx],thingy_data,sizeof(thingy_data)) == 0){
+				err = 0;
 			}
-		}
+			if (!err){
+				thingy_buf_idx += 1;
+				LOG_INF("thingy_buf_idx incremented, thingy_buf_idx = %i \n", thingy_buf_idx);
+				if(thingy_buf_idx >= THINGY_BUFFER_SIZE ){
+					LOG_INF("thingy_buf_idx >= THINGY_BUFFER_SIZE, setting write flag to false \n");
+					THINGY_BUFFER_WRITABLE = false;
+				}
+			}
+			// If it is not the first sample, add the values to temp-vals for average computation
+			if (sample_counter > 0 && !FIRST_SAMPLE){
+				thingy_event_compute_temp_sums(event);
+				LOG_INF("Partial sums has been added");
+			}
+		}	
 
-
-		// The two following prints are used for debugging to check if we have aligned our data correct
-		/* 
-		
-		Prints out the latest thingy_data array (the latest measurement)
-		
-		*/
-		LOG_INF("Current sample number is now %i: \n", sample_counter);
-		printk("Current sample: %i", sample_counter);
-		for (uint8_t elem = 0; elem <= 10; elem++){
-			printk("\n Current sample elem # %i: \n", elem);
-			printk("%i ", thingy_data[elem]);
-
-		printk("\n");	
-		}
 	    
-		/* 
-		
-		Prints out the thingy_matrix buffer
-		
-		*/
-	    
-		LOG_INF("Thingy data buffer: \n");
-		LOG_INF("Size of THINGY_DATA_BUFFER_SIZE: %i \n", THINGY_BUFFER_SIZE);
+	    // Print code to check contents of thingy_buffer at this given time
+
+		printk("Thingy data buffer: \n");
 		for (uint8_t row = 0; row <= THINGY_BUFFER_SIZE-1; row++){
 			printk("\n Row # %i: \n", row);
 			for (uint8_t col = 0; col <= 10; col++){
@@ -352,48 +371,44 @@ static bool event_handler(const struct event_header *eh)
 		 	printk("\n");	
 		 }
 		
-		/*
-		We send "normally" to 91 from 53 whenever we've met the following conditions:
-		1) Connected to hub
-		2) The sample corresponds to every 20th minute
+		/* 
+		Step 3: Sending data from 53 to 91
 
-		!sample_counter % THINGY_SAMPLE_TO_SEND should be equal to (4,8,12,16,20 or 24) % 4 for default settings
-		3) It is not swarming 
+		Consists of 3 cases
+		3a): 
+		Edge case If this is the first sample received, we want to send it instantly
+
+		3b): 
+		Check if the current sample corresponds with when we should send, which 
+		in turn depends on if we're in power save mode or high res mode. This is done by checking if
+		!(sample_counter % THINGY_SAMPLE_TO_SEND) == 0
+
+		3bI):
+		Check swarm condition
+
+		3c):
+		If !(sample_counter % THINGY_SAMPLE_TO_SEND) != 0, then we skip sending, but append the
+		partial sums so we can compute the pseudoaverage when we're set to send again.
+
 		*/
 
-		LOG_INF("sample_counter %% THINGY_SAMPLE_TO_SEND = %i \n", sample_counter % THINGY_SAMPLE_TO_SEND);
-
+		LOG_INF("Check if it is time to send: sample_counter %% THINGY_SAMPLE_TO_SEND = %i \n", sample_counter % THINGY_SAMPLE_TO_SEND);
 		if(!(sample_counter % THINGY_SAMPLE_TO_SEND)){
 
 			LOG_INF("Checking if first sample after start, or if 4th sample and swarmingstate. \n");
-
 			LOG_INF("Hub is connected and sample_counter %% THINGY_SAMPLE_TO_SEND = %i \n", sample_counter % THINGY_SAMPLE_TO_SEND);
 			
 			/* 
-			
-				First sample received after startup and/or restart: Do normal sending
+			Step 3a): 
+			First sample received after startup and/or restart: Do normal sending
 				
 			*/
 			if (sample_counter == 0 && FIRST_SAMPLE){
 				LOG_INF("event_handler(): Hub is connected, and first sample received. Sending sample over nus. \n");
 				LOG_INF("Current sample number is now %i: \n", sample_counter);
-				printk("Current sample: %i", sample_counter);
-				for (uint8_t elem = 0; elem <= 10; elem++){
-					// printk("test \n");
-					printk("\n Current sample elem # %i: \n", elem);
-					// printk("%i ", thingy_data_struct->thingy_data[elem]);
-					printk("%i ", thingy_data[elem]);
-				printk("\n");	
-				}
 				
-				uint8_t first_sample[11];
-				
-				/*
-				Overflødig. Kunne bare brukt "thingy_data" som datamelding å sende, men dette gir
-				kanskje litt tid til å sende før neste måling går gjennom
-				*/
-				
-				memcpy(first_sample, thingy_data,11);
+				uint8_t first_sample[11];				
+				memcpy(first_sample, thingy_data, sizeof(thingy_data));
 
 				printk("First sample: %i", sample_counter);
 				for (uint8_t elem = 0; elem <= 10; elem++){
@@ -402,44 +417,46 @@ static bool event_handler(const struct event_header *eh)
 				printk("\n");	
 				}
 
-
 				int err = bt_nus_send(hub_conn, first_sample, 11);
 				LOG_INF("First sample: No fatal crash when sending");
 				sample_counter += 1;
-				LOG_INF("SAMPLE_COUNTER INCREMENTED BY 1");
+				LOG_INF("sample_counter incremented, now at sample num %i \n ", sample_counter);
 				FIRST_SAMPLE = false;
 			}
 			
+			/*
+			Step 3b): THIS SHOULD BE MADE INTO ITS OWN FUNCTION
+			Modulo condition has been met and it is not FIRST_SAMPLE
+			*/
 			else{
 
 				/* 
-					We have received n samples s.t the modulo condition is satisfied for the mode we are
-					running
-					
-					1) Computing the pseudoaverage of the states we're measuring
+
+				1) Computing the pseudoaverage of the states we're measuring
 					
 				*/
 				LOG_INF("4th sample recieved. Computing average and sending \n");
-				pressure_int_avg = pressure_int_sum / THINGY_SAMPLE_TO_SEND;
-				pressure_float_avg = pressure_float_sum / THINGY_SAMPLE_TO_SEND;
-				temperature_int_avg = temperature_int_sum / THINGY_SAMPLE_TO_SEND;
-				temperature_float_avg = temperature_float_sum / THINGY_SAMPLE_TO_SEND;
-				humidity_avg = humidity_sum  / THINGY_SAMPLE_TO_SEND;
+				pressure_int_avg = temp_sums.pressure_int_sum / THINGY_SAMPLE_TO_SEND;
+				pressure_float_avg = temp_sums.pressure_float_sum / THINGY_SAMPLE_TO_SEND;
+				temperature_int_avg = temp_sums.temperature_int_sum / THINGY_SAMPLE_TO_SEND;
+				temperature_float_avg = temp_sums.temperature_float_sum / THINGY_SAMPLE_TO_SEND;
+				humidity_avg = temp_sums.humidity_sum  / THINGY_SAMPLE_TO_SEND;
 
 				pressure_avg_union.a = pressure_int_avg;
 
 				/* 
 				
-					Resetting the partial sums for next batch of sampling
+				Resetting the partial sums for next batch of sampling
 					
 				*/
 				
 				LOG_INF("Clearing partial sums for average computing \n");
-				pressure_int_sum = 0;
-				pressure_float_sum = 0;
-				temperature_int_sum = 0;
-				temperature_float_sum = 0;
-				humidity_sum = 0;
+				
+				temp_sums.pressure_int_sum = 0;
+				temp_sums.pressure_float_sum = 0;
+				temp_sums.temperature_int_sum = 0;
+				temp_sums.temperature_float_sum = 0;
+				temp_sums.humidity_sum = 0;
 				
 				/* 
 				
@@ -490,7 +507,7 @@ static bool event_handler(const struct event_header *eh)
 					/*Send latest average to 91 */
 					LOG_INF("sample_counter %% THINGY_SAMPLE_TO_SEND = %i \n", sample_counter % THINGY_SAMPLE_TO_SEND);
 					sample_counter += 1;
-					LOG_INF("SAMPLE_COUNTER INCREMENTED BY 1\n");
+					LOG_INF("sample_counter incremented, now at sample num %i \n ", sample_counter);
 
 					int err = bt_nus_send(hub_conn, thingy_data, 11);
 					// int err = bt_nus_send(hub_conn, avg_thingy_data, 11);
@@ -503,7 +520,7 @@ static bool event_handler(const struct event_header *eh)
 					/*Send latest average to 91 */
 					LOG_INF("sample_counter %% THINGY_SAMPLE_TO_SEND = %i \n", sample_counter % THINGY_SAMPLE_TO_SEND);
 					sample_counter += 1;
-					LOG_INF("SAMPLE_COUNTER INCREMENTED BY 1\n");
+					LOG_INF("sample_counter incremented, now at sample num %i \n ", sample_counter);
 					
 					
 					int err = bt_nus_send(hub_conn, thingy_data, 11);
@@ -514,6 +531,7 @@ static bool event_handler(const struct event_header *eh)
 		}
 			/* 
 			
+			Step 3c): 
 			If we're not ready to send (i.e haven't satisfied the modulo-condition), just increment the sample counter and don't initiate
 			data transmission
 			
