@@ -55,6 +55,7 @@ LOG_MODULE_REGISTER(MODULE, CONFIG_LOG_DEFAULT_LEVEL);
 static K_SEM_DEFINE(cloud_connected, 0, 1);
 
 static struct k_work_delayable ble_scan_stop;
+static struct k_work_delayable dummy_data;
 
 #define STACKSIZE 2048
 
@@ -98,6 +99,35 @@ static void ble_scan_stop_fn(struct k_work *work)
 	memcpy(ble_stopped_scanning->dyndata.data, "Stopped scanning", strlen("Stopped scanning"));
 
 	EVENT_SUBMIT(ble_stopped_scanning);
+
+	k_work_schedule(&dummy_data, K_SECONDS(10));
+}
+static void dummy_data_fn(struct k_work *work)
+{
+	LOG_INF("Dummy_data_fn");
+	struct ble_event *ble_event = new_ble_event(8);
+
+	ble_event->type = BLE_RECEIVED;
+
+	/* Send the data without the * and ID to cloud_module */
+	uint8_t data_array[8] = {0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08};
+	// for(int i=0; i<8; i++){
+	// 	data_array[i] = (uint8_t)data[i+2];
+	// 	LOG_DBG("%.02x", data_array[i]);
+	// }
+
+	// strcpy(addr, "Dummy");
+
+	memcpy(ble_event->dyndata.data, data_array, 8);
+
+	memcpy(ble_event->address, "Dummy", 17);
+	
+	/* Get name from received ID */
+	memcpy(ble_event->name, log_strdup("Dummy"), 20);
+
+	EVENT_SUBMIT(ble_event);
+
+	k_work_reschedule(&dummy_data, K_SECONDS(300));
 }
 
 void scan_start(bool start){
@@ -636,6 +666,7 @@ static void module_thread_fn(void){
 	}
 
 	k_work_init_delayable(&ble_scan_stop, ble_scan_stop_fn);
+	k_work_init_delayable(&dummy_data, dummy_data_fn);
 
 	scan_start(true);
 
