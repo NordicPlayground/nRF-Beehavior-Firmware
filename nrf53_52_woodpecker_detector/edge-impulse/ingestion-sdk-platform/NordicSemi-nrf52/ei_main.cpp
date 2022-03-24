@@ -90,5 +90,8 @@ void ei_main(void)
         ei_at_cmd_handle(ei_ble_rcv_cmd_buffer);
         memset(ei_ble_rcv_cmd_buffer, 0x00, sizeof(ei_ble_rcv_cmd_buffer));
     }
+    
+
+
 
 }

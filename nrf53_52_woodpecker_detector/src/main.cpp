@@ -6,6 +6,7 @@
 #include "ei_device_nordic_nrf52.h"
 #include "ei_zephyr_flash_commands.h"
 #include "ei_main.h"
+#include "ei_run_impulse.h"
 
 
 int main(void)
@@ -13,6 +14,7 @@ int main(void)
     /* This is needed so that output of printf 
        is output immediately without buffering 
     */
+
     setvbuf(stdout, NULL, _IONBF, 0);
 
     /* Initialize board uart */
@@ -30,6 +32,10 @@ int main(void)
 
     /* Initialize Edge Impuls sensors and commands */
     ei_init();
+    MakingSysSleepNight (2000);
+    k_sleep(K_MSEC(2));
+    MakingSysSleepNight (1400);
+    
 
     while(1){
         ei_main();

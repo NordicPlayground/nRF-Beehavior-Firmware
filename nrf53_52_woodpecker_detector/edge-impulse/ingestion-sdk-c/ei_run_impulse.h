@@ -26,5 +26,6 @@
 /* Prototypes -------------------------------------------------------------- */
 void run_nn_normal(void);
 void run_nn_continuous_normal(void);
+void MakingSysSleepNight (int clock_signal);
 
 #endif
