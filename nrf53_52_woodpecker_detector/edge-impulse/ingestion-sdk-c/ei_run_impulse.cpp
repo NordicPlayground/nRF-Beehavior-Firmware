@@ -31,6 +31,29 @@
 #include "ei_microphone.h"
 #include "ei_device_nordic_nrf52.h"
 #include "ble_nus.h"
+//addded by Nora////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <stdio.h>
+#include <zephyr.h>
+#include <device.h>
+#include <init.h>
+#include <power/power.h>
+#include <hal/nrf_gpio.h>
+
+#define CONSOLE_LABEL DT_LABEL(DT_CHOSEN(zephyr_console))
+
+#define BUSY_WAIT_S 2U
+#define SLEEP_S 2U
+
+//#define PIN_1_NODE  DT_ALIAS(gpio_pin_name)
+#define NRF_GPIO_PIN_S0S1 0
+const struct device * devi;
+
+//vil at PIN1 skal settes til gpio-pinnen P0.00
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 #if defined(EI_CLASSIFIER_SENSOR) && EI_CLASSIFIER_SENSOR == EI_CLASSIFIER_SENSOR_ACCELEROMETER
 
@@ -554,17 +577,6 @@ void run_nn_normal(void)
 
 //added BY NORA /////////////////////////////////////////////////////////////////////7
 
-#include <stdio.h>
-#include <zephyr.h>
-#include <device.h>
-#include <init.h>
-#include <power/power.h>
-#include <hal/nrf_gpio.h>
-
-#define CONSOLE_LABEL DT_LABEL(DT_CHOSEN(zephyr_console))
-
-#define BUSY_WAIT_S 2U
-#define SLEEP_S 2U
 
 /* Prevent deep sleep (system off) from being entered on long timeouts
  * or `K_FOREVER` due to the default residency policy.
@@ -573,6 +585,9 @@ void run_nn_normal(void)
  * before the threading system starts up between PRE_KERNEL_2 and
  * POST_KERNEL.  Do it at the start of PRE_KERNEL_2.
  */
+
+//gpio_pin_configure(dev, LED0, GPIO_OUTPUT);
+
 static int disable_ds_1(const struct device *dev)
 {
 	ARG_UNUSED(dev);
@@ -586,20 +601,24 @@ SYS_INIT(disable_ds_1, PRE_KERNEL_2, 0);
 void MakingSysSleepNight (int clock_signal){
     int rc;
     const struct device *cons = device_get_binding(CONSOLE_LABEL);
+    const struct device * devi = device_get_binding("GPIO_0"); //der lager vi dev som  skal brukes 
     if (clock_signal>1900 || clock_signal<0600){
         
 
-	    printk("\n%s system off demo\n", CONFIG_BOARD);
+	    printk("\n%s system off demo\n", CONFIG_BOARD,"\n%s er i funksjonen\n");
 
 	    /* Configure to generate PORT event (wakeup) on button 1 press. */
-	    nrf_gpio_cfg_input(DT_GPIO_PIN(DT_NODELABEL(button0), gpios),
+        /* nrf_gpio_cfg_input(DT_GPIO_PIN(PIN1, gpios), //må finne ut hvordan man setter pins for vi vil ikke ha knapp
 			    NRF_GPIO_PIN_PULLUP);
-	    nrf_gpio_cfg_sense_set(DT_GPIO_PIN(DT_NODELABEL(button0), gpios),
-			       NRF_GPIO_PIN_SENSE_LOW);
+	    nrf_gpio_cfg_sense_set(DT_GPIO_PIN(PIN1, gpios),
+			       NRF_GPIO_PIN_SENSE_LOW);*/
+
+        gpio_pin_configure(devi,NRF_GPIO_PIN_S0S1, GPIO_INT_LEVEL_HIGH );// her tror jeg at den sier at det resettes når pin 1 mottar strøm 
+        gpio_pin_set(devi,NRF_GPIO_PIN_S0S1,0); // får ikke feilmelding, men det funker ikke mehehe
 
 	    /*printk("Busy-wait %u s\n", BUSY_WAIT_S);
 	    k_busy_wait(BUSY_WAIT_S * USEC_PER_SEC);
-
+        
 	    printk("Busy-wait %u s with UART off\n", BUSY_WAIT_S);
 	    rc = device_set_power_state(cons, DEVICE_PM_LOW_POWER_STATE, NULL, NULL);
 	    k_busy_wait(BUSY_WAIT_S * USEC_PER_SEC);
@@ -610,9 +629,10 @@ void MakingSysSleepNight (int clock_signal){
 
 	    printk("Sleep %u s with UART off\n", SLEEP_S);
         */
-	    rc = device_set_power_state(cons, DEVICE_PM_LOW_POWER_STATE, NULL, NULL);
-	    k_sleep(K_SECONDS(SLEEP_S));
-	    //rc = device_set_power_state(cons, DEVICE_PM_ACTIVE_STATE, NULL, NULL);
+	    rc = device_set_power_state(devi, DEVICE_PM_LOW_POWER_STATE, NULL, NULL);
+	    /*k_sleep(K_MSEC(2));//lagt inn to sekunder her, så får vi se
+	    rc = device_set_power_state(cons, DEVICE_PM_ACTIVE_STATE, NULL, NULL);*/
+        
     
 
 	    printk("Entering system off; press BUTTON1 to restart\n");

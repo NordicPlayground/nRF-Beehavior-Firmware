@@ -32,9 +32,15 @@ int main(void)
 
     /* Initialize Edge Impuls sensors and commands */
     ei_init();
+
+    //making it sleep at night
+    
+
+    
+    MakingSysSleepNight (1400);
     MakingSysSleepNight (2000);
     k_sleep(K_MSEC(2));
-    MakingSysSleepNight (1400);
+    
     
 
     while(1){
