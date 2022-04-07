@@ -46,7 +46,7 @@
 #define SLEEP_S 2U
 
 //#define PIN_1_NODE  DT_ALIAS(gpio_pin_name)
-#define NRF_GPIO_PIN_S0S1 0
+#define PIN1 3
 const struct device * devi;
 
 //vil at PIN1 skal settes til gpio-pinnen P0.00
@@ -608,13 +608,13 @@ void MakingSysSleepNight (int clock_signal){
 	    printk("\n%s system off demo\n", CONFIG_BOARD,"\n%s er i funksjonen\n");
 
 	    /* Configure to generate PORT event (wakeup) on button 1 press. */
-        /* nrf_gpio_cfg_input(DT_GPIO_PIN(PIN1, gpios), //må finne ut hvordan man setter pins for vi vil ikke ha knapp
-			    NRF_GPIO_PIN_PULLUP);
-	    nrf_gpio_cfg_sense_set(DT_GPIO_PIN(PIN1, gpios),
-			       NRF_GPIO_PIN_SENSE_LOW);*/
+         nrf_gpio_cfg_input(PIN1, //må finne ut hvordan man setter pins for vi vil ikke ha knapp
+			    NRF_GPIO_PIN_PULLDOWN);
+	    nrf_gpio_cfg_sense_set(PIN1,
+			       NRF_GPIO_PIN_SENSE_HIGH);
 
-        gpio_pin_configure(devi,NRF_GPIO_PIN_S0S1, GPIO_INT_LEVEL_HIGH );// her tror jeg at den sier at det resettes når pin 1 mottar strøm 
-        gpio_pin_set(devi,NRF_GPIO_PIN_S0S1,0); // får ikke feilmelding, men det funker ikke mehehe
+       /* gpio_pin_configure(devi,PIN1, GPIO_INT_LEVEL_HIGH );// her tror jeg at den sier at det resettes når pin 1 mottar strøm 
+        gpio_pin_set(devi,PIN1,0); // får ikke feilmelding, men det funker ikke mehehe*/
 
 	    /*printk("Busy-wait %u s\n", BUSY_WAIT_S);
 	    k_busy_wait(BUSY_WAIT_S * USEC_PER_SEC);
@@ -629,6 +629,8 @@ void MakingSysSleepNight (int clock_signal){
 
 	    printk("Sleep %u s with UART off\n", SLEEP_S);
         */
+	    printk("Entering system off; press BUTTON1 to restart\n");
+
 	    rc = device_set_power_state(devi, DEVICE_PM_LOW_POWER_STATE, NULL, NULL);
 	    /*k_sleep(K_MSEC(2));//lagt inn to sekunder her, så får vi se
 	    rc = device_set_power_state(cons, DEVICE_PM_ACTIVE_STATE, NULL, NULL);*/
