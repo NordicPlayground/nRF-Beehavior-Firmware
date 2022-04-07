@@ -49,7 +49,21 @@
 #define PIN1 3
 const struct device * devi;
 
-//vil at PIN1 skal settes til gpio-pinnen P0.00
+//vil at PIN1 skal settes til gpio-pinnen P0.03
+//dette er for å kunne bruke tid fra 91-eren, men må nok teste MED selve kortet først hehe
+/*#include <date_time.h>*/
+
+/*TIME*/
+/*s64_t unix_time_ms;*/
+
+/*Force the date_time library to get current time */
+/*date_time_update();*/
+
+/*Read current time and put in container */
+/*err = date_time_now(&unix_time_ms);*/
+
+/*Print the current time */
+/*printk("Date_time: %i %i\n", (u32_t)(unix_time_ms/1000000), (u32_t)(unix_time_ms%1000000));*/
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -587,6 +601,8 @@ void run_nn_normal(void)
  */
 
 //gpio_pin_configure(dev, LED0, GPIO_OUTPUT);
+//Må adde i prjconfig for å kunne bruke tid!!!!!!!
+
 
 static int disable_ds_1(const struct device *dev)
 {
@@ -611,7 +627,7 @@ void MakingSysSleepNight (int clock_signal){
          nrf_gpio_cfg_input(PIN1, //må finne ut hvordan man setter pins for vi vil ikke ha knapp
 			    NRF_GPIO_PIN_PULLDOWN);
 	    nrf_gpio_cfg_sense_set(PIN1,
-			       NRF_GPIO_PIN_SENSE_HIGH);
+			       NRF_GPIO_PIN_SENSE_HIGH); //nylilg addet som gjør at man kan restarte dette programmet når en pin er høy!!!diggesen
 
        /* gpio_pin_configure(devi,PIN1, GPIO_INT_LEVEL_HIGH );// her tror jeg at den sier at det resettes når pin 1 mottar strøm 
         gpio_pin_set(devi,PIN1,0); // får ikke feilmelding, men det funker ikke mehehe*/
