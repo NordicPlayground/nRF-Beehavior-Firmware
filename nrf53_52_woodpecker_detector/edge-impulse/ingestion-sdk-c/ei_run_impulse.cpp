@@ -674,3 +674,6 @@ void MakingSysSleepNight (int clock_signal){
  
 
 }
+// hva skal bli gjort i dag???
+//vil ha at det blir hver time sjekket hva tiden er i nrf91-ern, 
+//om klokka er typ 07.00, så skal et spenningssignal sendes til nrf5284 og få den til å enten være våken eller sove. 

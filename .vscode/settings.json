@@ -1,5 +1,3 @@
 {
-    "nrf-connect.applications": [
-        "${workspaceFolder}\\nrf53_52_woodpecker_detector"
-    ]
+    "nrf-connect.applications": []
 }
