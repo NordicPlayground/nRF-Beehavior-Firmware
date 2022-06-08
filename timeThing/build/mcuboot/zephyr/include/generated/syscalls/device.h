@@ -52,25 +52,25 @@ static inline const struct device * device_get_binding(const char * name)
 #endif
 
 
-extern bool z_impl_device_is_ready(const struct device * dev);
+extern int z_impl_device_usable_check(const struct device * dev);
 
 __pinned_func
-static inline bool device_is_ready(const struct device * dev)
+static inline int device_usable_check(const struct device * dev)
 {
 #ifdef CONFIG_USERSPACE
 	if (z_syscall_trap()) {
 		/* coverity[OVERRUN] */
-		return (bool) arch_syscall_invoke1(*(uintptr_t *)&dev, K_SYSCALL_DEVICE_IS_READY);
+		return (int) arch_syscall_invoke1(*(uintptr_t *)&dev, K_SYSCALL_DEVICE_USABLE_CHECK);
 	}
 #endif
 	compiler_barrier();
-	return z_impl_device_is_ready(dev);
+	return z_impl_device_usable_check(dev);
 }
 
 #if (CONFIG_TRACING_SYSCALL == 1)
 #ifndef DISABLE_SYSCALL_TRACING
 
-#define device_is_ready(dev) ({ 	bool retval; 	sys_port_trace_syscall_enter(K_SYSCALL_DEVICE_IS_READY, device_is_ready, dev); 	retval = device_is_ready(dev); 	sys_port_trace_syscall_exit(K_SYSCALL_DEVICE_IS_READY, device_is_ready, dev, retval); 	retval; })
+#define device_usable_check(dev) ({ 	int retval; 	sys_port_trace_syscall_enter(K_SYSCALL_DEVICE_USABLE_CHECK, device_usable_check, dev); 	retval = device_usable_check(dev); 	sys_port_trace_syscall_exit(K_SYSCALL_DEVICE_USABLE_CHECK, device_usable_check, dev, retval); 	retval; })
 #endif
 #endif
 

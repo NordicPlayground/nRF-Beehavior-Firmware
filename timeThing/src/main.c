@@ -9,6 +9,7 @@
 #include <modem/lte_lc.h>
 #include <modem/modem_info.h>
 #include <nrf_modem_at.h>
+#include <string.h>
 
 
 
@@ -169,6 +170,7 @@ void main(void)
 		k_sleep(K_SECONDS(5));
 		nrf_modem_at_cmd(time_buf, sizeof(time_buf), "AT%%CCLK?");
 		LOG_INF("time now: %s", time_buf);
+
 		date_time_now(&unix_time_ms);
 
 		time_t nowish = unix_time_ms/1000;
@@ -177,12 +179,17 @@ void main(void)
 
 
 		LOG_INF("time now2: %lli", unix_time_ms);
+	
+		
 
 
 		LOG_INF("time now22: %i", (ptm->tm_hour));
 		LOG_INF("time now22: %i", (ptm->tm_min));
 		LOG_INF("time nowsek: %i", (ptm->tm_sec));
 		LOG_INF("time nowsek: %i", (ptm->tm_isdst));
+		int summertime = (int)(time_buf[30])-48;
+		LOG_INF("summertimeys: %i", summertime);
+		
 
 	}
 	

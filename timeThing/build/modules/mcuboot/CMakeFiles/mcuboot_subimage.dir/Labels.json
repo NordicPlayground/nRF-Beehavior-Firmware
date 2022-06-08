@@ -2,34 +2,34 @@
 	"sources" : 
 	[
 		{
-			"file" : "/home/moho/Documents/egrhoefhoef/get_time/build/modules/mcuboot/CMakeFiles/mcuboot_subimage"
+			"file" : "C:/ncs/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/CMakeFiles/mcuboot_subimage"
 		},
 		{
-			"file" : "/home/moho/Documents/egrhoefhoef/get_time/build/modules/mcuboot/CMakeFiles/mcuboot_subimage.rule"
+			"file" : "C:/ncs/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/CMakeFiles/mcuboot_subimage.rule"
 		},
 		{
-			"file" : "/home/moho/Documents/egrhoefhoef/get_time/build/modules/mcuboot/CMakeFiles/mcuboot_subimage-complete.rule"
+			"file" : "C:/ncs/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/CMakeFiles/mcuboot_subimage-complete.rule"
 		},
 		{
-			"file" : "/home/moho/Documents/egrhoefhoef/get_time/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-build.rule"
+			"file" : "C:/ncs/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-build.rule"
 		},
 		{
-			"file" : "/home/moho/Documents/egrhoefhoef/get_time/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-configure.rule"
+			"file" : "C:/ncs/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-configure.rule"
 		},
 		{
-			"file" : "/home/moho/Documents/egrhoefhoef/get_time/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-download.rule"
+			"file" : "C:/ncs/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-download.rule"
 		},
 		{
-			"file" : "/home/moho/Documents/egrhoefhoef/get_time/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-install.rule"
+			"file" : "C:/ncs/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-install.rule"
 		},
 		{
-			"file" : "/home/moho/Documents/egrhoefhoef/get_time/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-mkdir.rule"
+			"file" : "C:/ncs/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-mkdir.rule"
 		},
 		{
-			"file" : "/home/moho/Documents/egrhoefhoef/get_time/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-patch.rule"
+			"file" : "C:/ncs/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-patch.rule"
 		},
 		{
-			"file" : "/home/moho/Documents/egrhoefhoef/get_time/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-update.rule"
+			"file" : "C:/ncs/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-update.rule"
 		}
 	],
 	"target" : 

@@ -123,49 +123,49 @@ static inline int can_send(const struct device * dev, const struct zcan_frame * 
 #endif
 
 
-extern int z_impl_can_add_rx_filter_msgq(const struct device * dev, struct k_msgq * msgq, const struct zcan_filter * filter);
+extern int z_impl_can_attach_msgq(const struct device * dev, struct k_msgq * msg_q, const struct zcan_filter * filter);
 
 __pinned_func
-static inline int can_add_rx_filter_msgq(const struct device * dev, struct k_msgq * msgq, const struct zcan_filter * filter)
+static inline int can_attach_msgq(const struct device * dev, struct k_msgq * msg_q, const struct zcan_filter * filter)
 {
 #ifdef CONFIG_USERSPACE
 	if (z_syscall_trap()) {
 		/* coverity[OVERRUN] */
-		return (int) arch_syscall_invoke3(*(uintptr_t *)&dev, *(uintptr_t *)&msgq, *(uintptr_t *)&filter, K_SYSCALL_CAN_ADD_RX_FILTER_MSGQ);
+		return (int) arch_syscall_invoke3(*(uintptr_t *)&dev, *(uintptr_t *)&msg_q, *(uintptr_t *)&filter, K_SYSCALL_CAN_ATTACH_MSGQ);
 	}
 #endif
 	compiler_barrier();
-	return z_impl_can_add_rx_filter_msgq(dev, msgq, filter);
+	return z_impl_can_attach_msgq(dev, msg_q, filter);
 }
 
 #if (CONFIG_TRACING_SYSCALL == 1)
 #ifndef DISABLE_SYSCALL_TRACING
 
-#define can_add_rx_filter_msgq(dev, msgq, filter) ({ 	int retval; 	sys_port_trace_syscall_enter(K_SYSCALL_CAN_ADD_RX_FILTER_MSGQ, can_add_rx_filter_msgq, dev, msgq, filter); 	retval = can_add_rx_filter_msgq(dev, msgq, filter); 	sys_port_trace_syscall_exit(K_SYSCALL_CAN_ADD_RX_FILTER_MSGQ, can_add_rx_filter_msgq, dev, msgq, filter, retval); 	retval; })
+#define can_attach_msgq(dev, msg_q, filter) ({ 	int retval; 	sys_port_trace_syscall_enter(K_SYSCALL_CAN_ATTACH_MSGQ, can_attach_msgq, dev, msg_q, filter); 	retval = can_attach_msgq(dev, msg_q, filter); 	sys_port_trace_syscall_exit(K_SYSCALL_CAN_ATTACH_MSGQ, can_attach_msgq, dev, msg_q, filter, retval); 	retval; })
 #endif
 #endif
 
 
-extern void z_impl_can_remove_rx_filter(const struct device * dev, int filter_id);
+extern void z_impl_can_detach(const struct device * dev, int filter_id);
 
 __pinned_func
-static inline void can_remove_rx_filter(const struct device * dev, int filter_id)
+static inline void can_detach(const struct device * dev, int filter_id)
 {
 #ifdef CONFIG_USERSPACE
 	if (z_syscall_trap()) {
 		/* coverity[OVERRUN] */
-		arch_syscall_invoke2(*(uintptr_t *)&dev, *(uintptr_t *)&filter_id, K_SYSCALL_CAN_REMOVE_RX_FILTER);
+		arch_syscall_invoke2(*(uintptr_t *)&dev, *(uintptr_t *)&filter_id, K_SYSCALL_CAN_DETACH);
 		return;
 	}
 #endif
 	compiler_barrier();
-	z_impl_can_remove_rx_filter(dev, filter_id);
+	z_impl_can_detach(dev, filter_id);
 }
 
 #if (CONFIG_TRACING_SYSCALL == 1)
 #ifndef DISABLE_SYSCALL_TRACING
 
-#define can_remove_rx_filter(dev, filter_id) do { 	sys_port_trace_syscall_enter(K_SYSCALL_CAN_REMOVE_RX_FILTER, can_remove_rx_filter, dev, filter_id); 	can_remove_rx_filter(dev, filter_id); 	sys_port_trace_syscall_exit(K_SYSCALL_CAN_REMOVE_RX_FILTER, can_remove_rx_filter, dev, filter_id); } while(false)
+#define can_detach(dev, filter_id) do { 	sys_port_trace_syscall_enter(K_SYSCALL_CAN_DETACH, can_detach, dev, filter_id); 	can_detach(dev, filter_id); 	sys_port_trace_syscall_exit(K_SYSCALL_CAN_DETACH, can_detach, dev, filter_id); } while(false)
 #endif
 #endif
 
@@ -193,25 +193,25 @@ static inline int can_get_max_filters(const struct device * dev, enum can_ide id
 #endif
 
 
-extern int z_impl_can_get_state(const struct device * dev, enum can_state * state, struct can_bus_err_cnt * err_cnt);
+extern enum can_state z_impl_can_get_state(const struct device * dev, struct can_bus_err_cnt * err_cnt);
 
 __pinned_func
-static inline int can_get_state(const struct device * dev, enum can_state * state, struct can_bus_err_cnt * err_cnt)
+static inline enum can_state can_get_state(const struct device * dev, struct can_bus_err_cnt * err_cnt)
 {
 #ifdef CONFIG_USERSPACE
 	if (z_syscall_trap()) {
 		/* coverity[OVERRUN] */
-		return (int) arch_syscall_invoke3(*(uintptr_t *)&dev, *(uintptr_t *)&state, *(uintptr_t *)&err_cnt, K_SYSCALL_CAN_GET_STATE);
+		return (enum can_state) arch_syscall_invoke2(*(uintptr_t *)&dev, *(uintptr_t *)&err_cnt, K_SYSCALL_CAN_GET_STATE);
 	}
 #endif
 	compiler_barrier();
-	return z_impl_can_get_state(dev, state, err_cnt);
+	return z_impl_can_get_state(dev, err_cnt);
 }
 
 #if (CONFIG_TRACING_SYSCALL == 1)
 #ifndef DISABLE_SYSCALL_TRACING
 
-#define can_get_state(dev, state, err_cnt) ({ 	int retval; 	sys_port_trace_syscall_enter(K_SYSCALL_CAN_GET_STATE, can_get_state, dev, state, err_cnt); 	retval = can_get_state(dev, state, err_cnt); 	sys_port_trace_syscall_exit(K_SYSCALL_CAN_GET_STATE, can_get_state, dev, state, err_cnt, retval); 	retval; })
+#define can_get_state(dev, err_cnt) ({ 	enum can_state retval; 	sys_port_trace_syscall_enter(K_SYSCALL_CAN_GET_STATE, can_get_state, dev, err_cnt); 	retval = can_get_state(dev, err_cnt); 	sys_port_trace_syscall_exit(K_SYSCALL_CAN_GET_STATE, can_get_state, dev, err_cnt, retval); 	retval; })
 #endif
 #endif
 

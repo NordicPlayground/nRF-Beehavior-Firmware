@@ -98,6 +98,29 @@ static inline int flash_erase(const struct device * dev, off_t offset, size_t si
 #endif
 
 
+extern int z_impl_flash_write_protection_set(const struct device * dev, bool enable);
+
+__pinned_func
+static inline int flash_write_protection_set(const struct device * dev, bool enable)
+{
+#ifdef CONFIG_USERSPACE
+	if (z_syscall_trap()) {
+		/* coverity[OVERRUN] */
+		return (int) arch_syscall_invoke2(*(uintptr_t *)&dev, *(uintptr_t *)&enable, K_SYSCALL_FLASH_WRITE_PROTECTION_SET);
+	}
+#endif
+	compiler_barrier();
+	return z_impl_flash_write_protection_set(dev, enable);
+}
+
+#if (CONFIG_TRACING_SYSCALL == 1)
+#ifndef DISABLE_SYSCALL_TRACING
+
+#define flash_write_protection_set(dev, enable) ({ 	int retval; 	sys_port_trace_syscall_enter(K_SYSCALL_FLASH_WRITE_PROTECTION_SET, flash_write_protection_set, dev, enable); 	retval = flash_write_protection_set(dev, enable); 	sys_port_trace_syscall_exit(K_SYSCALL_FLASH_WRITE_PROTECTION_SET, flash_write_protection_set, dev, enable, retval); 	retval; })
+#endif
+#endif
+
+
 extern int z_impl_flash_get_page_info_by_offs(const struct device * dev, off_t offset, struct flash_pages_info * info);
 
 __pinned_func

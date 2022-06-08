@@ -121,30 +121,6 @@ static inline int ipm_set_enabled(const struct device * ipmdev, int enable)
 #endif
 
 
-extern void z_impl_ipm_complete(const struct device * ipmdev);
-
-__pinned_func
-static inline void ipm_complete(const struct device * ipmdev)
-{
-#ifdef CONFIG_USERSPACE
-	if (z_syscall_trap()) {
-		/* coverity[OVERRUN] */
-		arch_syscall_invoke1(*(uintptr_t *)&ipmdev, K_SYSCALL_IPM_COMPLETE);
-		return;
-	}
-#endif
-	compiler_barrier();
-	z_impl_ipm_complete(ipmdev);
-}
-
-#if (CONFIG_TRACING_SYSCALL == 1)
-#ifndef DISABLE_SYSCALL_TRACING
-
-#define ipm_complete(ipmdev) do { 	sys_port_trace_syscall_enter(K_SYSCALL_IPM_COMPLETE, ipm_complete, ipmdev); 	ipm_complete(ipmdev); 	sys_port_trace_syscall_exit(K_SYSCALL_IPM_COMPLETE, ipm_complete, ipmdev); } while(false)
-#endif
-#endif
-
-
 #ifdef __cplusplus
 }
 #endif

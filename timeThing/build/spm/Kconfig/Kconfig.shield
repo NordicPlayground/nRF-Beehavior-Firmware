@@ -1,1 +1,1 @@
-osource "/home/moho/ncs/nrf/boards/shields/*/Kconfig.shield"
+osource "C:/ncs/nrf/boards/shields/*/Kconfig.shield"

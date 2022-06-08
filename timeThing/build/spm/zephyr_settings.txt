@@ -6,6 +6,6 @@
 # and/or the west manifest file.
 #
 # See the Modules guide for more information.
-"BOARD_ROOT":"/home/moho/ncs/nrf"
-"DTS_ROOT":"/home/moho/ncs/nrf"
-"MODULE_EXT_ROOT":"/home/moho/ncs/nrf"
+"BOARD_ROOT":"C:/ncs/nrf"
+"DTS_ROOT":"C:/ncs/nrf"
+"MODULE_EXT_ROOT":"C:/ncs/nrf"

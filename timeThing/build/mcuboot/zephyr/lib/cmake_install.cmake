@@ -1,8 +1,8 @@
-# Install script for directory: /home/moho/ncs/zephyr/lib
+# Install script for directory: C:/ncs/zephyr/lib
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/usr/local")
+  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/Zephyr-Kernel")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -34,15 +34,16 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "/home/moho/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-objdump")
+  set(CMAKE_OBJDUMP "C:/gnuarmemb/9_2019-q4-major/bin/arm-none-eabi-objdump.exe")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/moho/Documents/egrhoefhoef/get_time/build/mcuboot/zephyr/lib/libc/cmake_install.cmake")
-  include("/home/moho/Documents/egrhoefhoef/get_time/build/mcuboot/zephyr/lib/posix/cmake_install.cmake")
-  include("/home/moho/Documents/egrhoefhoef/get_time/build/mcuboot/zephyr/lib/os/cmake_install.cmake")
-  include("/home/moho/Documents/egrhoefhoef/get_time/build/mcuboot/zephyr/lib/util/cmake_install.cmake")
+  include("C:/ncs/nRF-Beehavior-Firmware/timeThing/build/mcuboot/zephyr/lib/libc/cmake_install.cmake")
+  include("C:/ncs/nRF-Beehavior-Firmware/timeThing/build/mcuboot/zephyr/lib/posix/cmake_install.cmake")
+  include("C:/ncs/nRF-Beehavior-Firmware/timeThing/build/mcuboot/zephyr/lib/gui/cmake_install.cmake")
+  include("C:/ncs/nRF-Beehavior-Firmware/timeThing/build/mcuboot/zephyr/lib/os/cmake_install.cmake")
+  include("C:/ncs/nRF-Beehavior-Firmware/timeThing/build/mcuboot/zephyr/lib/util/cmake_install.cmake")
 
 endif()
 

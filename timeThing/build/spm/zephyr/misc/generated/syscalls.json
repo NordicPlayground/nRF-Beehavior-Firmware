@@ -36,7 +36,7 @@
     ],
     [
         [
-            "bool device_is_ready",
+            "int device_usable_check",
             "const struct device *dev"
         ],
         "device.h"
@@ -568,20 +568,6 @@
     ],
     [
         [
-            "void k_pipe_flush",
-            "struct k_pipe *pipe"
-        ],
-        "kernel.h"
-    ],
-    [
-        [
-            "void k_pipe_buffer_flush",
-            "struct k_pipe *pipe"
-        ],
-        "kernel.h"
-    ],
-    [
-        [
             "int k_poll",
             "struct k_poll_event *events, int num_events,\n\t\t     k_timeout_t timeout"
         ],
@@ -736,14 +722,14 @@
     ],
     [
         [
-            "int can_add_rx_filter_msgq",
-            "const struct device *dev, struct k_msgq *msgq,\n\t\t\t\t     const struct zcan_filter *filter"
+            "int can_attach_msgq",
+            "const struct device *dev, struct k_msgq *msg_q,\n\t\t\t      const struct zcan_filter *filter"
         ],
         "can.h"
     ],
     [
         [
-            "void can_remove_rx_filter",
+            "void can_detach",
             "const struct device *dev, int filter_id"
         ],
         "can.h"
@@ -757,8 +743,8 @@
     ],
     [
         [
-            "int can_get_state",
-            "const struct device *dev, enum can_state *state,\n\t\t\t    struct can_bus_err_cnt *err_cnt"
+            "enum can_state can_get_state",
+            "const struct device *dev,\n\t\t\t\t       struct can_bus_err_cnt *err_cnt"
         ],
         "can.h"
     ],
@@ -905,20 +891,6 @@
     [
         [
             "int dma_stop",
-            "const struct device *dev, uint32_t channel"
-        ],
-        "dma.h"
-    ],
-    [
-        [
-            "int dma_suspend",
-            "const struct device *dev, uint32_t channel"
-        ],
-        "dma.h"
-    ],
-    [
-        [
-            "int dma_resume",
             "const struct device *dev, uint32_t channel"
         ],
         "dma.h"
@@ -1144,6 +1116,13 @@
         [
             "int flash_erase",
             "const struct device *dev, off_t offset, size_t size"
+        ],
+        "flash.h"
+    ],
+    [
+        [
+            "int flash_write_protection_set",
+            "const struct device *dev,\n\t\t\t\t\t bool enable"
         ],
         "flash.h"
     ],
@@ -1375,13 +1354,6 @@
         [
             "int ipm_set_enabled",
             "const struct device *ipmdev, int enable"
-        ],
-        "ipm.h"
-    ],
-    [
-        [
-            "void ipm_complete",
-            "const struct device *ipmdev"
         ],
         "ipm.h"
     ],
@@ -1702,6 +1674,48 @@
     ],
     [
         [
+            "int uart_tx",
+            "const struct device *dev, const uint8_t *buf,\n\t\t      size_t len,\n\t\t      int32_t timeout"
+        ],
+        "uart.h"
+    ],
+    [
+        [
+            "int uart_tx_u16",
+            "const struct device *dev, const uint16_t *buf,\n\t\t\t  size_t len, int32_t timeout"
+        ],
+        "uart.h"
+    ],
+    [
+        [
+            "int uart_tx_abort",
+            "const struct device *dev"
+        ],
+        "uart.h"
+    ],
+    [
+        [
+            "int uart_rx_enable",
+            "const struct device *dev, uint8_t *buf,\n\t\t\t     size_t len,\n\t\t\t     int32_t timeout"
+        ],
+        "uart.h"
+    ],
+    [
+        [
+            "int uart_rx_enable_u16",
+            "const struct device *dev, uint16_t *buf,\n\t\t\t\t size_t len, int32_t timeout"
+        ],
+        "uart.h"
+    ],
+    [
+        [
+            "int uart_rx_disable",
+            "const struct device *dev"
+        ],
+        "uart.h"
+    ],
+    [
+        [
             "int uart_err_check",
             "const struct device *dev"
         ],
@@ -1724,7 +1738,7 @@
     [
         [
             "void uart_poll_out",
-            "const struct device *dev,\n\t\t\t     unsigned char out_char"
+            "const struct device *dev,\n\t\t\t\t      unsigned char out_char"
         ],
         "uart.h"
     ],
@@ -1801,48 +1815,6 @@
     [
         [
             "int uart_irq_update",
-            "const struct device *dev"
-        ],
-        "uart.h"
-    ],
-    [
-        [
-            "int uart_tx",
-            "const struct device *dev, const uint8_t *buf,\n\t\t      size_t len,\n\t\t      int32_t timeout"
-        ],
-        "uart.h"
-    ],
-    [
-        [
-            "int uart_tx_u16",
-            "const struct device *dev, const uint16_t *buf,\n\t\t\t  size_t len, int32_t timeout"
-        ],
-        "uart.h"
-    ],
-    [
-        [
-            "int uart_tx_abort",
-            "const struct device *dev"
-        ],
-        "uart.h"
-    ],
-    [
-        [
-            "int uart_rx_enable",
-            "const struct device *dev, uint8_t *buf,\n\t\t\t     size_t len,\n\t\t\t     int32_t timeout"
-        ],
-        "uart.h"
-    ],
-    [
-        [
-            "int uart_rx_enable_u16",
-            "const struct device *dev, uint16_t *buf,\n\t\t\t\t size_t len, int32_t timeout"
-        ],
-        "uart.h"
-    ],
-    [
-        [
-            "int uart_rx_disable",
             "const struct device *dev"
         ],
         "uart.h"

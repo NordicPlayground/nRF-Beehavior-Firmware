@@ -1,7 +1,7 @@
-The target system is: Generic - 3.0.99 - arm
-The host system is: Linux - 5.14.0-1042-oem - x86_64
+The target system is: Generic - 2.7.99 - arm
+The host system is: Windows - 10.0.19044 - AMD64
 Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
-Compiler: /home/moho/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-gcc 
+Compiler: C:/gnuarmemb/9_2019-q4-major/bin/arm-none-eabi-gcc.exe 
 Build flags: 
 Id flags: -c 
 
@@ -11,10 +11,10 @@ The output was:
 
 Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CMakeCCompilerId.o"
 
-The C compiler identification is GNU, found in "/home/moho/Documents/egrhoefhoef/get_time/build/spm/CMakeFiles/3.23.2/CompilerIdC/CMakeCCompilerId.o"
+The C compiler identification is GNU, found in "C:/ncs/nRF-Beehavior-Firmware/timeThing/build/spm/CMakeFiles/3.22.2/CompilerIdC/CMakeCCompilerId.o"
 
 Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
-Compiler: /home/moho/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-g++ 
+Compiler: C:/gnuarmemb/9_2019-q4-major/bin/arm-none-eabi-gcc.exe 
 Build flags: 
 Id flags: -c 
 
@@ -24,11 +24,20 @@ The output was:
 
 Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CMakeCXXCompilerId.o"
 
-The CXX compiler identification is GNU, found in "/home/moho/Documents/egrhoefhoef/get_time/build/spm/CMakeFiles/3.23.2/CompilerIdCXX/CMakeCXXCompilerId.o"
+The CXX compiler identification is GNU, found in "C:/ncs/nRF-Beehavior-Firmware/timeThing/build/spm/CMakeFiles/3.22.2/CompilerIdCXX/CMakeCXXCompilerId.o"
 
 Checking whether the ASM compiler is GNU using "--version" matched "(GNU assembler)|(GCC)|(Free Software Foundation)":
-arm-none-eabi-gcc (GNU Arm Embedded Toolchain 10.3-2021.10) 10.3.1 20210824 (release)
-Copyright (C) 2020 Free Software Foundation, Inc.
+arm-none-eabi-gcc.exe (GNU Tools for Arm Embedded Processors 9-2019-q4-major) 9.2.1 20191025 (release) [ARM/arm-9-branch revision 277599]
+Copyright (C) 2019 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+Performing C SOURCE FILE Test check_C__nostartfiles__nostdlib__isystem__c__gnuarmemb_9_2019_q4_major_bin____lib_gcc_arm_none_eabi_9_2_1_include___isystem__c__gnuarmemb_9_2019_q4_major_bin____lib_gcc_arm_none_eabi_9_2_1_include_fixed___Wl___unresolved_symbols_ignore_in_object_files__Wl___entry_0__Wl___out_implib_C__ncs_nRF_Beehavior_Firmware_timeThing_build_spm_libspmsecureentries_a succeeded with the following output:
+Change Dir: C:/ncs/nRF-Beehavior-Firmware/timeThing/build/spm/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/ProgramData/chocolatey/bin/ninja.exe cmTC_bfd91 && [1/2] Building C object CMakeFiles/cmTC_bfd91.dir/src.c.obj
+[2/2] Linking C executable cmTC_bfd91
+
+
+Source file was:
+int main(void) { return 0; }

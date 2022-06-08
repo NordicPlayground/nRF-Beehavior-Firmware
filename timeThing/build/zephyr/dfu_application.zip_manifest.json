@@ -1,6 +1,6 @@
 {
     "format-version": 0,
-    "time": 1654692218,
+    "time": 1654696489,
     "files": [
         {
             "load_address": 98816,
@@ -8,18 +8,18 @@
             "type": "application",
             "board": "thingy91_nrf9160",
             "soc": "nRF9160_SICA",
-            "size": 156980,
+            "size": 153132,
             "file": "app_update.bin",
-            "modtime": 1654692218
+            "modtime": 1654696489
         }
     ],
-    "name": "get_time",
+    "name": "timeThing",
     "firmware": {
         "zephyr": {
-            "revision": "bb39dfe3121a1c245d7c5804de0e14e19b299b83"
+            "revision": "a4edab554f67590a89703067af703c7996604562"
         },
         "nrf": {
-            "revision": "3b0fa17d816431c164f277b77a92b21834ae2d7e"
+            "revision": "ec486dab95df9d142a65000b0412b85e5ca5973c"
         }
     }
 }

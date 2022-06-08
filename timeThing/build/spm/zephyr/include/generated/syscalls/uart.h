@@ -29,6 +29,144 @@
 extern "C" {
 #endif
 
+extern int z_impl_uart_tx(const struct device * dev, const uint8_t * buf, size_t len, int32_t timeout);
+
+__pinned_func
+static inline int uart_tx(const struct device * dev, const uint8_t * buf, size_t len, int32_t timeout)
+{
+#ifdef CONFIG_USERSPACE
+	if (z_syscall_trap()) {
+		/* coverity[OVERRUN] */
+		return (int) arch_syscall_invoke4(*(uintptr_t *)&dev, *(uintptr_t *)&buf, *(uintptr_t *)&len, *(uintptr_t *)&timeout, K_SYSCALL_UART_TX);
+	}
+#endif
+	compiler_barrier();
+	return z_impl_uart_tx(dev, buf, len, timeout);
+}
+
+#if (CONFIG_TRACING_SYSCALL == 1)
+#ifndef DISABLE_SYSCALL_TRACING
+
+#define uart_tx(dev, buf, len, timeout) ({ 	int retval; 	sys_port_trace_syscall_enter(K_SYSCALL_UART_TX, uart_tx, dev, buf, len, timeout); 	retval = uart_tx(dev, buf, len, timeout); 	sys_port_trace_syscall_exit(K_SYSCALL_UART_TX, uart_tx, dev, buf, len, timeout, retval); 	retval; })
+#endif
+#endif
+
+
+extern int z_impl_uart_tx_u16(const struct device * dev, const uint16_t * buf, size_t len, int32_t timeout);
+
+__pinned_func
+static inline int uart_tx_u16(const struct device * dev, const uint16_t * buf, size_t len, int32_t timeout)
+{
+#ifdef CONFIG_USERSPACE
+	if (z_syscall_trap()) {
+		/* coverity[OVERRUN] */
+		return (int) arch_syscall_invoke4(*(uintptr_t *)&dev, *(uintptr_t *)&buf, *(uintptr_t *)&len, *(uintptr_t *)&timeout, K_SYSCALL_UART_TX_U16);
+	}
+#endif
+	compiler_barrier();
+	return z_impl_uart_tx_u16(dev, buf, len, timeout);
+}
+
+#if (CONFIG_TRACING_SYSCALL == 1)
+#ifndef DISABLE_SYSCALL_TRACING
+
+#define uart_tx_u16(dev, buf, len, timeout) ({ 	int retval; 	sys_port_trace_syscall_enter(K_SYSCALL_UART_TX_U16, uart_tx_u16, dev, buf, len, timeout); 	retval = uart_tx_u16(dev, buf, len, timeout); 	sys_port_trace_syscall_exit(K_SYSCALL_UART_TX_U16, uart_tx_u16, dev, buf, len, timeout, retval); 	retval; })
+#endif
+#endif
+
+
+extern int z_impl_uart_tx_abort(const struct device * dev);
+
+__pinned_func
+static inline int uart_tx_abort(const struct device * dev)
+{
+#ifdef CONFIG_USERSPACE
+	if (z_syscall_trap()) {
+		/* coverity[OVERRUN] */
+		return (int) arch_syscall_invoke1(*(uintptr_t *)&dev, K_SYSCALL_UART_TX_ABORT);
+	}
+#endif
+	compiler_barrier();
+	return z_impl_uart_tx_abort(dev);
+}
+
+#if (CONFIG_TRACING_SYSCALL == 1)
+#ifndef DISABLE_SYSCALL_TRACING
+
+#define uart_tx_abort(dev) ({ 	int retval; 	sys_port_trace_syscall_enter(K_SYSCALL_UART_TX_ABORT, uart_tx_abort, dev); 	retval = uart_tx_abort(dev); 	sys_port_trace_syscall_exit(K_SYSCALL_UART_TX_ABORT, uart_tx_abort, dev, retval); 	retval; })
+#endif
+#endif
+
+
+extern int z_impl_uart_rx_enable(const struct device * dev, uint8_t * buf, size_t len, int32_t timeout);
+
+__pinned_func
+static inline int uart_rx_enable(const struct device * dev, uint8_t * buf, size_t len, int32_t timeout)
+{
+#ifdef CONFIG_USERSPACE
+	if (z_syscall_trap()) {
+		/* coverity[OVERRUN] */
+		return (int) arch_syscall_invoke4(*(uintptr_t *)&dev, *(uintptr_t *)&buf, *(uintptr_t *)&len, *(uintptr_t *)&timeout, K_SYSCALL_UART_RX_ENABLE);
+	}
+#endif
+	compiler_barrier();
+	return z_impl_uart_rx_enable(dev, buf, len, timeout);
+}
+
+#if (CONFIG_TRACING_SYSCALL == 1)
+#ifndef DISABLE_SYSCALL_TRACING
+
+#define uart_rx_enable(dev, buf, len, timeout) ({ 	int retval; 	sys_port_trace_syscall_enter(K_SYSCALL_UART_RX_ENABLE, uart_rx_enable, dev, buf, len, timeout); 	retval = uart_rx_enable(dev, buf, len, timeout); 	sys_port_trace_syscall_exit(K_SYSCALL_UART_RX_ENABLE, uart_rx_enable, dev, buf, len, timeout, retval); 	retval; })
+#endif
+#endif
+
+
+extern int z_impl_uart_rx_enable_u16(const struct device * dev, uint16_t * buf, size_t len, int32_t timeout);
+
+__pinned_func
+static inline int uart_rx_enable_u16(const struct device * dev, uint16_t * buf, size_t len, int32_t timeout)
+{
+#ifdef CONFIG_USERSPACE
+	if (z_syscall_trap()) {
+		/* coverity[OVERRUN] */
+		return (int) arch_syscall_invoke4(*(uintptr_t *)&dev, *(uintptr_t *)&buf, *(uintptr_t *)&len, *(uintptr_t *)&timeout, K_SYSCALL_UART_RX_ENABLE_U16);
+	}
+#endif
+	compiler_barrier();
+	return z_impl_uart_rx_enable_u16(dev, buf, len, timeout);
+}
+
+#if (CONFIG_TRACING_SYSCALL == 1)
+#ifndef DISABLE_SYSCALL_TRACING
+
+#define uart_rx_enable_u16(dev, buf, len, timeout) ({ 	int retval; 	sys_port_trace_syscall_enter(K_SYSCALL_UART_RX_ENABLE_U16, uart_rx_enable_u16, dev, buf, len, timeout); 	retval = uart_rx_enable_u16(dev, buf, len, timeout); 	sys_port_trace_syscall_exit(K_SYSCALL_UART_RX_ENABLE_U16, uart_rx_enable_u16, dev, buf, len, timeout, retval); 	retval; })
+#endif
+#endif
+
+
+extern int z_impl_uart_rx_disable(const struct device * dev);
+
+__pinned_func
+static inline int uart_rx_disable(const struct device * dev)
+{
+#ifdef CONFIG_USERSPACE
+	if (z_syscall_trap()) {
+		/* coverity[OVERRUN] */
+		return (int) arch_syscall_invoke1(*(uintptr_t *)&dev, K_SYSCALL_UART_RX_DISABLE);
+	}
+#endif
+	compiler_barrier();
+	return z_impl_uart_rx_disable(dev);
+}
+
+#if (CONFIG_TRACING_SYSCALL == 1)
+#ifndef DISABLE_SYSCALL_TRACING
+
+#define uart_rx_disable(dev) ({ 	int retval; 	sys_port_trace_syscall_enter(K_SYSCALL_UART_RX_DISABLE, uart_rx_disable, dev); 	retval = uart_rx_disable(dev); 	sys_port_trace_syscall_exit(K_SYSCALL_UART_RX_DISABLE, uart_rx_disable, dev, retval); 	retval; })
+#endif
+#endif
+
+
 extern int z_impl_uart_err_check(const struct device * dev);
 
 __pinned_func
@@ -378,144 +516,6 @@ static inline int uart_irq_update(const struct device * dev)
 #ifndef DISABLE_SYSCALL_TRACING
 
 #define uart_irq_update(dev) ({ 	int retval; 	sys_port_trace_syscall_enter(K_SYSCALL_UART_IRQ_UPDATE, uart_irq_update, dev); 	retval = uart_irq_update(dev); 	sys_port_trace_syscall_exit(K_SYSCALL_UART_IRQ_UPDATE, uart_irq_update, dev, retval); 	retval; })
-#endif
-#endif
-
-
-extern int z_impl_uart_tx(const struct device * dev, const uint8_t * buf, size_t len, int32_t timeout);
-
-__pinned_func
-static inline int uart_tx(const struct device * dev, const uint8_t * buf, size_t len, int32_t timeout)
-{
-#ifdef CONFIG_USERSPACE
-	if (z_syscall_trap()) {
-		/* coverity[OVERRUN] */
-		return (int) arch_syscall_invoke4(*(uintptr_t *)&dev, *(uintptr_t *)&buf, *(uintptr_t *)&len, *(uintptr_t *)&timeout, K_SYSCALL_UART_TX);
-	}
-#endif
-	compiler_barrier();
-	return z_impl_uart_tx(dev, buf, len, timeout);
-}
-
-#if (CONFIG_TRACING_SYSCALL == 1)
-#ifndef DISABLE_SYSCALL_TRACING
-
-#define uart_tx(dev, buf, len, timeout) ({ 	int retval; 	sys_port_trace_syscall_enter(K_SYSCALL_UART_TX, uart_tx, dev, buf, len, timeout); 	retval = uart_tx(dev, buf, len, timeout); 	sys_port_trace_syscall_exit(K_SYSCALL_UART_TX, uart_tx, dev, buf, len, timeout, retval); 	retval; })
-#endif
-#endif
-
-
-extern int z_impl_uart_tx_u16(const struct device * dev, const uint16_t * buf, size_t len, int32_t timeout);
-
-__pinned_func
-static inline int uart_tx_u16(const struct device * dev, const uint16_t * buf, size_t len, int32_t timeout)
-{
-#ifdef CONFIG_USERSPACE
-	if (z_syscall_trap()) {
-		/* coverity[OVERRUN] */
-		return (int) arch_syscall_invoke4(*(uintptr_t *)&dev, *(uintptr_t *)&buf, *(uintptr_t *)&len, *(uintptr_t *)&timeout, K_SYSCALL_UART_TX_U16);
-	}
-#endif
-	compiler_barrier();
-	return z_impl_uart_tx_u16(dev, buf, len, timeout);
-}
-
-#if (CONFIG_TRACING_SYSCALL == 1)
-#ifndef DISABLE_SYSCALL_TRACING
-
-#define uart_tx_u16(dev, buf, len, timeout) ({ 	int retval; 	sys_port_trace_syscall_enter(K_SYSCALL_UART_TX_U16, uart_tx_u16, dev, buf, len, timeout); 	retval = uart_tx_u16(dev, buf, len, timeout); 	sys_port_trace_syscall_exit(K_SYSCALL_UART_TX_U16, uart_tx_u16, dev, buf, len, timeout, retval); 	retval; })
-#endif
-#endif
-
-
-extern int z_impl_uart_tx_abort(const struct device * dev);
-
-__pinned_func
-static inline int uart_tx_abort(const struct device * dev)
-{
-#ifdef CONFIG_USERSPACE
-	if (z_syscall_trap()) {
-		/* coverity[OVERRUN] */
-		return (int) arch_syscall_invoke1(*(uintptr_t *)&dev, K_SYSCALL_UART_TX_ABORT);
-	}
-#endif
-	compiler_barrier();
-	return z_impl_uart_tx_abort(dev);
-}
-
-#if (CONFIG_TRACING_SYSCALL == 1)
-#ifndef DISABLE_SYSCALL_TRACING
-
-#define uart_tx_abort(dev) ({ 	int retval; 	sys_port_trace_syscall_enter(K_SYSCALL_UART_TX_ABORT, uart_tx_abort, dev); 	retval = uart_tx_abort(dev); 	sys_port_trace_syscall_exit(K_SYSCALL_UART_TX_ABORT, uart_tx_abort, dev, retval); 	retval; })
-#endif
-#endif
-
-
-extern int z_impl_uart_rx_enable(const struct device * dev, uint8_t * buf, size_t len, int32_t timeout);
-
-__pinned_func
-static inline int uart_rx_enable(const struct device * dev, uint8_t * buf, size_t len, int32_t timeout)
-{
-#ifdef CONFIG_USERSPACE
-	if (z_syscall_trap()) {
-		/* coverity[OVERRUN] */
-		return (int) arch_syscall_invoke4(*(uintptr_t *)&dev, *(uintptr_t *)&buf, *(uintptr_t *)&len, *(uintptr_t *)&timeout, K_SYSCALL_UART_RX_ENABLE);
-	}
-#endif
-	compiler_barrier();
-	return z_impl_uart_rx_enable(dev, buf, len, timeout);
-}
-
-#if (CONFIG_TRACING_SYSCALL == 1)
-#ifndef DISABLE_SYSCALL_TRACING
-
-#define uart_rx_enable(dev, buf, len, timeout) ({ 	int retval; 	sys_port_trace_syscall_enter(K_SYSCALL_UART_RX_ENABLE, uart_rx_enable, dev, buf, len, timeout); 	retval = uart_rx_enable(dev, buf, len, timeout); 	sys_port_trace_syscall_exit(K_SYSCALL_UART_RX_ENABLE, uart_rx_enable, dev, buf, len, timeout, retval); 	retval; })
-#endif
-#endif
-
-
-extern int z_impl_uart_rx_enable_u16(const struct device * dev, uint16_t * buf, size_t len, int32_t timeout);
-
-__pinned_func
-static inline int uart_rx_enable_u16(const struct device * dev, uint16_t * buf, size_t len, int32_t timeout)
-{
-#ifdef CONFIG_USERSPACE
-	if (z_syscall_trap()) {
-		/* coverity[OVERRUN] */
-		return (int) arch_syscall_invoke4(*(uintptr_t *)&dev, *(uintptr_t *)&buf, *(uintptr_t *)&len, *(uintptr_t *)&timeout, K_SYSCALL_UART_RX_ENABLE_U16);
-	}
-#endif
-	compiler_barrier();
-	return z_impl_uart_rx_enable_u16(dev, buf, len, timeout);
-}
-
-#if (CONFIG_TRACING_SYSCALL == 1)
-#ifndef DISABLE_SYSCALL_TRACING
-
-#define uart_rx_enable_u16(dev, buf, len, timeout) ({ 	int retval; 	sys_port_trace_syscall_enter(K_SYSCALL_UART_RX_ENABLE_U16, uart_rx_enable_u16, dev, buf, len, timeout); 	retval = uart_rx_enable_u16(dev, buf, len, timeout); 	sys_port_trace_syscall_exit(K_SYSCALL_UART_RX_ENABLE_U16, uart_rx_enable_u16, dev, buf, len, timeout, retval); 	retval; })
-#endif
-#endif
-
-
-extern int z_impl_uart_rx_disable(const struct device * dev);
-
-__pinned_func
-static inline int uart_rx_disable(const struct device * dev)
-{
-#ifdef CONFIG_USERSPACE
-	if (z_syscall_trap()) {
-		/* coverity[OVERRUN] */
-		return (int) arch_syscall_invoke1(*(uintptr_t *)&dev, K_SYSCALL_UART_RX_DISABLE);
-	}
-#endif
-	compiler_barrier();
-	return z_impl_uart_rx_disable(dev);
-}
-
-#if (CONFIG_TRACING_SYSCALL == 1)
-#ifndef DISABLE_SYSCALL_TRACING
-
-#define uart_rx_disable(dev) ({ 	int retval; 	sys_port_trace_syscall_enter(K_SYSCALL_UART_RX_DISABLE, uart_rx_disable, dev); 	retval = uart_rx_disable(dev); 	sys_port_trace_syscall_exit(K_SYSCALL_UART_RX_DISABLE, uart_rx_disable, dev, retval); 	retval; })
 #endif
 #endif
 
