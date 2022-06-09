@@ -1,0 +1,25 @@
+{
+    "format-version": 0,
+    "time": 1654696489,
+    "files": [
+        {
+            "load_address": 98816,
+            "version_MCUBOOT": "0.0.0+0",
+            "type": "application",
+            "board": "thingy91_nrf9160",
+            "soc": "nRF9160_SICA",
+            "size": 153132,
+            "file": "app_update.bin",
+            "modtime": 1654696489
+        }
+    ],
+    "name": "timeThing",
+    "firmware": {
+        "zephyr": {
+            "revision": "a4edab554f67590a89703067af703c7996604562"
+        },
+        "nrf": {
+            "revision": "ec486dab95df9d142a65000b0412b85e5ca5973c"
+        }
+    }
+}
