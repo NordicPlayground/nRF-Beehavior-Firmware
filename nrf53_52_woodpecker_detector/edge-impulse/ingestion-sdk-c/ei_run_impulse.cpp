@@ -37,7 +37,7 @@
 #include <zephyr.h>
 #include <device.h>
 #include <init.h>
-#include <power/power.h>
+// #include <power/power.h>
 #include <hal/nrf_gpio.h>
 
 #define CONSOLE_LABEL DT_LABEL(DT_CHOSEN(zephyr_console))
@@ -48,6 +48,7 @@
 //#define PIN_1_NODE  DT_ALIAS(gpio_pin_name)
 #define PIN1 3
 const struct device * devi;
+const struct device * deviss;
 
 //vil at PIN1 skal settes til gpio-pinnen P0.03
 //dette er for å kunne bruke tid fra 91-eren, men må nok teste MED selve kortet først hehe
@@ -608,69 +609,78 @@ static int disable_ds_1(const struct device *dev)
 {
 	ARG_UNUSED(dev);
 
-	pm_ctrl_disable_state(POWER_STATE_DEEP_SLEEP_1);
+	// pm_ctrl_disable_state(POWER_STATE_DEEP_SLEEP_1);
 	return 0;
 }
 
 SYS_INIT(disable_ds_1, PRE_KERNEL_2, 0);
 
+void SleepFromClockSignal (uint32_t seconds){
+    // const struct device * deviss = device_get_binding("GPIO_0");
+    // rc = device_set_power_state(deviss, DEVICE_PM_LOW_POWER_STATE, NULL, NULL);
+    // pm_power_state_force(POWER_STATE_DEEP_SLEEP_1);
+    k_sleep(K_MSEC(seconds));
+    // pm_device_state_set();
+    
+}
+
 void MakingSysSleepNight (int clock_signal){
-    int rc;
-    const struct device *cons = device_get_binding(CONSOLE_LABEL);
-    const struct device * devi = device_get_binding("GPIO_0"); //der lager vi dev som  skal brukes 
-    if (clock_signal>1900 || clock_signal<0600){
+//     int rc;
+//     const struct device *cons = device_get_binding(CONSOLE_LABEL);
+//     const struct device * devi = device_get_binding("GPIO_0"); //der lager vi dev som  skal brukes 
+//     if (clock_signal>1900 || clock_signal<0600){
+       
+
+// 	    printk("\n%s system off demo\n", CONFIG_BOARD,"\n%s er i funksjonen\n");
+
+// 	    /* Configure to generate PORT event (wakeup) on button 1 press. */
+//          nrf_gpio_cfg_input(PIN1, 
+// 			    NRF_GPIO_PIN_PULLDOWN);
+// 	    nrf_gpio_cfg_sense_set(PIN1,
+// 			       NRF_GPIO_PIN_SENSE_HIGH); //nylilg addet som gjør at man kan restarte dette programmet når en pin er høy!!!diggesen
+
+//        /* gpio_pin_configure(devi,PIN1, GPIO_INT_LEVEL_HIGH );// her tror jeg at den sier at det resettes når pin 1 mottar strøm 
+//         gpio_pin_set(devi,PIN1,0); // får ikke feilmelding, men det funker ikke mehehe*/
+
+// 	    /*printk("Busy-wait %u s\n", BUSY_WAIT_S);
+// 	    k_busy_wait(BUSY_WAIT_S * USEC_PER_SEC);
         
+// 	    printk("Busy-wait %u s with UART off\n", BUSY_WAIT_S);
+// 	    rc = device_set_power_state(cons, DEVICE_PM_LOW_POWER_STATE, NULL, NULL);
+// 	    k_busy_wait(BUSY_WAIT_S * USEC_PER_SEC);
+// 	    rc = device_set_power_state(cons, DEVICE_PM_ACTIVE_STATE, NULL, NULL);
 
-	    printk("\n%s system off demo\n", CONFIG_BOARD,"\n%s er i funksjonen\n");
+// 	    printk("Sleep %u s\n", SLEEP_S);
+// 	    k_sleep(K_SECONDS(SLEEP_S));
 
-	    /* Configure to generate PORT event (wakeup) on button 1 press. */
-         nrf_gpio_cfg_input(PIN1, //må finne ut hvordan man setter pins for vi vil ikke ha knapp
-			    NRF_GPIO_PIN_PULLDOWN);
-	    nrf_gpio_cfg_sense_set(PIN1,
-			       NRF_GPIO_PIN_SENSE_HIGH); //nylilg addet som gjør at man kan restarte dette programmet når en pin er høy!!!diggesen
+// 	    printk("Sleep %u s with UART off\n", SLEEP_S);
+//         */
+// 	    printk("Entering system off; press BUTTON1 to restart\n");
 
-       /* gpio_pin_configure(devi,PIN1, GPIO_INT_LEVEL_HIGH );// her tror jeg at den sier at det resettes når pin 1 mottar strøm 
-        gpio_pin_set(devi,PIN1,0); // får ikke feilmelding, men det funker ikke mehehe*/
-
-	    /*printk("Busy-wait %u s\n", BUSY_WAIT_S);
-	    k_busy_wait(BUSY_WAIT_S * USEC_PER_SEC);
-        
-	    printk("Busy-wait %u s with UART off\n", BUSY_WAIT_S);
-	    rc = device_set_power_state(cons, DEVICE_PM_LOW_POWER_STATE, NULL, NULL);
-	    k_busy_wait(BUSY_WAIT_S * USEC_PER_SEC);
-	    rc = device_set_power_state(cons, DEVICE_PM_ACTIVE_STATE, NULL, NULL);
-
-	    printk("Sleep %u s\n", SLEEP_S);
-	    k_sleep(K_SECONDS(SLEEP_S));
-
-	    printk("Sleep %u s with UART off\n", SLEEP_S);
-        */
-	    printk("Entering system off; press BUTTON1 to restart\n");
-
-	    rc = device_set_power_state(devi, DEVICE_PM_LOW_POWER_STATE, NULL, NULL);
-	    /*k_sleep(K_MSEC(2));//lagt inn to sekunder her, så får vi se
-	    rc = device_set_power_state(cons, DEVICE_PM_ACTIVE_STATE, NULL, NULL);*/
+// 	    rc = device_set_power_state(devi, DEVICE_PM_LOW_POWER_STATE, NULL, NULL);
+// 	    /*k_sleep(K_MSEC(2));//lagt inn to sekunder her, så får vi se
+// 	    rc = device_set_power_state(cons, DEVICE_PM_ACTIVE_STATE, NULL, NULL);*/
         
     
 
-	    printk("Entering system off; press BUTTON1 to restart\n");
+// 	    printk("Entering system off; press BUTTON1 to restart\n");
 
-	    /* Above we disabled entry to deep sleep based on duration of
-	     * controlled delay.  Here we need to override that, then
-	     * force entry to deep sleep on any delay.
-	     */
-	    pm_power_state_force(POWER_STATE_DEEP_SLEEP_1);
-	    k_sleep(K_MSEC(2));
+// 	    /* Above we disabled entry to deep sleep based on duration of
+// 	     * controlled delay.  Here we need to override that, then
+// 	     * force entry to deep sleep on any delay.
+// 	     */
+// 	    pm_power_state_force(POWER_STATE_DEEP_SLEEP_1);
+// 	    k_sleep(K_MSEC(2));
 
-	    printk("ERROR: System off failed\n");
-	    while (true) {
-		    /* spin to avoid fall-off behavior */
-	    }
+// 	    printk("ERROR: System off failed\n");
+// 	    while (true) {
+// 		    /* spin to avoid fall-off behavior */
+// 	    }
 
-    }
-    else {
-        printk("it's dayyy");
-    }
+//     }
+//     else {
+//         printk("it's dayyy");
+//     }
  
 
 }

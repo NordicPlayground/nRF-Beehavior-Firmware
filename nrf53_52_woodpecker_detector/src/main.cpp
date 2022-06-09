@@ -37,8 +37,8 @@ int main(void)
     
 
     
-    MakingSysSleepNight (1400);
-    MakingSysSleepNight (2000);
+    MakingSysSleepNight(1400);
+    MakingSysSleepNight(2000);
     k_sleep(K_MSEC(2));
     
     

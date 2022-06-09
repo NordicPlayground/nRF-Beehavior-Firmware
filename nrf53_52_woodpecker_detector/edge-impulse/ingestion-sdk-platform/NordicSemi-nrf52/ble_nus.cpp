@@ -368,7 +368,18 @@ static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
 
     bt_addr_le_to_str(bt_conn_get_dst(conn), addr, ARRAY_SIZE(addr));
 
-    LOG_INF("Received data from: %s", log_strdup(addr));
+    LOG_INF("Received data from: %s, length: %d", log_strdup(addr), len);
+    if (len==4){
+        char seconds_arr[4];
+            for (uint8_t i = 0; i < 4; i++){
+                seconds_arr[i] = data[i];	
+            }
+        uint32_t seconds;
+
+		memcpy(&seconds, seconds_arr, sizeof(seconds));
+        LOG_INF("TIME: %d", seconds);
+        // SleepFromClockSignal(seconds);
+    }
 
     for (uint16_t pos = 0; pos != len;) {
         struct uart_data_t *tx = (struct uart_data_t *)k_malloc(sizeof(*tx));
@@ -402,10 +413,10 @@ static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
         ei_ble_rcv_cmd_flag = true;
         memcpy(ei_ble_rcv_cmd_buffer, tx->data, tx->len);
 
-        // err = uart_tx(uart, tx->data, tx->len, SYS_FOREVER_MS);
-        // if (err) {
-        //     k_fifo_put(&fifo_uart_tx_data, tx);
-        // }
+        err = uart_tx(uart, tx->data, tx->len, SYS_FOREVER_MS);
+        if (err) {
+            k_fifo_put(&fifo_uart_tx_data, tx);
+        }
     }
 }
 
@@ -427,10 +438,10 @@ static void num_comp_reply(bool accept)
 {
     if (accept) {
         bt_conn_auth_passkey_confirm(auth_conn);
-        LOG_INF("Numeric Match, conn %p", auth_conn);
+        // LOG_INF("Numeric Match, conn %p", auth_conn);
     } else {
         bt_conn_auth_cancel(auth_conn);
-        LOG_INF("Numeric Reject, conn %p", auth_conn);
+        // LOG_INF("Numeric Reject, conn %p", auth_conn);
     }
 
     bt_conn_unref(auth_conn);
