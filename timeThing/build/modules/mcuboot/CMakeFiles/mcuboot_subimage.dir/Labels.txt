@@ -1,13 +1,13 @@
 # Target labels
  mcuboot_subimage
 # Source files and their labels
-C:/ncs/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/CMakeFiles/mcuboot_subimage
-C:/ncs/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/CMakeFiles/mcuboot_subimage.rule
-C:/ncs/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/CMakeFiles/mcuboot_subimage-complete.rule
-C:/ncs/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-build.rule
-C:/ncs/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-configure.rule
-C:/ncs/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-download.rule
-C:/ncs/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-install.rule
-C:/ncs/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-mkdir.rule
-C:/ncs/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-patch.rule
-C:/ncs/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-update.rule
+/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/CMakeFiles/mcuboot_subimage
+/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/CMakeFiles/mcuboot_subimage.rule
+/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/CMakeFiles/mcuboot_subimage-complete.rule
+/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-build.rule
+/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-configure.rule
+/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-download.rule
+/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-install.rule
+/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-mkdir.rule
+/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-patch.rule
+/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/mcuboot/mcuboot_subimage-prefix/src/mcuboot_subimage-stamp/mcuboot_subimage-update.rule

@@ -262,7 +262,7 @@
 					compatible = "rohm,bh1749";
 					label = "BH1749";
 					reg = < 0x38 >;
-					int-gpios = < &gpio0 0x1b 0x0 >;
+					int-gpios = < &gpio0 0x1b 0x11 >;
 				};
 			};
 			i2c3: i2c@b000 {

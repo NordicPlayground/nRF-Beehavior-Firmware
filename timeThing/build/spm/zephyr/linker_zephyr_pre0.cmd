@@ -5,16 +5,6 @@ MEMORY
     FLASH (rx) : ORIGIN = 0xc200, LENGTH = 0xc000
     SRAM (wx) : ORIGIN = 0x20000000, LENGTH = 0x8000
    
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
     IDT_LIST (wx) : ORIGIN = 0xFFFFF7FF, LENGTH = 2K
     }
 ENTRY("__start")

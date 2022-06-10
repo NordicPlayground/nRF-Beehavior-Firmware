@@ -7,16 +7,15 @@
 #endif
 #include <syscalls/can.h>
 
-extern enum can_state z_vrfy_can_get_state(const struct device * dev, struct can_bus_err_cnt * err_cnt);
+extern int z_vrfy_can_get_state(const struct device * dev, enum can_state * state, struct can_bus_err_cnt * err_cnt);
 uintptr_t z_mrsh_can_get_state(uintptr_t arg0, uintptr_t arg1, uintptr_t arg2,
 		uintptr_t arg3, uintptr_t arg4, uintptr_t arg5, void *ssf)
 {
 	_current->syscall_frame = ssf;
-	(void) arg2;	/* unused */
 	(void) arg3;	/* unused */
 	(void) arg4;	/* unused */
 	(void) arg5;	/* unused */
-	enum can_state ret = z_vrfy_can_get_state(*(const struct device **)&arg0, *(struct can_bus_err_cnt **)&arg1)
+	int ret = z_vrfy_can_get_state(*(const struct device **)&arg0, *(enum can_state **)&arg1, *(struct can_bus_err_cnt **)&arg2)
 ;
 	_current->syscall_frame = NULL;
 	return (uintptr_t) ret;

@@ -1303,6 +1303,40 @@ static inline size_t k_pipe_write_avail(struct k_pipe * pipe)
 }
 
 
+extern void z_impl_k_pipe_flush(struct k_pipe * pipe);
+
+__pinned_func
+static inline void k_pipe_flush(struct k_pipe * pipe)
+{
+#ifdef CONFIG_USERSPACE
+	if (z_syscall_trap()) {
+		/* coverity[OVERRUN] */
+		arch_syscall_invoke1(*(uintptr_t *)&pipe, K_SYSCALL_K_PIPE_FLUSH);
+		return;
+	}
+#endif
+	compiler_barrier();
+	z_impl_k_pipe_flush(pipe);
+}
+
+
+extern void z_impl_k_pipe_buffer_flush(struct k_pipe * pipe);
+
+__pinned_func
+static inline void k_pipe_buffer_flush(struct k_pipe * pipe)
+{
+#ifdef CONFIG_USERSPACE
+	if (z_syscall_trap()) {
+		/* coverity[OVERRUN] */
+		arch_syscall_invoke1(*(uintptr_t *)&pipe, K_SYSCALL_K_PIPE_BUFFER_FLUSH);
+		return;
+	}
+#endif
+	compiler_barrier();
+	z_impl_k_pipe_buffer_flush(pipe);
+}
+
+
 extern int z_impl_k_poll(struct k_poll_event * events, int num_events, k_timeout_t timeout);
 
 __pinned_func
