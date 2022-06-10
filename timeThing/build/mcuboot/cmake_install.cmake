@@ -1,8 +1,8 @@
-# Install script for directory: C:/ncs/bootloader/mcuboot/boot/zephyr
+# Install script for directory: /home/moho/ncs/bootloader/mcuboot/boot/zephyr
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/Zephyr-Kernel")
+  set(CMAKE_INSTALL_PREFIX "/usr/local")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -34,12 +34,12 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "C:/gnuarmemb/9_2019-q4-major/bin/arm-none-eabi-objdump.exe")
+  set(CMAKE_OBJDUMP "/home/moho/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-objdump")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("C:/ncs/nRF-Beehavior-Firmware/timeThing/build/mcuboot/zephyr/cmake_install.cmake")
+  include("/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/mcuboot/zephyr/cmake_install.cmake")
 
 endif()
 
@@ -51,5 +51,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/ncs/nRF-Beehavior-Firmware/timeThing/build/mcuboot/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/mcuboot/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

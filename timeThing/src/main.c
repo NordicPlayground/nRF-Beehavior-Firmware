@@ -190,6 +190,32 @@ void main(void)
 		LOG_INF("time nowsek: %i", (ptm->tm_isdst));
 		int summertime = (int)(time_buf[30])-48;
 		LOG_INF("summertimeys: %i", summertime);
+
+		char rawNumberStringH[10];
+		char rawNumberStringM[10];
+		char leadingZerro[10];
+		char finalMinute[10];
+		char rawNumberStringHM[20];
+
+
+		if((ptm->tm_min) < 10){
+			strcpy(leadingZerro, "0");
+			strcat(leadingZerro, rawNumberStringM);
+
+		}
+
+		itoa((ptm->tm_hour), rawNumberStringH, 10);
+		itoa((ptm->tm_min), leadingZerro, 10);
+
+		strcpy(rawNumberStringHM, rawNumberStringH);
+		strcat(rawNumberStringHM, leadingZerro);
+
+		
+
+
+		
+
+		LOG_INF("Int format: %i",atoi(rawNumberStringHM));
 		
 
 	}

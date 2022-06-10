@@ -75,6 +75,52 @@ static inline int dma_stop(const struct device * dev, uint32_t channel)
 #endif
 
 
+extern int z_impl_dma_suspend(const struct device * dev, uint32_t channel);
+
+__pinned_func
+static inline int dma_suspend(const struct device * dev, uint32_t channel)
+{
+#ifdef CONFIG_USERSPACE
+	if (z_syscall_trap()) {
+		/* coverity[OVERRUN] */
+		return (int) arch_syscall_invoke2(*(uintptr_t *)&dev, *(uintptr_t *)&channel, K_SYSCALL_DMA_SUSPEND);
+	}
+#endif
+	compiler_barrier();
+	return z_impl_dma_suspend(dev, channel);
+}
+
+#if (CONFIG_TRACING_SYSCALL == 1)
+#ifndef DISABLE_SYSCALL_TRACING
+
+#define dma_suspend(dev, channel) ({ 	int retval; 	sys_port_trace_syscall_enter(K_SYSCALL_DMA_SUSPEND, dma_suspend, dev, channel); 	retval = dma_suspend(dev, channel); 	sys_port_trace_syscall_exit(K_SYSCALL_DMA_SUSPEND, dma_suspend, dev, channel, retval); 	retval; })
+#endif
+#endif
+
+
+extern int z_impl_dma_resume(const struct device * dev, uint32_t channel);
+
+__pinned_func
+static inline int dma_resume(const struct device * dev, uint32_t channel)
+{
+#ifdef CONFIG_USERSPACE
+	if (z_syscall_trap()) {
+		/* coverity[OVERRUN] */
+		return (int) arch_syscall_invoke2(*(uintptr_t *)&dev, *(uintptr_t *)&channel, K_SYSCALL_DMA_RESUME);
+	}
+#endif
+	compiler_barrier();
+	return z_impl_dma_resume(dev, channel);
+}
+
+#if (CONFIG_TRACING_SYSCALL == 1)
+#ifndef DISABLE_SYSCALL_TRACING
+
+#define dma_resume(dev, channel) ({ 	int retval; 	sys_port_trace_syscall_enter(K_SYSCALL_DMA_RESUME, dma_resume, dev, channel); 	retval = dma_resume(dev, channel); 	sys_port_trace_syscall_exit(K_SYSCALL_DMA_RESUME, dma_resume, dev, channel, retval); 	retval; })
+#endif
+#endif
+
+
 extern int z_impl_dma_request_channel(const struct device * dev, void * filter_param);
 
 __pinned_func

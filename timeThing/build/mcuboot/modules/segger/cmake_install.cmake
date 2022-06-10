@@ -1,8 +1,8 @@
-# Install script for directory: C:/ncs/zephyr/modules/segger
+# Install script for directory: /home/moho/ncs/zephyr/modules/segger
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/Zephyr-Kernel")
+  set(CMAKE_INSTALL_PREFIX "/usr/local")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -34,6 +34,6 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "C:/gnuarmemb/9_2019-q4-major/bin/arm-none-eabi-objdump.exe")
+  set(CMAKE_OBJDUMP "/home/moho/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-objdump")
 endif()
 
