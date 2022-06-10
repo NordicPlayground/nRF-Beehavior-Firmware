@@ -372,13 +372,13 @@ static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
     if (len==4){
         char seconds_arr[4];
             for (uint8_t i = 0; i < 4; i++){
-                seconds_arr[i] = data[i];	
+                seconds_arr[i] = data[3-i];	// tror det er riktig vei nå
             }
         uint32_t seconds;
 
 		memcpy(&seconds, seconds_arr, sizeof(seconds));
         LOG_INF("TIME: %d", seconds);
-        // SleepFromClockSignal(seconds);
+        SleepFromClockSignal(seconds); // might not work
     }
 
     for (uint16_t pos = 0; pos != len;) {

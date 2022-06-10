@@ -616,11 +616,11 @@ static int disable_ds_1(const struct device *dev)
 SYS_INIT(disable_ds_1, PRE_KERNEL_2, 0);
 
 void SleepFromClockSignal (uint32_t seconds){
-    // const struct device * deviss = device_get_binding("GPIO_0");
-    // rc = device_set_power_state(deviss, DEVICE_PM_LOW_POWER_STATE, NULL, NULL);
-    // pm_power_state_force(POWER_STATE_DEEP_SLEEP_1);
+    const struct device * deviss = device_get_binding("GPIO_0"); //is this necessary??
+    rc = device_set_power_state(deviss, DEVICE_PM_LOW_POWER_STATE, NULL, NULL);
+    pm_power_state_force(POWER_STATE_DEEP_SLEEP_1);
     k_sleep(K_MSEC(seconds));
-    // pm_device_state_set();
+    pm_device_state_set(); //hva skjer her??
     
 }
 
