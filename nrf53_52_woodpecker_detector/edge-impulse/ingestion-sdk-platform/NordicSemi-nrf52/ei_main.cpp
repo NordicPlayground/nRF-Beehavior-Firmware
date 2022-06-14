@@ -74,7 +74,15 @@ void ei_init(void)
     ei_at_register_generic_cmds();
     ei_at_cmd_register("RUNIMPULSE", "Run the impulse", run_nn_normal);
     //ei_at_cmd_register("RUNIMPULSEDEBUG", "Run the impulse with extra debug output", run_nn_debug);
-    ei_at_cmd_register("RUNIMPULSECONT", "Run the impulse continuously", run_nn_continuous_normal);
+    ei_at_cmd_register("R/* Edge Impulse ingestion SDK
+ * Copyright (c) 2020 EdgeImpulse Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to UNIMPULSECONT", "Run the impulse continuously", run_nn_continuous_normal);
     ei_printf("Type AT+HELP to see a list of commands.\r\n> ");
 
     EiDevice.set_state(eiStateFinished);

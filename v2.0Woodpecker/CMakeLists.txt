@@ -22,6 +22,10 @@ add_definitions(-DEIDSP_USE_CMSIS_DSP=1
 # Add the Edge Impulse SDK
 add_subdirectory(edge-impulse-sdk/cmake/zephyr)
 
+# Add modules
+
+add_subdirectory(src/Modules)
+
 # Edge impulse SDK include directories
 set(INCLUDES
     .

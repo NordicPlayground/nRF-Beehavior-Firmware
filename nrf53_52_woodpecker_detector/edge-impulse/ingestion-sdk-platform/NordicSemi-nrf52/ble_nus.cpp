@@ -1,5 +1,5 @@
 #include "ble_nus.h"
-#include "ei_classifier_porting.h"
+#include "edge-impulse-sdk/porting/ei_classifier_porting.h"
 
 bool ei_ble_rcv_cmd_flag = false;
 char ei_ble_rcv_cmd_buffer[50] = {0};
