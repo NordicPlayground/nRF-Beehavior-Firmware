@@ -1,7 +1,7 @@
-# 1 "/home/moho/ncs/zephyr/misc/empty_file.c"
+# 1 "C:/ncs/zephyr/misc/empty_file.c"
 # 1 "<built-in>"
 # 1 "<command-line>"
-# 1 "/home/moho/ncs/zephyr/boards/arm/nrf52840dk_nrf52840/nrf52840dk_nrf52840.dts" 1
+# 1 "C:/ncs/zephyr/boards/arm/nrf52840dk_nrf52840/nrf52840dk_nrf52840.dts" 1
 
 
 
@@ -9,30 +9,30 @@
 
 
 /dts-v1/;
-# 1 "/home/moho/ncs/zephyr/dts/arm/nordic/nrf52840_qiaa.dtsi" 1 3 4
+# 1 "C:/ncs/zephyr/dts/arm/nordic/nrf52840_qiaa.dtsi" 1 3 4
 
 
 
 
 
 
-# 1 "/home/moho/ncs/zephyr/dts/common/mem.h" 1 3 4
-# 8 "/home/moho/ncs/zephyr/dts/arm/nordic/nrf52840_qiaa.dtsi" 2 3 4
-# 1 "/home/moho/ncs/zephyr/dts/arm/nordic/nrf52840.dtsi" 1 3 4
+# 1 "C:/ncs/zephyr/dts/common/mem.h" 1 3 4
+# 8 "C:/ncs/zephyr/dts/arm/nordic/nrf52840_qiaa.dtsi" 2 3 4
+# 1 "C:/ncs/zephyr/dts/arm/nordic/nrf52840.dtsi" 1 3 4
 
 
-# 1 "/home/moho/ncs/zephyr/dts/arm/armv7-m.dtsi" 1 3 4
+# 1 "C:/ncs/zephyr/dts/arm/armv7-m.dtsi" 1 3 4
 
 
-# 1 "/home/moho/ncs/zephyr/dts/common/skeleton.dtsi" 1 3 4
-# 9 "/home/moho/ncs/zephyr/dts/common/skeleton.dtsi" 3 4
+# 1 "C:/ncs/zephyr/dts/common/skeleton.dtsi" 1 3 4
+# 9 "C:/ncs/zephyr/dts/common/skeleton.dtsi" 3 4
 / {
  #address-cells = <1>;
  #size-cells = <1>;
  chosen { };
  aliases { };
 };
-# 4 "/home/moho/ncs/zephyr/dts/arm/armv7-m.dtsi" 2 3 4
+# 4 "C:/ncs/zephyr/dts/arm/armv7-m.dtsi" 2 3 4
 
 / {
  soc {
@@ -56,26 +56,26 @@
   };
  };
 };
-# 4 "/home/moho/ncs/zephyr/dts/arm/nordic/nrf52840.dtsi" 2 3 4
-# 1 "/home/moho/ncs/zephyr/dts/arm/nordic/nrf_common.dtsi" 1 3 4
+# 4 "C:/ncs/zephyr/dts/arm/nordic/nrf52840.dtsi" 2 3 4
+# 1 "C:/ncs/zephyr/dts/arm/nordic/nrf_common.dtsi" 1 3 4
 
 
 
 
 
 
-# 1 "/home/moho/ncs/zephyr/include/zephyr/dt-bindings/i2c/i2c.h" 1 3 4
-# 8 "/home/moho/ncs/zephyr/dts/arm/nordic/nrf_common.dtsi" 2 3 4
-# 1 "/home/moho/ncs/zephyr/include/zephyr/dt-bindings/gpio/gpio.h" 1 3 4
-# 9 "/home/moho/ncs/zephyr/dts/arm/nordic/nrf_common.dtsi" 2 3 4
-# 1 "/home/moho/ncs/zephyr/include/zephyr/dt-bindings/pinctrl/nrf-pinctrl.h" 1 3 4
-# 10 "/home/moho/ncs/zephyr/dts/arm/nordic/nrf_common.dtsi" 2 3 4
-# 1 "/home/moho/ncs/zephyr/include/zephyr/dt-bindings/pwm/pwm.h" 1 3 4
-# 11 "/home/moho/ncs/zephyr/dts/arm/nordic/nrf_common.dtsi" 2 3 4
+# 1 "C:/ncs/zephyr/include/zephyr/dt-bindings/i2c/i2c.h" 1 3 4
+# 8 "C:/ncs/zephyr/dts/arm/nordic/nrf_common.dtsi" 2 3 4
+# 1 "C:/ncs/zephyr/include/zephyr/dt-bindings/gpio/gpio.h" 1 3 4
+# 9 "C:/ncs/zephyr/dts/arm/nordic/nrf_common.dtsi" 2 3 4
+# 1 "C:/ncs/zephyr/include/zephyr/dt-bindings/pinctrl/nrf-pinctrl.h" 1 3 4
+# 10 "C:/ncs/zephyr/dts/arm/nordic/nrf_common.dtsi" 2 3 4
+# 1 "C:/ncs/zephyr/include/zephyr/dt-bindings/pwm/pwm.h" 1 3 4
+# 11 "C:/ncs/zephyr/dts/arm/nordic/nrf_common.dtsi" 2 3 4
 
-# 1 "/home/moho/ncs/zephyr/dts/arm/nordic/override.dtsi" 1 3 4
-# 13 "/home/moho/ncs/zephyr/dts/arm/nordic/nrf_common.dtsi" 2 3 4
-# 21 "/home/moho/ncs/zephyr/dts/arm/nordic/nrf_common.dtsi" 3 4
+# 1 "C:/ncs/zephyr/dts/arm/nordic/override.dtsi" 1 3 4
+# 13 "C:/ncs/zephyr/dts/arm/nordic/nrf_common.dtsi" 2 3 4
+# 21 "C:/ncs/zephyr/dts/arm/nordic/nrf_common.dtsi" 3 4
 / {
  pinctrl: pin-controller {
 
@@ -99,7 +99,7 @@
 
  status = "disabled";
 };
-# 5 "/home/moho/ncs/zephyr/dts/arm/nordic/nrf52840.dtsi" 2 3 4
+# 5 "C:/ncs/zephyr/dts/arm/nordic/nrf52840.dtsi" 2 3 4
 
 / {
  chosen {
@@ -654,7 +654,7 @@
 &nvic {
  arm,num-irq-priority-bits = <3>;
 };
-# 9 "/home/moho/ncs/zephyr/dts/arm/nordic/nrf52840_qiaa.dtsi" 2 3 4
+# 9 "C:/ncs/zephyr/dts/arm/nordic/nrf52840_qiaa.dtsi" 2 3 4
 
 &flash0 {
  reg = <0x00000000 ((1024) * 1024)>;
@@ -669,8 +669,8 @@
   compatible = "nordic,nRF52840-QIAA", "nordic,nRF52840", "nordic,nRF52", "simple-bus";
  };
 };
-# 9 "/home/moho/ncs/zephyr/boards/arm/nrf52840dk_nrf52840/nrf52840dk_nrf52840.dts" 2
-# 1 "/home/moho/ncs/zephyr/boards/arm/nrf52840dk_nrf52840/nrf52840dk_nrf52840-pinctrl.dtsi" 1
+# 9 "C:/ncs/zephyr/boards/arm/nrf52840dk_nrf52840/nrf52840dk_nrf52840.dts" 2
+# 1 "C:/ncs/zephyr/boards/arm/nrf52840dk_nrf52840/nrf52840dk_nrf52840-pinctrl.dtsi" 1
 
 
 
@@ -853,7 +853,7 @@
  };
 
 };
-# 10 "/home/moho/ncs/zephyr/boards/arm/nrf52840dk_nrf52840/nrf52840dk_nrf52840.dts" 2
+# 10 "C:/ncs/zephyr/boards/arm/nrf52840dk_nrf52840/nrf52840dk_nrf52840.dts" 2
 
 / {
  model = "Nordic nRF52840 DK NRF52840";
@@ -1113,7 +1113,7 @@ arduino_spi: &spi3 {
    label = "image-scratch";
    reg = <0x000da000 0x0001e000>;
   };
-# 279 "/home/moho/ncs/zephyr/boards/arm/nrf52840dk_nrf52840/nrf52840dk_nrf52840.dts"
+# 279 "C:/ncs/zephyr/boards/arm/nrf52840dk_nrf52840/nrf52840dk_nrf52840.dts"
   storage_partition: partition@f8000 {
    label = "storage";
    reg = <0x000f8000 0x00008000>;
@@ -1126,4 +1126,4 @@ zephyr_udc0: &usbd {
  status = "okay";
 };
 # 1 "<command-line>" 2
-# 1 "/home/moho/ncs/zephyr/misc/empty_file.c"
+# 1 "C:/ncs/zephyr/misc/empty_file.c"

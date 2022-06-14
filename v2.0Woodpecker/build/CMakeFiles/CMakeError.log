@@ -1,24 +1,24 @@
 Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
-Compiler: /home/moho/ncs/toolchains/v2.0.0/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc 
+Compiler: C:/gnuarmemb/9_2019-q4-major/bin/arm-none-eabi-gcc.exe 
 Build flags: 
 Id flags:  
 
 The output was:
 1
-/home/moho/ncs/toolchains/v2.0.0/opt/zephyr-sdk/arm-zephyr-eabi/bin/../lib/gcc/arm-zephyr-eabi/10.3.0/../../../../arm-zephyr-eabi/bin/ld: /home/moho/ncs/toolchains/v2.0.0/opt/zephyr-sdk/arm-zephyr-eabi/bin/../lib/gcc/arm-zephyr-eabi/10.3.0/../../../../arm-zephyr-eabi/lib/libc.a(lib_a-exit.o): in function `exit':
-exit.c:(.text.exit+0x34): undefined reference to `_exit'
-collect2: error: ld returned 1 exit status
+c:/gnuarmemb/9_2019-q4-major/bin/../lib/gcc/arm-none-eabi/9.2.1/../../../../arm-none-eabi/bin/ld.exe: c:/gnuarmemb/9_2019-q4-major/bin/../lib/gcc/arm-none-eabi/9.2.1/../../../../arm-none-eabi/lib\libc.a(lib_a-exit.o): in function `exit':
+exit.c:(.text.exit+0x2c): undefined reference to `_exit'
+collect2.exe: error: ld returned 1 exit status
 
 
 Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
-Compiler: /home/moho/ncs/toolchains/v2.0.0/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-g++ 
+Compiler: C:/gnuarmemb/9_2019-q4-major/bin/arm-none-eabi-g++.exe 
 Build flags: 
 Id flags:  
 
 The output was:
 1
-/home/moho/ncs/toolchains/v2.0.0/opt/zephyr-sdk/arm-zephyr-eabi/bin/../lib/gcc/arm-zephyr-eabi/10.3.0/../../../../arm-zephyr-eabi/bin/ld: /home/moho/ncs/toolchains/v2.0.0/opt/zephyr-sdk/arm-zephyr-eabi/bin/../lib/gcc/arm-zephyr-eabi/10.3.0/../../../../arm-zephyr-eabi/lib/libc.a(lib_a-exit.o): in function `exit':
-exit.c:(.text.exit+0x34): undefined reference to `_exit'
-collect2: error: ld returned 1 exit status
+c:/gnuarmemb/9_2019-q4-major/bin/../lib/gcc/arm-none-eabi/9.2.1/../../../../arm-none-eabi/bin/ld.exe: c:/gnuarmemb/9_2019-q4-major/bin/../lib/gcc/arm-none-eabi/9.2.1/../../../../arm-none-eabi/lib\libc.a(lib_a-exit.o): in function `exit':
+exit.c:(.text.exit+0x2c): undefined reference to `_exit'
+collect2.exe: error: ld returned 1 exit status
 
 

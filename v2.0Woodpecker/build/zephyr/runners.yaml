@@ -13,13 +13,13 @@ debug-runner: jlink
 
 # Common runner configuration values.
 config:
-  board_dir: /home/moho/ncs/zephyr/boards/arm/nrf52840dk_nrf52840
+  board_dir: C:/ncs/zephyr/boards/arm/nrf52840dk_nrf52840
   # Build outputs:
   elf_file: zephyr.elf
   hex_file: zephyr.hex
   bin_file: zephyr.bin
   # Host tools:
-  gdb: /home/moho/ncs/toolchains/v2.0.0/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-gdb
+  gdb: C:/gnuarmemb/9_2019-q4-major/bin/arm-none-eabi-gdb.exe
 
 # Runner specific arguments
 args:

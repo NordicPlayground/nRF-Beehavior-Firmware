@@ -1,8 +1,8 @@
-# Install script for directory: /home/moho/Documents/nRF-Beehavior-Firmware/v2.0Woodpecker/edge-impulse-sdk/cmake/zephyr
+# Install script for directory: C:/ncs/nRF-Beehavior-Firmware/v2.0Woodpecker/edge-impulse-sdk/cmake/zephyr
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/usr/local")
+  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/Zephyr-Kernel")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -34,6 +34,6 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "/home/moho/ncs/toolchains/v2.0.0/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-objdump")
+  set(CMAKE_OBJDUMP "C:/gnuarmemb/9_2019-q4-major/bin/arm-none-eabi-objdump.exe")
 endif()
 
