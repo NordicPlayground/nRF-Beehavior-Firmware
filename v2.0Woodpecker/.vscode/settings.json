@@ -2,6 +2,9 @@
     "nrf-connect.applications": [
         "${workspaceFolder}"
     ],
-    "nrf-connect.topdir": "${nrf-connect.sdk:2.0.0}",
-    "nrf-connect.toolchain.path": "PATH"
+    "files.associations": {
+        "uart_async_adapter.h": "c",
+        "uart.h": "c",
+        "usb_device.h": "c"
+    }
 }

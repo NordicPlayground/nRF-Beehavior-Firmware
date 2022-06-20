@@ -12,7 +12,7 @@ linker.cmd: /home/moho/ncs/zephyr/soc/arm/nordic_nrf/nrf52/linker.ld \
  /home/moho/ncs/zephyr/include/zephyr/sys/util_macro.h \
  /home/moho/ncs/zephyr/include/zephyr/sys/util_internal.h \
  /home/moho/ncs/zephyr/include/zephyr/sys/util_loops.h \
- /home/moho/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux/gcc-arm-none-eabi-10.3-2021.10/lib/gcc/arm-none-eabi/10.3.1/include/stdbool.h \
+ /home/moho/ncs/toolchains/v2.0.0/opt/zephyr-sdk/arm-zephyr-eabi/lib/gcc/arm-zephyr-eabi/10.3.0/include/stdbool.h \
  /home/moho/ncs/zephyr/include/zephyr/devicetree/io-channels.h \
  /home/moho/ncs/zephyr/include/zephyr/devicetree/clocks.h \
  /home/moho/ncs/zephyr/include/zephyr/devicetree/gpio.h \
@@ -34,6 +34,7 @@ linker.cmd: /home/moho/ncs/zephyr/soc/arm/nordic_nrf/nrf52/linker.ld \
  /home/moho/ncs/zephyr/include/zephyr/linker/linker-tool.h \
  /home/moho/ncs/zephyr/include/zephyr/linker/linker-tool-gcc.h \
  /home/moho/ncs/zephyr/include/zephyr/sys/mem_manage.h \
+ /home/moho/Documents/nRF-Beehavior-Firmware/v2.0Woodpecker/build/zephyr/include/generated/pm_config.h \
  /home/moho/ncs/zephyr/include/zephyr/linker/rel-sections.ld \
  /home/moho/Documents/nRF-Beehavior-Firmware/v2.0Woodpecker/build/zephyr/include/generated/snippets-rom-start.ld \
  /home/moho/ncs/zephyr/include/../arch/common/rom_start_offset.ld \

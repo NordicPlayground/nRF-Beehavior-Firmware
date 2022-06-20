@@ -1,43 +1,72 @@
-cmake_minimum_required(VERSION 3.13.1)
+#
+# Copyright (c) 2021 Nordic Semiconductor
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+cmake_minimum_required(VERSION 3.20.0)
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
+project("Edge Impulse wrapper sample")
 
-project(example-standalone-inferencing-zephyr)
+set(PM_STATIC_YML_FILE
+  ${CMAKE_CURRENT_SOURCE_DIR}/boards/pm_static_${BOARD}.yml
+  )
 
-include(utils/cmake/utils.cmake)
+# NORDIC SDK APP START
+target_include_directories(app PRIVATE src/include)
+target_sources(app PRIVATE src/main.c)
+# NORDIC SDK APP END
 
-# Needed for colorful output
-zephyr_compile_options(-fdiagnostics-color=always)
+#include ble
 
-# Use hardware acceleration for DSP and Neural Network code
-# You'll need to disable these on non-Arm cores
-add_definitions(-DEIDSP_USE_CMSIS_DSP=1
-                -DEI_CLASSIFIER_TFLITE_ENABLE_CMSIS_NN=1
-                -DARM_MATH_LOOPUNROLL
-                )
+# add_subdirectory(src/modules)
 
-# Add the Edge Impulse SDK
-add_subdirectory(edge-impulse-sdk/cmake/zephyr)
 
-# Add modules
+# Preinitialization related to Thingy:53 DFU
+target_sources_ifdef(CONFIG_BOARD_THINGY53_NRF5340_CPUAPP app PRIVATE
+  boards/thingy53.c
+)
+target_sources_ifdef(CONFIG_BOARD_THINGY53_NRF5340_CPUAPP_NS app PRIVATE
+  boards/thingy53.c
+)
 
-add_subdirectory(src/Modules)
 
-# Edge impulse SDK include directories
-set(INCLUDES
-    .
-    src
-    tflite-model
-    model-parameters
-    )
-include_directories(${INCLUDES})
+zephyr_library_include_directories(.)
 
-RECURSIVE_FIND_FILE(MODEL_FILES "tflite-model" "*.cpp")
-list(APPEND SOURCE_FILES ${MODEL_FILES})
 
-# add all sources to the project
-target_sources(app PRIVATE ${SOURCE_FILES})
-target_sources(app PRIVATE src/main.cpp)
+#
+# Copyright (c) 2018 Nordic Semiconductor
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+cmake_minimum_required(VERSION 3.20.0)
+
+set(PM_STATIC_YML_FILE
+  ${CMAKE_CURRENT_SOURCE_DIR}/boards/pm_static_${BOARD}.yml
+  )
+
+find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
+project(NONE)
+
+# NORDIC SDK APP START
+target_sources(app PRIVATE
+  src/main.c
+)
+
+# Include UART ASYNC API adapter
+target_sources_ifdef(CONFIG_BT_NUS_UART_ASYNC_ADAPTER app PRIVATE
+  src/modules/uart_async_adapter.c
+)
+
+# Preinitialization related to Thingy:53 DFU
+target_sources_ifdef(CONFIG_BOARD_THINGY53_NRF5340_CPUAPP app PRIVATE
+  boards/thingy53.c
+)
+target_sources_ifdef(CONFIG_BOARD_THINGY53_NRF5340_CPUAPP_NS app PRIVATE
+  boards/thingy53.c
+)
+
+# NORDIC SDK APP END
+
+zephyr_library_include_directories(.)

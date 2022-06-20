@@ -10,6 +10,7 @@ set_target_properties(devicetree_target PROPERTIES "DT_CHOSEN|zephyr,bt-c2h-uart
 set_target_properties(devicetree_target PROPERTIES "DT_CHOSEN|zephyr,sram" "/soc/memory@20000000")
 set_target_properties(devicetree_target PROPERTIES "DT_CHOSEN|zephyr,flash" "/soc/flash-controller@4001e000/flash@0")
 set_target_properties(devicetree_target PROPERTIES "DT_CHOSEN|zephyr,code-partition" "/soc/flash-controller@4001e000/flash@0/partitions/partition@c000")
+set_target_properties(devicetree_target PROPERTIES "DT_CHOSEN|nordic,nus-uart" "/soc/uart@40002000")
 set_target_properties(devicetree_target PROPERTIES "DT_ALIAS|led0" "/leds/led_0")
 set_target_properties(devicetree_target PROPERTIES "DT_ALIAS|bootloader-led0" "/leds/led_0")
 set_target_properties(devicetree_target PROPERTIES "DT_ALIAS|led1" "/leds/led_1")

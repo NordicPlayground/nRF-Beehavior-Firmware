@@ -13,7 +13,7 @@ zephyr/linker_zephyr_pre1.cmd: \
   /home/moho/ncs/zephyr/include/zephyr/sys/util_macro.h \
   /home/moho/ncs/zephyr/include/zephyr/sys/util_internal.h \
   /home/moho/ncs/zephyr/include/zephyr/sys/util_loops.h \
-  /home/moho/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux/gcc-arm-none-eabi-10.3-2021.10/lib/gcc/arm-none-eabi/10.3.1/include/stdbool.h \
+  /home/moho/ncs/toolchains/v2.0.0/opt/zephyr-sdk/arm-zephyr-eabi/lib/gcc/arm-zephyr-eabi/10.3.0/include/stdbool.h \
   /home/moho/ncs/zephyr/include/zephyr/devicetree/io-channels.h \
   /home/moho/ncs/zephyr/include/zephyr/devicetree/clocks.h \
   /home/moho/ncs/zephyr/include/zephyr/devicetree/gpio.h \
@@ -35,6 +35,7 @@ zephyr/linker_zephyr_pre1.cmd: \
   /home/moho/ncs/zephyr/include/zephyr/linker/linker-tool.h \
   /home/moho/ncs/zephyr/include/zephyr/linker/linker-tool-gcc.h \
   /home/moho/ncs/zephyr/include/zephyr/sys/mem_manage.h \
+  zephyr/include/generated/pm_config.h \
   /home/moho/ncs/zephyr/include/zephyr/linker/rel-sections.ld \
   zephyr/include/generated/snippets-rom-start.ld \
   /home/moho/ncs/zephyr/arch/common/rom_start_offset.ld \

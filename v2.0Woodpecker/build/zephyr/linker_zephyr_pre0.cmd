@@ -2,8 +2,8 @@
 _region_min_align = 32;
 MEMORY
     {
-    FLASH (rx) : ORIGIN = (0x0 + 0x0), LENGTH = (1024*1K - 0x0)
-    SRAM (wx) : ORIGIN = 0x20000000, LENGTH = (256 * 1K)
+    FLASH (rx) : ORIGIN = 0xc200, LENGTH = 0x78e00
+    SRAM (wx) : ORIGIN = 0x20000000, LENGTH = 0x40000
    
     IDT_LIST (wx) : ORIGIN = 0xFFFFF7FF, LENGTH = 2K
     }
@@ -41,7 +41,7 @@ SECTIONS
  *(.iplt)
  }
    
- __rom_region_start = (0x0 + 0x0);
+ __rom_region_start = 0xc200;
     rom_start :
  {
 . = 0x0;
@@ -129,7 +129,9 @@ _vector_end = .;
   __app_shmem_regions_end = .;
  } > FLASH
  bt_l2cap_fixed_chan_area : SUBALIGN(4) { _bt_l2cap_fixed_chan_list_start = .; KEEP(*(SORT_BY_NAME(._bt_l2cap_fixed_chan.static.*))); _bt_l2cap_fixed_chan_list_end = .; } > FLASH
+ bt_conn_cb_area : SUBALIGN(4) { _bt_conn_cb_list_start = .; KEEP(*(SORT_BY_NAME(._bt_conn_cb.static.*))); _bt_conn_cb_list_end = .; } > FLASH
  bt_gatt_service_static_area : SUBALIGN(4) { _bt_gatt_service_static_list_start = .; KEEP(*(SORT_BY_NAME(._bt_gatt_service_static.static.*))); _bt_gatt_service_static_list_end = .; } > FLASH
+ settings_handler_static_area : SUBALIGN(4) { _settings_handler_static_list_start = .; KEEP(*(SORT_BY_NAME(._settings_handler_static.static.*))); _settings_handler_static_list_end = .; } > FLASH
  k_p4wq_initparam_area : SUBALIGN(4) { _k_p4wq_initparam_list_start = .; KEEP(*(SORT_BY_NAME(._k_p4wq_initparam.static.*))); _k_p4wq_initparam_list_end = .; } > FLASH
  log_strings_sections : ALIGN_WITH_INPUT
  {
@@ -287,7 +289,7 @@ __ramfunc_load_start = LOADADDR(.ramfunc);
         } > SRAM
     _image_ram_end = .;
     _end = .;
-    __kernel_ram_end = 0x20000000 + (256 * 1K);
+    __kernel_ram_end = 0x20000000 + 0x40000;
     __kernel_ram_size = __kernel_ram_end - __kernel_ram_start;
    
 .intList :

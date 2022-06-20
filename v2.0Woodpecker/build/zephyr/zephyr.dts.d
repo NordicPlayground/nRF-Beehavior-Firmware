@@ -11,4 +11,5 @@ empty_file.o: /home/moho/ncs/zephyr/misc/empty_file.c \
  /home/moho/ncs/zephyr/include/zephyr/dt-bindings/pinctrl/nrf-pinctrl.h \
  /home/moho/ncs/zephyr/include/zephyr/dt-bindings/pwm/pwm.h \
  /home/moho/ncs/zephyr/dts/arm/nordic/override.dtsi \
- /home/moho/ncs/zephyr/boards/arm/nrf52840dk_nrf52840/nrf52840dk_nrf52840-pinctrl.dtsi
+ /home/moho/ncs/zephyr/boards/arm/nrf52840dk_nrf52840/nrf52840dk_nrf52840-pinctrl.dtsi \
+ /home/moho/Documents/nRF-Beehavior-Firmware/v2.0Woodpecker/app.overlay

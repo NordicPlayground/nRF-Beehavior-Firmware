@@ -1126,4 +1126,17 @@ zephyr_udc0: &usbd {
  status = "okay";
 };
 # 1 "<command-line>" 2
+# 1 "/home/moho/Documents/nRF-Beehavior-Firmware/v2.0Woodpecker/app.overlay" 1
+
+
+
+
+
+
+/ {
+ chosen {
+  nordic,nus-uart = &uart0;
+ };
+};
+# 1 "<command-line>" 2
 # 1 "/home/moho/ncs/zephyr/misc/empty_file.c"

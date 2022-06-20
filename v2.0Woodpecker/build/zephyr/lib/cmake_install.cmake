@@ -34,15 +34,26 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "/home/moho/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-objdump")
+  set(CMAKE_OBJDUMP "/home/moho/ncs/toolchains/v2.0.0/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-objdump")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for each subdirectory.
+  # Include the install script for the subdirectory.
   include("/home/moho/Documents/nRF-Beehavior-Firmware/v2.0Woodpecker/build/zephyr/lib/libc/cmake_install.cmake")
-  include("/home/moho/Documents/nRF-Beehavior-Firmware/v2.0Woodpecker/build/zephyr/lib/posix/cmake_install.cmake")
-  include("/home/moho/Documents/nRF-Beehavior-Firmware/v2.0Woodpecker/build/zephyr/lib/os/cmake_install.cmake")
-  include("/home/moho/Documents/nRF-Beehavior-Firmware/v2.0Woodpecker/build/zephyr/lib/util/cmake_install.cmake")
+endif()
 
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/home/moho/Documents/nRF-Beehavior-Firmware/v2.0Woodpecker/build/zephyr/lib/posix/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/home/moho/Documents/nRF-Beehavior-Firmware/v2.0Woodpecker/build/zephyr/lib/os/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("/home/moho/Documents/nRF-Beehavior-Firmware/v2.0Woodpecker/build/zephyr/lib/util/cmake_install.cmake")
 endif()
 

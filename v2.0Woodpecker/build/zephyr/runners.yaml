@@ -16,10 +16,10 @@ config:
   board_dir: /home/moho/ncs/zephyr/boards/arm/nrf52840dk_nrf52840
   # Build outputs:
   elf_file: zephyr.elf
-  hex_file: zephyr.hex
+  hex_file: /home/moho/Documents/nRF-Beehavior-Firmware/v2.0Woodpecker/build/zephyr/merged.hex
   bin_file: zephyr.bin
   # Host tools:
-  gdb: /home/moho/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-gdb
+  gdb: /home/moho/ncs/toolchains/v2.0.0/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-gdb
 
 # Runner specific arguments
 args:

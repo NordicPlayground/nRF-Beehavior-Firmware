@@ -1,3 +1,4 @@
+/home/moho/Documents/nRF-Beehavior-Firmware/v2.0Woodpecker/Kconfig
 /home/moho/Documents/nRF-Beehavior-Firmware/v2.0Woodpecker/build/Kconfig/Kconfig.modules
 /home/moho/Documents/nRF-Beehavior-Firmware/v2.0Woodpecker/build/Kconfig/Kconfig.shield
 /home/moho/Documents/nRF-Beehavior-Firmware/v2.0Woodpecker/build/Kconfig/Kconfig.shield.defconfig
@@ -240,7 +241,7 @@
 /home/moho/ncs/nrfxlib/nrf_security/src/drivers/nrf_oberon/Kconfig
 /home/moho/ncs/nrfxlib/openthread/Kconfig
 /home/moho/ncs/nrfxlib/zboss/Kconfig
-/home/moho/ncs/zephyr/Kconfig
+/home/moho/ncs/toolchains/v2.0.0/opt/zephyr-sdk/cmake/zephyr/Kconfig
 /home/moho/ncs/zephyr/Kconfig.zephyr
 /home/moho/ncs/zephyr/arch/Kconfig
 /home/moho/ncs/zephyr/arch/arm/Kconfig
@@ -322,7 +323,6 @@
 /home/moho/ncs/zephyr/boards/shields/x_nucleo_iks02a1/Kconfig.defconfig
 /home/moho/ncs/zephyr/boards/shields/x_nucleo_iks02a1/Kconfig.shield
 /home/moho/ncs/zephyr/boards/shields/x_nucleo_iks02a1/boards/nucleo_f411re.defconfig
-/home/moho/ncs/zephyr/cmake/toolchain/gnuarmemb/Kconfig
 /home/moho/ncs/zephyr/drivers/Kconfig
 /home/moho/ncs/zephyr/drivers/adc/Kconfig
 /home/moho/ncs/zephyr/drivers/adc/Kconfig.adc_emul
