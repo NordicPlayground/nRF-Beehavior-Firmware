@@ -9,3 +9,30 @@
 		nordic,nus-uart = &uart0;
 	};
 };
+
+//added by nora
+&pinctrl{
+    i2s_default: i2s_default {
+        group0 {
+            psels = <NRF_PSEL(I2S_MCK, 1, 4)>,
+                <NRF_PSEL(I2S_LRCK_M,1,12)>,
+                <NRF_PSEL(I2S_SCK_S,1,10)>,
+             <NRF_PSEL(I2S_SDIN, 1, 5)>;
+        };
+    };
+};
+woodpecker_i2s: &i2s0 {
+    status = "okay";
+    pinctrl-0 = <&i2s_default>;
+    pinctrl-names = "default";
+    // sck-pin = <45>;//??
+    // sdin-pin = <47>;//GOOD
+    // mck-pin = <42>;//GOOD
+    // lrck-pin = <44>;//GOOD
+    // sdout-pin = <46>;
+    mpxxdtyy@0 {
+        compatible = "st,mpxxdtyy";
+        label = "MPXXDTYY";
+        reg = <0x0 >;
+    };
+};

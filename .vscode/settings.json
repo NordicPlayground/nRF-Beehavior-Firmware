@@ -1,5 +1,7 @@
 {
-    "nrf-connect.applications": [],
+    "nrf-connect.applications": [
+        "${workspaceFolder}\\v2.0Woodpecker"
+    ],
     "nrf-connect.topdir": "${nrf-connect.sdk:2.0.0}",
     "nrf-connect.toolchain.path": "PATH"
 }
