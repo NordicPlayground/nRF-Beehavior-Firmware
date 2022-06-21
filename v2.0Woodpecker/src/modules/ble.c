@@ -231,8 +231,7 @@ static int uart_init(void)
 	tx = k_malloc(sizeof(*tx));
 
 	if (tx) {
-		pos = snprintf(tx->data, sizeof(tx->data),
-			       "Starting Nordic UART service example\r\n");
+		pos = snprintf(tx->data, sizeof(tx->data),"\n");
 
 		if ((pos < 0) || (pos >= sizeof(tx->data))) {
 			k_free(tx);
@@ -492,13 +491,13 @@ void init_wp_ble(void)
 	if (IS_ENABLED(CONFIG_BT_NUS_SECURITY_ENABLED)) {
 		err = bt_conn_auth_cb_register(&conn_auth_callbacks);
 		if (err) {
-			printk("Failed to register authorization callbacks.\n");
+			LOG_ERR("Failed to register authorization callbacks.\n");
 			return;
 		}
 
 		err = bt_conn_auth_info_cb_register(&conn_auth_info_callbacks);
 		if (err) {
-			printk("Failed to register authorization info callbacks.\n");
+			LOG_ERR("Failed to register authorization info callbacks.\n");
 			return;
 		}
 	}
