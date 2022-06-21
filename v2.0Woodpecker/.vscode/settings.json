@@ -1,10 +1,13 @@
 {
     "nrf-connect.applications": [
-        "${workspaceFolder}"
+        "${workspaceFolder}",
+        "/home/moho/Documents/hello_world"
     ],
     "files.associations": {
         "uart_async_adapter.h": "c",
         "uart.h": "c",
         "usb_device.h": "c"
-    }
+    },
+    "nrf-connect.topdir": "/home/moho/ncs",
+    "nrf-connect.toolchain.path": "PATH"
 }
