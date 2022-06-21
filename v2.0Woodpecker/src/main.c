@@ -6,10 +6,12 @@
 
 #include <zephyr/kernel.h>
 #include <ei_wrapper.h>
+#include <logging/log.h>
 
 #include "input_data.h"
-#include "modules/ble.c"
+#include "ble.h"
 
+LOG_MODULE_REGISTER(MAIN);
 
 #define FRAME_ADD_INTERVAL_MS	100
 
