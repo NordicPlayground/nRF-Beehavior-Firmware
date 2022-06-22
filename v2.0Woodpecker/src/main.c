@@ -78,13 +78,8 @@ static void result_ready_cb(int err)
 		frame_surplus--;
 	}
 }
-
-K_THREAD_DEFINE(bleconn, 2048, init_wp_ble, NULL, NULL, NULL, 7, 0, 0);
-
-void main(void)
-{
-	init_wp_ble();
-
+void init_ei_go(void){
+	
 	LOG_ERR("Edge Impulse wrapper failed to initialize");
 
 	
@@ -159,5 +154,24 @@ void main(void)
 
 		k_sleep(K_MSEC(FRAME_ADD_INTERVAL_MS));
 	}
-	printk("Test if the thread returns\n");
+}
+//K_THREAD_DEFINE(edgeimp, 2048, init_ei_go, NULL, NULL, NULL, 6, 0, 0);
+//K_THREAD_DEFINE(bleconn, 2048, init_wp_ble, NULL, NULL, NULL, 7, 0, 0);
+K_THREAD_STACK_DEFINE(my_stack_area, 2048);
+
+struct k_thread my_thread_data;
+K_THREAD_STACK_DEFINE(my_stack_area2, 2048);
+
+struct k_thread my_thread_data2;
+
+void main(void)
+{
+	LOG_INF("Da er vi i gang");
+	k_thread_create(&my_thread_data, my_stack_area,K_THREAD_STACK_SIZEOF(my_stack_area),init_wp_ble,NULL, NULL, NULL,5, 0, K_NO_WAIT);
+	k_thread_create(&my_thread_data2, my_stack_area2,K_THREAD_STACK_SIZEOF(my_stack_area2),init_ei_go,NULL, NULL, NULL,6, 0, K_NO_WAIT);
+	// init_wp_ble();
+	// init_ei_go();
+	LOG_INF("Ferdig");
+	
+	
 }

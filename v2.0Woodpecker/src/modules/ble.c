@@ -396,41 +396,43 @@ static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
 
 	LOG_INF("Received data from: %s", log_strdup(addr));
 
-	for (uint16_t pos = 0; pos != len;) {
-		struct uart_data_t *tx = k_malloc(sizeof(*tx));
+	LOG_INF("%d", data);
 
-		if (!tx) {
-			LOG_WRN("Not able to allocate UART send data buffer");
-			return;
+	// for (uint16_t pos = 0; pos != len;) {
+	 //	struct uart_data_t *tx = k_malloc(sizeof(*tx));
+
+	//	if (!tx) {
+	// 		LOG_WRN("Not able to allocate UART send data buffer");
+	// 		return;
+	// 	}
+
+		// /* Keep the last byte of TX buffer for potential LF char. */
+		// size_t tx_data_size = sizeof(tx->data) - 1;
+
+		// if ((len - pos) > tx_data_size) {
+		// 	tx->len = tx_data_size;
+		// } else {
+		// 	tx->len = (len - pos);
+		// }
+
+		// memcpy(tx->data, &data[pos], tx->len);
+
+		// pos += tx->len;
+
+		// /* Append the LF character when the CR character triggered
+		//  * transmission from the peer.
+		//  */
+		// if ((pos == len) && (data[len - 1] == '\r')) {
+		// 	tx->data[tx->len] = '\n';
+		// 	tx->len++;
+		// }
+
+		// err = uart_tx(uart, tx->data, tx->len, SYS_FOREVER_MS);
+		// if (err) {
+		// 	k_fifo_put(&fifo_uart_tx_data, tx);
 		}
-
-		/* Keep the last byte of TX buffer for potential LF char. */
-		size_t tx_data_size = sizeof(tx->data) - 1;
-
-		if ((len - pos) > tx_data_size) {
-			tx->len = tx_data_size;
-		} else {
-			tx->len = (len - pos);
-		}
-
-		memcpy(tx->data, &data[pos], tx->len);
-
-		pos += tx->len;
-
-		/* Append the LF character when the CR character triggered
-		 * transmission from the peer.
-		 */
-		if ((pos == len) && (data[len - 1] == '\r')) {
-			tx->data[tx->len] = '\n';
-			tx->len++;
-		}
-
-		err = uart_tx(uart, tx->data, tx->len, SYS_FOREVER_MS);
-		if (err) {
-			k_fifo_put(&fifo_uart_tx_data, tx);
-		}
-	}
-}
+// 	}
+// }
 
 
 
