@@ -10,6 +10,7 @@
 
 #include "input_data.h"
 #include "ble.h"
+#include "mic.h"
 
 LOG_MODULE_REGISTER(MAIN);
 
@@ -82,7 +83,7 @@ K_THREAD_DEFINE(bleconn, 2048, init_wp_ble, NULL, NULL, NULL, 7, 0, 0);
 
 void main(void)
 {
-
+	init_wp_ble();
 
 	LOG_ERR("Edge Impulse wrapper failed to initialize");
 
@@ -92,8 +93,8 @@ void main(void)
 	if (err) {
 		LOG_ERR("Edge Impulse wrapper failed to initialize (err: %d)\n",
 		       err);
-		return;
-	};
+		
+	}
 
 	if (ARRAY_SIZE(input_data) < ei_wrapper_get_window_size()) {
 		LOG_ERR("Not enough input data\n");
@@ -140,6 +141,11 @@ void main(void)
 	frame_surplus = (ARRAY_SIZE(input_data) - ei_wrapper_get_window_size())
 			/ ei_wrapper_get_frame_size();
 
+	size_t test_array_size = ARRAY_SIZE(input_data);
+	printk("the size of input data array: %d\n", test_array_size);
+
+
+
 	while (cnt < ARRAY_SIZE(input_data)) {
 		err = ei_wrapper_add_data(&input_data[cnt],
 					  ei_wrapper_get_frame_size());
@@ -153,4 +159,5 @@ void main(void)
 
 		k_sleep(K_MSEC(FRAME_ADD_INTERVAL_MS));
 	}
+	printk("Test if the thread returns\n");
 }

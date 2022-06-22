@@ -12,8 +12,8 @@
 #include "mic.h"
 
 /* uncomment if you want PCM output in ascii */
-/*#define PCM_OUTPUT_IN_ASCII		1  */
-#define PCM_OUTPUT_IN_ASCII	1
+//#define PCM_OUTPUT_IN_ASCII		1  
+//#define PCM_OUTPUT_IN_ASCII	1
 
 #define AUDIO_FREQ		16000
 #define CHAN_SIZE		16
@@ -116,6 +116,9 @@ void mic(void)
 
 			z_impl_k_str_out(&pcm_l, 1);
 			z_impl_k_str_out(&pcm_h, 1);
+			printk("%u, \n", &pcm_l);
+			printk("%u, \n", &pcm_h);
+
 		}
 	}
 #endif
