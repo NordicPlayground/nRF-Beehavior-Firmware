@@ -7,6 +7,7 @@
 / {
 	chosen {
 		nordic,nus-uart = &uart0;
+        
 	};
 };
 
@@ -21,6 +22,8 @@
         };
     };
 };
+
+
 woodpecker_i2s: &i2s0 {
     status = "okay";
     pinctrl-0 = <&i2s_default>;
