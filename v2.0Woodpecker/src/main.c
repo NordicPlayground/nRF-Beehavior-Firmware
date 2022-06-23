@@ -29,13 +29,13 @@ static void result_ready_cb(int err)
 
 	const char *label;
 	float value;
+	size_t inx;
 	float anomaly;
 
-	LOG_INF("\nClassification results\n");
-	LOG_INF("======================\n");
+	LOG_INF("Classification results\n");
 
 	while (true) {
-		err = ei_wrapper_get_next_classification_result(&label, &value, NULL);
+		err = ei_wrapper_get_next_classification_result(&label, &value, &inx);
 
 		if (err) {
 			if (err == -ENOENT) {
@@ -45,14 +45,30 @@ static void result_ready_cb(int err)
 			else{
 			LOG_ERR("Edge Impulse wrapper failed to initialize (err: %d)\n",
 		       err);
-			   break;
+			   
 			}
+			break;
 		}
+		if (inx == 2){
+
+			
+
+			memcpy(&woodpecker, &value, sizeof(woodpecker));
+
+			LOG_INF("%f", woodpecker);
+
+			LOG_INF("Value: %.2f\tLabel: %s\n", value, label);
+		}
+
 		
 		
-		LOG_INF("Value: %.2f\tLabel: %s\n", value, label);
+		
+
+		
 		
 	}
+
+	
 	
 	if (err) {
 		LOG_ERR("Cannot get classification results (err: %d)", err);
@@ -80,7 +96,6 @@ static void result_ready_cb(int err)
 }
 void init_ei_go(void){
 	
-	LOG_ERR("Edge Impulse wrapper failed to initialize");
 
 	
 	int err = ei_wrapper_init(result_ready_cb);
@@ -107,7 +122,7 @@ void init_ei_go(void){
 	for (size_t i = 0; i < ei_wrapper_get_classifier_label_count(); i++) {
 		LOG_DBG("- %s\n", ei_wrapper_get_classifier_label(i));
 	}
-	printk("\n");
+	LOG_INF("\n");
 
 	size_t cnt = 0;
 
@@ -137,7 +152,7 @@ void init_ei_go(void){
 			/ ei_wrapper_get_frame_size();
 
 	size_t test_array_size = ARRAY_SIZE(input_data);
-	printk("the size of input data array: %d\n", test_array_size);
+	LOG_INF("the size of input data array: %d\n", test_array_size);
 
 
 
@@ -157,21 +172,23 @@ void init_ei_go(void){
 }
 //K_THREAD_DEFINE(edgeimp, 2048, init_ei_go, NULL, NULL, NULL, 6, 0, 0);
 //K_THREAD_DEFINE(bleconn, 2048, init_wp_ble, NULL, NULL, NULL, 7, 0, 0);
-K_THREAD_STACK_DEFINE(my_stack_area, 2048);
+// K_THREAD_STACK_DEFINE(my_stack_area, 2048);
 
-struct k_thread my_thread_data;
-K_THREAD_STACK_DEFINE(my_stack_area2, 2048);
+// struct k_thread my_thread_data;
+// K_THREAD_STACK_DEFINE(my_stack_area2, 2048);
 
-struct k_thread my_thread_data2;
+// struct k_thread my_thread_data2;
+
+K_THREAD_DEFINE(bleT, 2048, init_wp_ble, NULL, NULL, NULL, 6, 0, 0);
+K_THREAD_DEFINE(eiT, 2048, init_ei_go, NULL, NULL, NULL, 7, 0, 0);
+
+
 
 void main(void)
 {
-	LOG_INF("Da er vi i gang");
-	k_thread_create(&my_thread_data, my_stack_area,K_THREAD_STACK_SIZEOF(my_stack_area),init_wp_ble,NULL, NULL, NULL,5, 0, K_NO_WAIT);
-	k_thread_create(&my_thread_data2, my_stack_area2,K_THREAD_STACK_SIZEOF(my_stack_area2),init_ei_go,NULL, NULL, NULL,6, 0, K_NO_WAIT);
-	// init_wp_ble();
-	// init_ei_go();
-	LOG_INF("Ferdig");
+woodpecker=1;
+
+
 	
 	
 }

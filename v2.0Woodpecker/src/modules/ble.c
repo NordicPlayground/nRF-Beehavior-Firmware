@@ -11,6 +11,8 @@
 
 #include "ble.h"
 
+#include "input_data.h"
+
 #define LOG_MODULE_NAME peripheral_uart
 LOG_MODULE_REGISTER(LOG_MODULE_NAME);
 
@@ -389,6 +391,8 @@ static struct bt_conn_auth_cb conn_auth_callbacks;
 static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
 			  uint16_t len)
 {
+
+	
 	int err;
 	char addr[BT_ADDR_LE_STR_LEN] = {0};
 
@@ -396,10 +400,18 @@ static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
 
 	LOG_INF("Received data from: %s", log_strdup(addr));
 
-	LOG_INF("%d", data);
+	
 
 	// for (uint16_t pos = 0; pos != len;) {
-	 //	struct uart_data_t *tx = k_malloc(sizeof(*tx));
+	struct uart_data_t *tx = k_malloc(sizeof(*tx));
+	
+	
+
+	LOG_INF("%s", data);
+
+	LOG_INF("uint: %i", (uint8_t) data[0]);
+
+	LOG_INF("float: %f", woodpecker);
 
 	//	if (!tx) {
 	// 		LOG_WRN("Not able to allocate UART send data buffer");
@@ -430,9 +442,15 @@ static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
 		// err = uart_tx(uart, tx->data, tx->len, SYS_FOREVER_MS);
 		// if (err) {
 		// 	k_fifo_put(&fifo_uart_tx_data, tx);
+		
+		
+
+		// 	}
+	// }
+		
 		}
-// 	}
-// }
+
+
 
 
 
@@ -530,10 +548,7 @@ void init_wp_ble(void)
 		return;
 	}
 
-	for (;;) {
-		//dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
-		k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
-	}
+	
 }
 
 void ble_write_thread(void)
@@ -541,17 +556,32 @@ void ble_write_thread(void)
 	/* Don't go any further until BLE is initialized */
 	k_sem_take(&ble_init_ok, K_FOREVER);
 
-	for (;;) {
-		/* Wait indefinitely for data to be sent over bluetooth */
-		struct uart_data_t *buf = k_fifo_get(&fifo_uart_rx_data,
-						     K_FOREVER);
 
-		if (bt_nus_send(NULL, buf->data, buf->len)) {
-			LOG_WRN("Failed to send data over BLE connection");
-		}
 
-		k_free(buf);
+	while (true)
+	{
+
+		LOG_INF("BLE WRITE");
+
+		bt_nus_send(NULL,(uint8_t)(woodpecker*255), 1);
+
+		LOG_INF("%i", (uint8_t)(woodpecker*255));
+
+		k_sleep(K_SECONDS(30));
 	}
+	
+
+	// for (;;) {
+	// 	/* Wait indefinitely for data to be sent over bluetooth */
+	// 	struct uart_data_t *buf = k_fifo_get(&fifo_uart_rx_data,
+	// 					     K_FOREVER);
+
+	// 	if (bt_nus_send(NULL, buf->data, buf->len)) {
+	// 		LOG_WRN("Failed to send data over BLE connection");
+	// 	}
+
+	// 	k_free(buf);
+	// }
 }
 
 K_THREAD_DEFINE(ble_write_thread_id, STACKSIZE, ble_write_thread, NULL, NULL,
