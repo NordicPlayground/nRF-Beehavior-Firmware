@@ -1,26 +1,10 @@
-/*
- * Copyright (c) 2018 Nordic Semiconductor ASA
- *
- * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
- */
-
-/** @file
- *  @brief Nordic UART Bridge Service (NUS) sample
- */
-#include "uart_async_adapter.h"
-
 #include "ble.h"
-
 #include "input_data.h"
+
+
 
 #define LOG_MODULE_NAME peripheral_uart
 LOG_MODULE_REGISTER(LOG_MODULE_NAME);
-
-
-
-static K_SEM_DEFINE(ble_init_ok, 0, 1);
-
-
 
 static void uart_cb(const struct device *dev, struct uart_event *evt, void *user_data)
 {
@@ -179,7 +163,7 @@ static int uart_init(void)
 
 	if (IS_ENABLED(CONFIG_USB_DEVICE_STACK)) {
 		err = usb_enable(NULL);
-		if (err) {
+		if (err && (err != -EALREADY)) {
 			LOG_ERR("Failed to enable USB");
 			return err;
 		}
@@ -203,7 +187,7 @@ static int uart_init(void)
 
 	err = uart_callback_set(uart, uart_cb, NULL);
 	if (err) {
-		LOG_ERR("Cannot initialize UART callback code: %i", err);
+		LOG_ERR("Cannot initialize UART callback");
 		return err;
 	}
 
@@ -233,7 +217,8 @@ static int uart_init(void)
 	tx = k_malloc(sizeof(*tx));
 
 	if (tx) {
-		pos = snprintf(tx->data, sizeof(tx->data),"\n");
+		pos = snprintf(tx->data, sizeof(tx->data),
+			       "Starting Nordic UART service example\r\n");
 
 		if ((pos < 0) || (pos >= sizeof(tx->data))) {
 			k_free(tx);
@@ -269,7 +254,7 @@ static void connected(struct bt_conn *conn, uint8_t err)
 
 	current_conn = bt_conn_ref(conn);
 
-	
+	dk_set_led_on(CON_STATUS_LED);
 }
 
 static void disconnected(struct bt_conn *conn, uint8_t reason)
@@ -288,7 +273,7 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 	if (current_conn) {
 		bt_conn_unref(current_conn);
 		current_conn = NULL;
-		
+		dk_set_led_off(CON_STATUS_LED);
 	}
 }
 
@@ -308,8 +293,6 @@ static void security_changed(struct bt_conn *conn, bt_security_t level,
 			level, err);
 	}
 }
-
-
 #endif
 
 BT_CONN_CB_DEFINE(conn_callbacks) = {
@@ -374,6 +357,7 @@ static void pairing_failed(struct bt_conn *conn, enum bt_security_err reason)
 		reason);
 }
 
+
 static struct bt_conn_auth_cb conn_auth_callbacks = {
 	.passkey_display = auth_passkey_display,
 	.passkey_confirm = auth_passkey_confirm,
@@ -391,8 +375,6 @@ static struct bt_conn_auth_cb conn_auth_callbacks;
 static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
 			  uint16_t len)
 {
-
-	
 	int err;
 	char addr[BT_ADDR_LE_STR_LEN] = {0};
 
@@ -400,63 +382,49 @@ static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
 
 	LOG_INF("Received data from: %s", log_strdup(addr));
 
-	
+	for (uint16_t pos = 0; pos != len;) {
+		struct uart_data_t *tx = k_malloc(sizeof(*tx));
 
-	// for (uint16_t pos = 0; pos != len;) {
-	struct uart_data_t *tx = k_malloc(sizeof(*tx));
-	
-	
-
-	LOG_INF("%s", data);
-
-	LOG_INF("uint: %i", (uint8_t) data[0]);
-
-	LOG_INF("float: %f", woodpecker);
-
-	//	if (!tx) {
-	// 		LOG_WRN("Not able to allocate UART send data buffer");
-	// 		return;
-	// 	}
-
-		// /* Keep the last byte of TX buffer for potential LF char. */
-		// size_t tx_data_size = sizeof(tx->data) - 1;
-
-		// if ((len - pos) > tx_data_size) {
-		// 	tx->len = tx_data_size;
-		// } else {
-		// 	tx->len = (len - pos);
-		// }
-
-		// memcpy(tx->data, &data[pos], tx->len);
-
-		// pos += tx->len;
-
-		// /* Append the LF character when the CR character triggered
-		//  * transmission from the peer.
-		//  */
-		// if ((pos == len) && (data[len - 1] == '\r')) {
-		// 	tx->data[tx->len] = '\n';
-		// 	tx->len++;
-		// }
-
-		// err = uart_tx(uart, tx->data, tx->len, SYS_FOREVER_MS);
-		// if (err) {
-		// 	k_fifo_put(&fifo_uart_tx_data, tx);
-		
-		
-
-		// 	}
-	// }
-		
+		if (!tx) {
+			LOG_WRN("Not able to allocate UART send data buffer");
+			return;
 		}
 
+		/* Keep the last byte of TX buffer for potential LF char. */
+		size_t tx_data_size = sizeof(tx->data) - 1;
 
+		if ((len - pos) > tx_data_size) {
+			tx->len = tx_data_size;
+		} else {
+			tx->len = (len - pos);
+		}
 
+		memcpy(tx->data, &data[pos], tx->len);
 
+		pos += tx->len;
+
+		/* Append the LF character when the CR character triggered
+		 * transmission from the peer.
+		 */
+		if ((pos == len) && (data[len - 1] == '\r')) {
+			tx->data[tx->len] = '\n';
+			tx->len++;
+		}
+
+		err = uart_tx(uart, tx->data, tx->len, SYS_FOREVER_MS);
+		if (err) {
+			k_fifo_put(&fifo_uart_tx_data, tx);
+		}
+	}
+}
+
+static struct bt_nus_cb nus_cb = {
+	.received = bt_receive_cb,
+};
 
 void error(void)
 {
-	//dk_set_leds_state(DK_ALL_LEDS_MSK, DK_NO_LEDS_MSK);
+	dk_set_leds_state(DK_ALL_LEDS_MSK, DK_NO_LEDS_MSK);
 
 	while (true) {
 		/* Spin for ever */
@@ -495,13 +463,29 @@ void button_changed(uint32_t button_state, uint32_t has_changed)
 }
 #endif /* CONFIG_BT_NUS_SECURITY_ENABLED */
 
+static void configure_gpio(void)
+{
+	int err;
+
+#ifdef CONFIG_BT_NUS_SECURITY_ENABLED
+	err = dk_buttons_init(button_changed);
+	if (err) {
+		LOG_ERR("Cannot init buttons (err: %d)", err);
+	}
+#endif /* CONFIG_BT_NUS_SECURITY_ENABLED */
+
+	err = dk_leds_init();
+	if (err) {
+		LOG_ERR("Cannot init LEDs (err: %d)", err);
+	}
+}
 
 void init_wp_ble(void)
 {
 	int blink_status = 0;
 	int err = 0;
 
-
+	configure_gpio();
 
 	err = uart_init();
 	if (err) {
@@ -511,13 +495,13 @@ void init_wp_ble(void)
 	if (IS_ENABLED(CONFIG_BT_NUS_SECURITY_ENABLED)) {
 		err = bt_conn_auth_cb_register(&conn_auth_callbacks);
 		if (err) {
-			LOG_ERR("Failed to register authorization callbacks.\n");
+			printk("Failed to register authorization callbacks.\n");
 			return;
 		}
 
 		err = bt_conn_auth_info_cb_register(&conn_auth_info_callbacks);
 		if (err) {
-			LOG_ERR("Failed to register authorization info callbacks.\n");
+			printk("Failed to register authorization info callbacks.\n");
 			return;
 		}
 	}
@@ -548,43 +532,46 @@ void init_wp_ble(void)
 		return;
 	}
 
-	
+	for (;;) {
+		dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
+		k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
+	}
 }
 
-void ble_write_thread(void)
+void ble_write_thread(float* woodpecker)
 {
 	/* Don't go any further until BLE is initialized */
 	k_sem_take(&ble_init_ok, K_FOREVER);
 
+	for (;;) {
+		/* Wait indefinitely for data to be sent over bluetooth */
+		struct Sending_buffer {
+			char data;
+			uint8_t len;
+		};
+
+		struct Sending_buffer buf;
+
+		
+
+		LOG_INF("%f", *woodpecker);
+
+		buf.data = (uint8_t) (*woodpecker*255);
+		buf.len = sizeof(buf.data);
+
+		k_sleep(K_SECONDS(10));
 
 
-	while (true)
-	{
+		if (bt_nus_send(NULL, &buf.data, buf.len)) {
+			LOG_WRN("Failed to send data over BLE connection");
+		}
+		else{
+			LOG_INF("data is sent %i", buf.data);
+		}
 
-		LOG_INF("BLE WRITE");
+		
 
-		bt_nus_send(NULL,(uint8_t)(woodpecker*255), 1);
-
-		LOG_INF("%i", (uint8_t)(woodpecker*255));
-
-		k_sleep(K_SECONDS(30));
+		
 	}
-	
-
-	// for (;;) {
-	// 	/* Wait indefinitely for data to be sent over bluetooth */
-	// 	struct uart_data_t *buf = k_fifo_get(&fifo_uart_rx_data,
-	// 					     K_FOREVER);
-
-	// 	if (bt_nus_send(NULL, buf->data, buf->len)) {
-	// 		LOG_WRN("Failed to send data over BLE connection");
-	// 	}
-
-	// 	k_free(buf);
-	// }
 }
-
-K_THREAD_DEFINE(ble_write_thread_id, STACKSIZE, ble_write_thread, NULL, NULL,
-		NULL, PRIORITY, 0, 0);
-
 

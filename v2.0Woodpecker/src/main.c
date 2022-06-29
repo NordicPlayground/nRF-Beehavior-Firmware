@@ -51,7 +51,7 @@ static void result_ready_cb(int err)
 		}
 		if (inx == 2){
 
-			
+			woodpecker = 1; 
 
 			memcpy(&woodpecker, &value, sizeof(woodpecker));
 
@@ -170,23 +170,19 @@ void init_ei_go(void){
 		k_sleep(K_MSEC(FRAME_ADD_INTERVAL_MS));
 	}
 }
-//K_THREAD_DEFINE(edgeimp, 2048, init_ei_go, NULL, NULL, NULL, 6, 0, 0);
-//K_THREAD_DEFINE(bleconn, 2048, init_wp_ble, NULL, NULL, NULL, 7, 0, 0);
-// K_THREAD_STACK_DEFINE(my_stack_area, 2048);
 
-// struct k_thread my_thread_data;
-// K_THREAD_STACK_DEFINE(my_stack_area2, 2048);
 
-// struct k_thread my_thread_data2;
-
-K_THREAD_DEFINE(bleT, 2048, init_wp_ble, NULL, NULL, NULL, 6, 0, 0);
-K_THREAD_DEFINE(eiT, 2048, init_ei_go, NULL, NULL, NULL, 7, 0, 0);
-
+K_THREAD_DEFINE(bleT, 4096, init_wp_ble, NULL, NULL, NULL, 6, 0, 0);
+K_THREAD_DEFINE(eiT, 4096, init_ei_go, NULL, NULL, NULL, 7, 0, 0);
+K_THREAD_DEFINE(ble_write_thread_id, STACKSIZE, ble_write_thread, &woodpecker, NULL,
+		NULL, PRIORITY, 0, 0);
 
 
 void main(void)
 {
-woodpecker=1;
+
+
+
 
 
 	

@@ -5,6 +5,7 @@
 #
 
 target_include_directories(app PRIVATE .)
-# target_sources(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/uart_async_adapter.c)
+target_sources(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/uart_async_adapter.c)
 target_sources(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ble.c)
+target_sources(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/mic.c)
 

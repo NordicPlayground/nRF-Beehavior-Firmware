@@ -1,3 +1,5 @@
+#pragma once
+
 #include <zephyr/types.h>
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/uart.h>
@@ -102,12 +104,7 @@ static void pairing_failed(struct bt_conn *conn, enum bt_security_err reason);
 
 #endif
 
-static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
-			  uint16_t len);
 
-static struct bt_nus_cb nus_cb = {
-	.received = bt_receive_cb,
-};
 
 void error(void);
 
@@ -120,4 +117,6 @@ void button_changed(uint32_t button_state, uint32_t has_changed);
 
 void init_wp_ble(void);
 
-void ble_write_thread(void);
+void ble_write_thread(float* woodpecker);
+
+static K_SEM_DEFINE(ble_init_ok, 0, 1);
