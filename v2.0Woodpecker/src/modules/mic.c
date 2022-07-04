@@ -5,6 +5,7 @@
  */
 
 #include "mic.h"
+#include <ei_wrapper.h>
 // 
 
 LOG_MODULE_REGISTER(dmic_sample);
@@ -24,16 +25,21 @@ static int do_pdm_transfer(const struct device *dmic_dev,
 		return ret;
 	}
 
+
+for(;;){
 	ret = dmic_trigger(dmic_dev, DMIC_TRIGGER_START);
 	if (ret < 0) {
 		LOG_ERR("START trigger failed: %d", ret);
 		return ret;
 	}
 
+	
+
 	for (int i = 0; i < block_count; ++i) {
 		void *buffer;
 		uint32_t size;
 		int ret;
+		int stopC;
 		//printk("size of buffer: %d", size);
 
 		ret = dmic_read(dmic_dev, 0, &buffer, &size, READ_TIMEOUT);
@@ -46,16 +52,25 @@ static int do_pdm_transfer(const struct device *dmic_dev,
 		for(int j = 0; j < size; j++){
 			int16_t *int_pnt;
 			int_pnt = &buffer + j;
-			input_data[j] = *int_pnt;
-			if(j == 15985){
+			input_data[(1600*i)+j] = (float) *int_pnt;
+
+			stopC=(1600*i)+j;
+
+			if(stopC == 15984){
+				LOG_INF("%i",stopC);
 				break;
 			}
-			//LOG_INF("%d", *int_pnt);
+			
+			
 		}
 
-		LOG_INF("Size of input data: %i", sizeof(input_data));
+			if(stopC == 15984){
+				break;
+			}
 
-		LOG_INF("%d - got buffer %p of %u bytes", i, buffer, size);
+		//LOG_INF("Size of input data: %i", sizeof(input_data));
+
+		//LOG_INF("%d - got buffer %p of %u bytes", i, buffer, size);
 		
 		k_mem_slab_free(&mem_slab, &buffer);
 	}
@@ -66,11 +81,34 @@ static int do_pdm_transfer(const struct device *dmic_dev,
 		return ret;
 	}
 
-	return ret;
+
+	LOG_INF("I am here, lol %i", ei_wrapper_get_window_size());
+
+	LOG_INF("Size of input data: %i", sizeof(input_data));
+	int err;
+		/* input_data is defined in input_data.h file. */
+	err = ei_wrapper_add_data(input_data,
+				  ei_wrapper_get_window_size());
+	if (err) {
+		LOG_ERR("Cannot provide input data (err: %d)\n", err);
+		LOG_ERR("Increase CONFIG_EI_WRAPPER_DATA_BUF_SIZE\n");
+	}
+	ei_wrapper_start_prediction(0,0);
+
+	k_sleep(K_SECONDS(2));
+
+	
+
+	// return ret;
+
+	}
+
+	
 }
 
 void mic(float *input_data)
 {
+	
 	const struct device *dmic_dev = DEVICE_DT_GET(DT_NODELABEL(dmic_dev));
 	int ret;
 
@@ -109,32 +147,14 @@ void mic(float *input_data)
 	cfg.streams[0].block_size =
 		BLOCK_SIZE(cfg.streams[0].pcm_rate, cfg.channel.req_num_chan);
 
-	ret = do_pdm_transfer(dmic_dev, &cfg, 2 * BLOCK_COUNT, input_data);
+
+
+	ret = do_pdm_transfer(dmic_dev, &cfg,   BLOCK_COUNT, input_data);
 	if (ret < 0) {
 		return;
 	}
 
-	/*cfg.channel.req_num_chan = 2;
-	cfg.channel.req_chan_map_lo =
-		dmic_build_channel_map(0, 0, PDM_CHAN_LEFT) |
-		dmic_build_channel_map(1, 0, PDM_CHAN_RIGHT);
-	cfg.streams[0].pcm_rate = MAX_SAMPLE_RATE;
-	cfg.streams[0].block_size =
-		BLOCK_SIZE(cfg.streams[0].pcm_rate, cfg.channel.req_num_chan);
+	
 
-	ret = do_pdm_transfer(dmic_dev, &cfg, 2 * BLOCK_COUNT);
-	if (ret < 0) {
-		return;
-	} */
-
-	// LOG_INF("Exiting");
-	// LOG_INF("-- start");
-	// int j;
-    // uint16_t *pcm_out = buffer;
-    // for (j = 0; j < size/2; j++) {
-    //     LOG_INF("0x%04x,", pcm_out[j]);   
-	// 	k_sleep(K_MSEC(10));
-    // }
-	// LOG_INF("-- end");
 
 }

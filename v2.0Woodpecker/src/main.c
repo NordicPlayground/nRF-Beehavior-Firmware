@@ -59,14 +59,7 @@ static void result_ready_cb(int err)
 
 			LOG_INF("Value: %.2f\tLabel: %s\n", value, label);
 		}
-
-		
-		
-		
-
-		
-		
-	}
+		}
 
 	
 	
@@ -106,69 +99,18 @@ void init_ei_go(void){
 		
 	}
 
-	if (ARRAY_SIZE(input_data) < ei_wrapper_get_window_size()) {
-		LOG_ERR("Not enough input data\n");
-		return;
-	}
 
-	if (ARRAY_SIZE(input_data) % ei_wrapper_get_frame_size() != 0) {
-		LOG_ERR("Improper number of input samples\n");
-		return;
-	}
-
-	LOG_INF("Machine learning model sampling frequency: %zu\n",
-	       ei_wrapper_get_classifier_frequency());
-	LOG_INF("Labels assigned by the model:\n");
-	for (size_t i = 0; i < ei_wrapper_get_classifier_label_count(); i++) {
-		LOG_DBG("- %s\n", ei_wrapper_get_classifier_label(i));
-	}
-	LOG_INF("\n");
-
-	size_t cnt = 0;
-
-	/* input_data is defined in input_data.h file. */
-	err = ei_wrapper_add_data(&input_data[cnt],
-				  ei_wrapper_get_window_size());
-	if (err) {
-		LOG_ERR("Cannot provide input data (err: %d)\n", err);
-		LOG_ERR("Increase CONFIG_EI_WRAPPER_DATA_BUF_SIZE\n");
-		return;
-	}
-	cnt += ei_wrapper_get_window_size();
-
-	err = ei_wrapper_start_prediction(0, 0);
-	if (err) {
-		LOG_ERR("Cannot start prediction (err: %d)\n", err);
-	} else {
-		LOG_INF("Prediction started...\n");
-	}
-
-	/* Predictions for additional data are triggered in the result ready
-	 * callback. The prediction start can be triggered before the input
-	 * data is provided. In that case the prediction is started right
-	 * after the prediction window is filled with data.
-	 */
-	frame_surplus = (ARRAY_SIZE(input_data) - ei_wrapper_get_window_size())
-			/ ei_wrapper_get_frame_size();
-
-	size_t test_array_size = ARRAY_SIZE(input_data);
-	LOG_INF("the size of input data array: %d\n", test_array_size);
+	// /* input_data is defined in input_data.h file. */
+	// err = ei_wrapper_add_data(&input_data[0],
+	// 			  ei_wrapper_get_window_size());
+	// if (err) {
+	// 	LOG_ERR("Cannot provide input data (err: %d)\n", err);
+	// 	LOG_ERR("Increase CONFIG_EI_WRAPPER_DATA_BUF_SIZE\n");
+	// 	return;
+	// }
+	
 
 
-
-	while (cnt < ARRAY_SIZE(input_data)) {
-		err = ei_wrapper_add_data(&input_data[cnt],
-					  ei_wrapper_get_frame_size());
-		if (err) {
-			LOG_ERR("Cannot provide input data (err: %d)\n", err);
-			LOG_ERR("Increase CONFIG_EI_WRAPPER_DATA_BUF_SIZE\n");
-			return;
-		}
-		cnt += ei_wrapper_get_frame_size();
-
-
-		k_sleep(K_MSEC(FRAME_ADD_INTERVAL_MS));
-	}
 }
 
 
@@ -181,8 +123,6 @@ K_THREAD_DEFINE(mic_sample, STACKSIZE, mic, &input_data, NULL,
 
 void main(void)
 {
-
-
 
 	
 	
