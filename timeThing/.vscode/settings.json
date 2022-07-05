@@ -1,5 +1,6 @@
 {
     "nrf-connect.applications": [
         "${workspaceFolder}"
-    ]
+    ],
+    "nrf-connect.topdir": "/home/moho/ncs"
 }

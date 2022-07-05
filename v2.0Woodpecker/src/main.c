@@ -11,6 +11,7 @@
 #include "input_data.h"
 #include "ble.h"
 #include "mic.h"
+//#include "mic.h"
 
 LOG_MODULE_REGISTER(MAIN);
 
@@ -118,8 +119,9 @@ K_THREAD_DEFINE(bleT, 4096, init_wp_ble, NULL, NULL, NULL, 6, 0, 0);
 K_THREAD_DEFINE(eiT, 4096, init_ei_go, NULL, NULL, NULL, 7, 0, 0);
 K_THREAD_DEFINE(ble_write_thread_id, STACKSIZE, ble_write_thread, &woodpecker, NULL,
 		NULL, PRIORITY, 0, 0);
-K_THREAD_DEFINE(mic_sample, STACKSIZE, mic, &input_data, NULL,
-		NULL, PRIORITY, 0, 0);
+K_THREAD_DEFINE(micS, STACKSIZE, mic, &input_data, NULL,
+		NULL, 8, 0, 0);
+
 
 void main(void)
 {

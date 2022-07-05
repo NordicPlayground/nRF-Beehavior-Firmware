@@ -21,17 +21,6 @@ common:
     - qemu_cortex_m3
   platform_exclude: native_posix qemu_x86
 tests:
-  sample.edge_impulse.wrapper:
-    build_only: false
-    sample:
-  name: X-NUCLEO-IKS02A1 sensor shield
-tests:
-  sample.shields.x_nucleo_iks02a1.microphone:
-    harness: shield
-    tags: shield
-    depends_on: woodpecker_i2s
-
-tests:
   sample.bluetooth.central_uart:
     build_only: true
     integration_platforms:
