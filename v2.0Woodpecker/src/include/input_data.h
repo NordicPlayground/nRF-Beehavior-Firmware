@@ -10,4 +10,4 @@ static float woodpecker;
 
 
 
-float input_data[16000];
+float input_data[14399];

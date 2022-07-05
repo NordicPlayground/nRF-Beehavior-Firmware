@@ -65,8 +65,11 @@ for(;;){
 		}
 
 			if(stopC == 15984){
+				LOG_INF("Size of input data: %d", stopC);
 				break;
 			}
+
+		LOG_INF("%i",stopC);
 
 		//LOG_INF("Size of input data: %i", sizeof(input_data));
 
@@ -84,7 +87,6 @@ for(;;){
 
 	LOG_INF("I am here, lol %i", ei_wrapper_get_window_size());
 
-	LOG_INF("Size of input data: %i", sizeof(input_data));
 	int err;
 		/* input_data is defined in input_data.h file. */
 	err = ei_wrapper_add_data(input_data,
@@ -149,7 +151,7 @@ void mic(float *input_data)
 
 
 
-	ret = do_pdm_transfer(dmic_dev, &cfg,   BLOCK_COUNT, input_data);
+	ret = do_pdm_transfer(dmic_dev, &cfg, 2 * BLOCK_COUNT, input_data);
 	if (ret < 0) {
 		return;
 	}
