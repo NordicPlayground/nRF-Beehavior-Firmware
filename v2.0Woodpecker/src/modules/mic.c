@@ -1,12 +1,6 @@
-/*
- * Copyright (c) 2021 Nordic Semiconductor ASA
- *
- * SPDX-License-Identifier: Apache-2.0
- */
 
 #include "mic.h"
 #include <ei_wrapper.h>
-// 
 
 LOG_MODULE_REGISTER(dmic_sample);
 

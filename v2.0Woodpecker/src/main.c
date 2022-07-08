@@ -1,8 +1,3 @@
-/*
- * Copyright (c) 2021 Nordic Semiconductor ASA
- *
- * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
- */
 
 #include <zephyr/kernel.h>
 #include <ei_wrapper.h>
@@ -11,7 +6,6 @@
 #include "input_data.h"
 #include "ble.h"
 #include "mic.h"
-//#include "mic.h"
 
 LOG_MODULE_REGISTER(MAIN);
 

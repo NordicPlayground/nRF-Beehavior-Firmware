@@ -1,8 +1,3 @@
-/*
- * Copyright (c) 2021 Nordic Semiconductor ASA
- *
- * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
- */
 
 / {
 	chosen {
@@ -10,17 +5,7 @@
 	};
 };
 
-/*
- * This file is used to enable a partition which is used through the flash API
- * but which is in reality stored in RAM. This is done to load data from
- * external flash to the network core. Since the network core cannot access
- * the external flash directly, the data is buffered in RAM before being
- * copied by the network core to the network core flash.
- *
- * The partition must be enabled by the application configuration to prevent
- * bus faults when mcumgr tries to access simulated partition with network core
- * image data.
- */
+
 
 / {
 	soc {
@@ -49,7 +34,7 @@
 				reg = <0x00000000 DT_SIZE_K(256)>;
 
 				partitions {
-					compatible = "fixed-partitions";
+					compatible = "dynamic-partitions";
 					#address-cells = <1>;
 					#size-cells = <1>;
 
@@ -83,4 +68,30 @@
 		compatible = "zephyr,cdc-acm-uart";
 		label = "CDC_ACM_1";
 	};
+};
+
+/ {
+	chosen {
+		nordic,nus-uart = &uart0;
+        
+	};
+};
+
+
+ &clock {
+    hfclkaudio-frequency = <12288000>;
+};
+&pinctrl {
+    pdm0_default_alt: pdm0_default_alt {
+        group1 {
+            psels = <NRF_PSEL(PDM_CLK, 1, 9)>,
+                <NRF_PSEL(PDM_DIN, 0, 27)>;
+        };
+    };
+};
+dmic_dev: &pdm0 {
+    status = "okay";
+    pinctrl-0 = <&pdm0_default_alt>;
+    pinctrl-names = "default";
+    clock-source = "ACLK";
 };
