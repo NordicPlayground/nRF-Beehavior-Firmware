@@ -46,7 +46,7 @@ for(;;){
 		for(int j = 0; j < size; j++){
 			int16_t *int_pnt;
 			int_pnt = &buffer + j;
-			input_data[(1600*i)+j] = (float) *int_pnt;
+			// input_data[(1600*i)+j] = (float) *int_pnt;
 
 			stopC=(1600*i)+j;
 
@@ -83,7 +83,7 @@ for(;;){
 
 	int err;
 		/* input_data is defined in input_data.h file. */
-	err = ei_wrapper_add_data(input_data,
+	err = ei_wrapper_add_data(&input_data[0],
 				  ei_wrapper_get_window_size());
 	if (err) {
 		LOG_ERR("Cannot provide input data (err: %d)\n", err);
