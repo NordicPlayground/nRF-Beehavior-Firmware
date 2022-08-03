@@ -44,17 +44,21 @@ static void result_ready_cb(int err)
 			}
 			break;
 		}
+		LOG_INF("idx: %i", inx);
+		LOG_INF("Value: %.2f\tLabel: %s\n", value, label);
 		if (inx == 2){
 
 			woodpecker = 1; 
+
+			LOG_INF("%f", woodpecker);
 
 			memcpy(&woodpecker, &value, sizeof(woodpecker));
 
 			LOG_INF("%f", woodpecker);
 
-			LOG_INF("Value: %.2f\tLabel: %s\n", value, label);
+			
 		}
-		}
+	}
 
 	
 	
@@ -72,6 +76,7 @@ static void result_ready_cb(int err)
 	}
 
 	if (frame_surplus > 0) {
+		LOG_DBG("Frame surplus");
 		err = ei_wrapper_start_prediction(0, 1);
 		if (err) {
 			LOG_ERR("Cannot restart prediction (err: %d)\n", err);
@@ -87,6 +92,10 @@ void init_ei_go(void){
 
 	
 	int err = ei_wrapper_init(result_ready_cb);
+
+	k_sleep(K_SECONDS(2));
+
+	LOG_INF("Frame size: %i", ei_wrapper_get_frame_size());
 
 	if (err) {
 		LOG_ERR("Edge Impulse wrapper failed to initialize (err: %d)\n",
@@ -113,13 +122,12 @@ K_THREAD_DEFINE(bleT, 4096, init_wp_ble, NULL, NULL, NULL, 6, 0, 0);
 K_THREAD_DEFINE(eiT, 4096, init_ei_go, NULL, NULL, NULL, 7, 0, 0);
 K_THREAD_DEFINE(ble_write_thread_id, STACKSIZE, ble_write_thread, &woodpecker, NULL,
 		NULL, PRIORITY, 0, 0);
-K_THREAD_DEFINE(micS, STACKSIZE, mic, &input_data, NULL,
+K_THREAD_DEFINE(micS, 1024, mic, &input_data, NULL,
 		NULL, 8, 0, 0);
 
 
 void main(void)
 {
-
-	
+	LOG_INF("main()");
 	
 }

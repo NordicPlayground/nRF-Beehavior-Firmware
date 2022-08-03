@@ -5,7 +5,9 @@
 #include <logging/log.h>
 
 
+
 #define MAX_SAMPLE_RATE  16000
+
 #define SAMPLE_BIT_WIDTH 16
 #define BYTES_PER_SAMPLE sizeof(int16_t)
 /* Milliseconds to wait for a block to be read. */
