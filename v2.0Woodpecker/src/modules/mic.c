@@ -1,41 +1,26 @@
 
 #include "mic.h"
 #include <ei_wrapper.h>
-// #include "edge-impulse-sdk/classifier/ei_run_classifier.h"
 
 LOG_MODULE_REGISTER(dmic_sample);
 
-uint16_t actual_sample_rate = 0;
-uint16_t audio_16[16000];
 float audio[16000];
 
 static int do_pdm_transfer(const struct device *dmic_dev,
 			   struct dmic_cfg *cfg,
-			   size_t block_count, float *input_data)
+			   size_t block_count)
 {
 	int ret;
 
-	// k_sleep(K_SECONDS(5));
-
-
-// for(;;){
-
-	// k_sleep(K_SECONDS(2));
 	ret = dmic_trigger(dmic_dev, DMIC_TRIGGER_START);
 	if (ret < 0) {
 		LOG_ERR("START trigger failed: %d", ret);
 		return ret;
 	}
 
-	//Need to wait atleast 100 us before the data on DOUT is valid
-	// k_sleep(K_USEC(200));
-
 	for (int i = 0; i < 11; ++i) {
 		void *buffer;
 		uint32_t size;
-	// 	int ret;
-
-	// 	void *this_buffer = buffer + 3200*i;
 
 		ret = dmic_read(dmic_dev, 0, &buffer, &size, READ_TIMEOUT);
 		if (ret < 0) {
@@ -43,11 +28,10 @@ static int do_pdm_transfer(const struct device *dmic_dev,
 			return ret;
 		}
 
-		LOG_INF("%i - got buffer %p of %u bytes", i, buffer, size);
+		LOG_DBG("%i - got buffer %p of %u bytes", i, buffer, size);
 
-		// // k_sleep(K_SECONDS(1));
-
-
+		//Discard first readout due to microphone needing to 
+		//stabilize before valid data can be read
 		if(i!=0){
 			int16_t tempInt;
 			float tempFloat;
@@ -55,18 +39,9 @@ static int do_pdm_transfer(const struct device *dmic_dev,
 				memcpy(&tempInt, buffer + 2*j, 2);
 				tempFloat = (float)tempInt;
 				audio[(i-1)*1600+j] = tempFloat;
-				// memcpy(&audio[i*1600+j-15], &tempFloat, sizeof(tempFloat));
-				// LOG_INF("%i", byte);
-				// k_sleep(K_MSEC(2));
 			}
 		}
-		// LOG_INF("Copying to address: %x, in array %x", &audio_16[i*size/2], &audio_16);
-		// memcpy(&audio_16[i*size/2], buffer, size);
-		// LOG_INF("Size of float: %u", sizeof(float));
-		// LOG_INF("%i - got buffer %p of %u bytes", i, buffer, size);
-
 		k_mem_slab_free(&mem_slab, &buffer);
-		// LOG_INF("%i - got buffer %p of %u bytes", i, buffer, size);
 	}
 
 	ret = dmic_trigger(dmic_dev, DMIC_TRIGGER_STOP);
@@ -75,37 +50,19 @@ static int do_pdm_transfer(const struct device *dmic_dev,
 		return ret;
 	}
 
-	// for(int i = 0; i < sizeof(audio); i++){
-	// 	LOG_INF("%u", audio_16[i]);
-	// 	k_sleep(K_MSEC(2));
-	// }
-
-	memcpy(input_data, &audio, 15984*sizeof(float));
-
-	LOG_INF("I am here, lol %i", ei_wrapper_get_window_size());
-	
-		/* input_data is defined in input_data.h file. */
-	
 	ret = ei_wrapper_add_data(&audio,
 				  ei_wrapper_get_window_size());
-	LOG_INF("Input_data[0]: %f", input_data[100]);
-	if (err) {
-		LOG_ERR("Cannot provide input data (err: %d)\n", err);
+				  
+	if (ret) {
+		LOG_ERR("Cannot provide input data (err: %d)\n", ret);
 		LOG_ERR("Increase CONFIG_EI_WRAPPER_DATA_BUF_SIZE\n");
 	}
 	ei_wrapper_start_prediction(0,0);
 
-
-	
-
-	// return ret;
-
-	// }
-
 	return 0;
 }
 
-void mic(float *input_data)
+void mic()
 {
 	
 	const struct device *dmic_dev = DEVICE_DT_GET(DT_NODELABEL(dmic_dev));
@@ -159,14 +116,10 @@ void mic(float *input_data)
 	}
 
 	while(true){
-		ret = do_pdm_transfer(dmic_dev, &cfg, 2 * BLOCK_COUNT, input_data);
+		ret = do_pdm_transfer(dmic_dev, &cfg, 2 * BLOCK_COUNT);
 		if (ret < 0) {
 			return;
 		}
-		// for(int i = 0; i < 14984; i++){
-		// 	LOG_INF("%f", audio[i]);
-		// 	k_sleep(K_MSEC(2));
-		// }
 		k_sleep(K_SECONDS(5));
 	}
 }

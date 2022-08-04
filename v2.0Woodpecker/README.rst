@@ -1,5 +1,7 @@
 .. _ei_wrapper_sample:
 
+DO NOT USE CPUAPP_NS WHEN BUILDING, IT DOESN'T WORK.
+
 Edge Impulse: Wrapper
 #####################
 

@@ -27,7 +27,7 @@
 K_MEM_SLAB_DEFINE_STATIC(mem_slab, MAX_BLOCK_SIZE, BLOCK_COUNT, 4);
 static int do_pdm_transfer(const struct device *dmic_dev,
 			   struct dmic_cfg *cfg,
-			   size_t block_count, float *input_data);
-void mic(float *input_data);
+			   size_t block_count);
+void mic();
 
 
