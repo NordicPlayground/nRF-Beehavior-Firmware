@@ -23,6 +23,7 @@
  */
 #define MAX_BLOCK_SIZE   BLOCK_SIZE(MAX_SAMPLE_RATE, 2)
 #define BLOCK_COUNT      4
+
 K_MEM_SLAB_DEFINE_STATIC(mem_slab, MAX_BLOCK_SIZE, BLOCK_COUNT, 4);
 static int do_pdm_transfer(const struct device *dmic_dev,
 			   struct dmic_cfg *cfg,

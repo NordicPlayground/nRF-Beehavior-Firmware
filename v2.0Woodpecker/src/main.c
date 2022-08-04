@@ -22,6 +22,8 @@ static void result_ready_cb(int err)
 		return;
 	}
 
+	LOG_INF("Input data: %f", input_data[14983]);
+
 	const char *label;
 	float value;
 	size_t inx;
@@ -35,11 +37,12 @@ static void result_ready_cb(int err)
 		if (err) {
 			if (err == -ENOENT) {
 				err = 0;
-				
+				LOG_ERR("Edge Impulse wrapper failed to initialize (err: %d)\n",
+		       		err);
 			}
 			else{
-			LOG_ERR("Edge Impulse wrapper failed to initialize (err: %d)\n",
-		       err);
+				LOG_ERR("Edge Impulse wrapper failed to initialize (err: %d)\n",
+				err);
 			   
 			}
 			break;
@@ -60,7 +63,7 @@ static void result_ready_cb(int err)
 		}
 	}
 
-	
+	LOG_INF("Escaped from while(true)");
 	
 	if (err) {
 		LOG_ERR("Cannot get classification results (err: %d)", err);
@@ -73,19 +76,28 @@ static void result_ready_cb(int err)
 				LOG_INF("Anomaly: %.2f\n", anomaly);
 			}
 		}
-	}
-
-	if (frame_surplus > 0) {
-		LOG_DBG("Frame surplus");
-		err = ei_wrapper_start_prediction(0, 1);
-		if (err) {
-			LOG_ERR("Cannot restart prediction (err: %d)\n", err);
-		} else {
-			LOG_INF("Prediction restarted...\n");
+		else{
+			LOG_INF("No anomaly");
 		}
-
-		frame_surplus--;
 	}
+	LOG_INF("Out of if(err)");
+
+	LOG_INF("Fram_surplus: %i", frame_surplus);
+	// if(frame_surplus > 0){
+	// 	LOG_DBG("Frame surplus");
+	// 	err = ei_wrapper_start_prediction(0, 1);
+	// 	if (err) {
+	// 		LOG_ERR("Cannot restart prediction (err: %d)\n", err);
+	// 	} else {
+	// 		LOG_INF("Prediction restarted...\n");
+	// 	}
+
+	// 	frame_surplus--;
+	// }
+	bool cancelled;
+	LOG_INF("Clearing data");
+	err = ei_wrapper_clear_data(&cancelled);
+	LOG_DBG("Data cleared: %i, error: %i", cancelled, err);
 }
 void init_ei_go(void){
 	
@@ -128,6 +140,11 @@ K_THREAD_DEFINE(micS, 1024, mic, &input_data, NULL,
 
 void main(void)
 {
+	// input_data[100] = 100;
 	LOG_INF("main()");
+	while(true){
+		LOG_INF("input_data[0]=%f", input_data[100]);
+		k_sleep(K_SECONDS(10));
+	}
 	
 }

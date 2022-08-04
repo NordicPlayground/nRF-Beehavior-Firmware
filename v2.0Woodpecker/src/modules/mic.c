@@ -1,13 +1,13 @@
 
 #include "mic.h"
 #include <ei_wrapper.h>
-#include "edge-impulse-sdk/classifier/ei_run_classifier.h"
+// #include "edge-impulse-sdk/classifier/ei_run_classifier.h"
 
 LOG_MODULE_REGISTER(dmic_sample);
 
 uint16_t actual_sample_rate = 0;
-float audio[16000];
 uint16_t audio_16[16000];
+float audio[16000];
 
 static int do_pdm_transfer(const struct device *dmic_dev,
 			   struct dmic_cfg *cfg,
@@ -28,9 +28,9 @@ static int do_pdm_transfer(const struct device *dmic_dev,
 	}
 
 	//Need to wait atleast 100 us before the data on DOUT is valid
-	k_sleep(K_USEC(200));
+	// k_sleep(K_USEC(200));
 
-	for (int i = 0; i < 10; ++i) {
+	for (int i = 0; i < 11; ++i) {
 		void *buffer;
 		uint32_t size;
 	// 	int ret;
@@ -48,16 +48,17 @@ static int do_pdm_transfer(const struct device *dmic_dev,
 		// // k_sleep(K_SECONDS(1));
 
 
-
-		int16_t tempInt;
-		float tempFloat;
-		for(int j=0; j<1600; j++){
-			memcpy(&tempInt, buffer + 2*j, 2);
-			tempFloat = (float)tempInt;
-			audio[i*1600+j] = tempFloat;
-			// memcpy(&audio[i*1600+j-15], &tempFloat, sizeof(tempFloat));
-			// LOG_INF("%i", byte);
-			// k_sleep(K_MSEC(2));
+		if(i!=0){
+			int16_t tempInt;
+			float tempFloat;
+			for(int j=0; j<1600; j++){
+				memcpy(&tempInt, buffer + 2*j, 2);
+				tempFloat = (float)tempInt;
+				audio[(i-1)*1600+j] = tempFloat;
+				// memcpy(&audio[i*1600+j-15], &tempFloat, sizeof(tempFloat));
+				// LOG_INF("%i", byte);
+				// k_sleep(K_MSEC(2));
+			}
 		}
 		// LOG_INF("Copying to address: %x, in array %x", &audio_16[i*size/2], &audio_16);
 		// memcpy(&audio_16[i*size/2], buffer, size);
@@ -81,12 +82,11 @@ static int do_pdm_transfer(const struct device *dmic_dev,
 
 	memcpy(input_data, &audio, 15984*sizeof(float));
 
-	// // LOG_INF("I am here, lol %i", ei_wrapper_get_window_size());
-
-	int err;
+	LOG_INF("I am here, lol %i", ei_wrapper_get_window_size());
+	
 		/* input_data is defined in input_data.h file. */
-	LOG_INF("Input_data[0]: %f", input_data[100]);
-	err = ei_wrapper_add_data(&input_data[0],
+	
+	ret = ei_wrapper_add_data(&audio,
 				  ei_wrapper_get_window_size());
 	LOG_INF("Input_data[0]: %f", input_data[100]);
 	if (err) {
@@ -163,6 +163,10 @@ void mic(float *input_data)
 		if (ret < 0) {
 			return;
 		}
-		k_sleep(K_SECONDS(15));
+		// for(int i = 0; i < 14984; i++){
+		// 	LOG_INF("%f", audio[i]);
+		// 	k_sleep(K_MSEC(2));
+		// }
+		k_sleep(K_SECONDS(5));
 	}
 }
