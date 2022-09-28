@@ -1,0 +1,83 @@
+#
+# Copyright (c) 2021 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+menu "BLE_TO_CLOUD"
+
+config BLE_TO_CLOUD_APP_VERSION
+	string "Bluetooth to cloud application firmware version"
+	default "0.0.0-development"
+
+config BLE_TO_CLOUD_APP_VERSION_MAX_LEN
+	int "Maximum length of application firmware version"
+	default 150
+
+config BOARD_THINGY91
+	bool "Set when flashing to thingy91_nrf9160ns"
+	default n
+
+config POWER_SAVING_MODE_ENABLE
+	bool "Power saving"
+	default y
+
+config MAX_OUTGOING_MESSAGES
+	int "Outgoing message maximum"
+	default 5
+	help
+	  Sets the maximum number of device messages which may be enqueued
+	  before further messages are dropped.
+
+config MAX_MESSAGE_SIZE
+	int "Maximum message size of cloud messages"
+	default 120
+	help
+	  Maximum allowed size of an message to the cloud before it overflows.
+
+config MAX_CONSECUTIVE_SEND_FAILURES
+	int "Max outgoing consecutive send failures"
+	default 5
+	help
+	  Sets the maximum number of device messages which may fail to send
+	  before a connection reset and cooldown is triggered.
+
+config CONSECUTIVE_SEND_FAILURE_COOLDOWN_SECONDS
+	int "Cooldown after max consecutive send failures exceeded"
+	default 10
+	help
+	  If a connection reset is triggered by too many failed device
+	  messages, the sample will wait this long (in seconds) before trying
+	  again.
+
+config SMS_SEND_PHONE_NUMBER
+	string "Phone number, including country code, where the SMS message is sent"
+	default "+4747448146"
+
+config SMS_WARNING_ENABLED
+	bool "Enable if you want sms warnings when the hive reaches alarming levels"
+	default n
+	
+config WARNING_DELAY_HOURS
+	int "Amount of time that will be passed before the next warning is sent."
+	default 24
+	help
+	  Amount of time that will be passed before the next warning is sent, to avoid multiple 
+	  messages being sent with every update from sensors.
+
+config SAMPLE_TFM_MBEDTLS
+	bool "Use TF-M and MbedTLS"
+	help
+	  Use TF-M and MbedTLS in this sample instead of using
+	  the offloaded TLS stack in the modem.
+
+
+endmenu
+
+menu "Zephyr Kernel"
+source "Kconfig.zephyr"
+endmenu
+
+module = APPLICATION_MODULE
+module-str = Application module
+source "subsys/logging/Kconfig.template.log_config"

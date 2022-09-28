@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/nrf/samples/CMakeFiles/spm_subimage"
+		},
+		{
+			"file" : "/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/nrf/samples/CMakeFiles/spm_subimage.rule"
+		},
+		{
+			"file" : "/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/nrf/samples/CMakeFiles/spm_subimage-complete.rule"
+		},
+		{
+			"file" : "/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/nrf/samples/spm_subimage-prefix/src/spm_subimage-stamp/spm_subimage-build.rule"
+		},
+		{
+			"file" : "/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/nrf/samples/spm_subimage-prefix/src/spm_subimage-stamp/spm_subimage-configure.rule"
+		},
+		{
+			"file" : "/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/nrf/samples/spm_subimage-prefix/src/spm_subimage-stamp/spm_subimage-download.rule"
+		},
+		{
+			"file" : "/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/nrf/samples/spm_subimage-prefix/src/spm_subimage-stamp/spm_subimage-install.rule"
+		},
+		{
+			"file" : "/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/nrf/samples/spm_subimage-prefix/src/spm_subimage-stamp/spm_subimage-mkdir.rule"
+		},
+		{
+			"file" : "/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/nrf/samples/spm_subimage-prefix/src/spm_subimage-stamp/spm_subimage-patch.rule"
+		},
+		{
+			"file" : "/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/nrf/samples/spm_subimage-prefix/src/spm_subimage-stamp/spm_subimage-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"spm_subimage"
+		],
+		"name" : "spm_subimage"
+	}
+}

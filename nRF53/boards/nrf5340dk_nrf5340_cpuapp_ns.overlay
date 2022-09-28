@@ -1,0 +1,13 @@
+// /* Disable uart0 to conserve power */
+// &uart0 {
+// 	status = "disabled";
+// };
+/* Disable uart2 in nonsecure since it is used by the TFM secure app. */
+&uart2 {
+		status = "disabled";
+};
+
+/* Disable uart1 in nonsecure since it is used by the TFM secure app, must be disabled when using low power mode. */
+&uart1 {
+	status = "disabled";
+};

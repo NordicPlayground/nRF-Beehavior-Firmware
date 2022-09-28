@@ -1,0 +1,95 @@
+
+/ {
+	chosen {
+		nordic,pm-ext-flash = &mx25r64;
+	};
+};
+
+
+/ {
+	soc {
+		/* Add a flash controller which has the compatible
+		 * 'zephyr,sim-flash'. This will ensure that the flash
+		 * simulator can use it. None of the other properties in this
+		 * node is used for anything.
+		 */
+		nordic_ram_flash_controller: nordic_ram-flash-controller@0 {
+			compatible = "zephyr,sim-flash";
+			reg = <0x00000000 DT_SIZE_K(40)>;
+			#address-cells = <1>;
+			#size-cells = <1>;
+			erase-value = <0xff>;
+			label = "nordic_ram_flash_flash_controller";
+
+			/* This node label must match that used in the flash
+			 * simulator.
+			 */
+			flash_sim0: flash_sim@0 {
+				status = "okay";
+				compatible = "soc-nv-flash";
+				label = "simulated_flash";
+				erase-block-size = <4096>;
+				write-block-size = <4>;
+				reg = <0x00000000 DT_SIZE_K(256)>;
+
+				partitions {
+					compatible = "dynamic-partitions";
+					#address-cells = <1>;
+					#size-cells = <1>;
+
+					/* This partition must be defined for
+					 * MCUboot to find the partition ID
+					 * of the primary slot for image 1,
+					 * which is stored in this partition.
+					 */
+					slot2_partition: partition@0 {
+						label = "image-2";
+						reg = <0x00000000 0x00000A000>;
+					};
+				};
+			};
+		};
+	};
+
+	chosen {
+		zephyr,console = &cdc_acm_uart0;
+		nordic,nus-uart = &cdc_acm_uart1;
+	};
+};
+
+&zephyr_udc0 {
+	cdc_acm_uart0: cdc_acm_uart0 {
+		compatible = "zephyr,cdc-acm-uart";
+		label = "CDC_ACM_0";
+	};
+
+	cdc_acm_uart1: cdc_acm_uart1 {
+		compatible = "zephyr,cdc-acm-uart";
+		label = "CDC_ACM_1";
+	};
+};
+
+/ {
+	chosen {
+		nordic,nus-uart = &uart0;
+        
+	};
+};
+
+ &clock {
+    hfclkaudio-frequency = <12288000>;
+};
+&pinctrl {
+    pdm0_default_alt: pdm0_default_alt {
+        group1 {
+            psels = <NRF_PSEL(PDM_CLK, 1, 9)>,
+                <NRF_PSEL(PDM_DIN, 0, 27)>;
+        };
+    };
+};
+dmic_dev: &pdm0 {
+    status = "okay";
+    pinctrl-0 = <&pdm0_default_alt>;
+    pinctrl-names = "default";
+    clock-source = "ACLK";
+};

@@ -1,0 +1,502 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Quick Share</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="robots" content="noindex,nofollow,noimageindex">
+<meta name = "format-detection" content = "telephone=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi" />
+<meta property="og:title" content="Quick Share">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://linksharing.samsungcloud.com/ls/public/v1/links/1661761090182LZm8AZg/contents/1f3a4c30277311edaea17669976cb06b?signature=KBNoHMgUK6vfyaIajYqss8v8IObbKY2LR_eDRbY0UEhqbHIIvLTK4dlX0Vlcf_c3wp1mN3zFrQtkOgQdws2te1q3BYNUmyqkIvP4hCxzhdEdR4eRiFJ-gfQo_jszulcC-iNkQgfUxTfet6TM2ncuaQ&storageType=file">
+<meta property="og:description" content="1 file (3.4 MB)">
+    <link rel="shortcut icon" type="image/x-icon" href="/resources/images/Webview_app_icon_quick_share.png" />
+<link rel="stylesheet" href="/resources/css/layout.css?ver=20220127">
+<script type="text/javascript" src="/resources/js/jquery/jquery-2.2.0.min.js"></script>
+<script type="text/javascript" src="/resources/js/jquery/jquery.numeric.min.js"></script>
+<script type="text/javascript" src="/resources/js/common/moment.min.js"></script>
+<script type="text/javascript" src="/resources/js/common/handlebars.min-latest.js"></script>
+<script type="text/javascript" src="/resources/js/common/handlebars.helper.js"></script>
+<script type="text/javascript" src="/resources/js/common/remoteshare.prototype.js?ver=20061701"></script>
+<script type="text/javascript" src="/resources/js/app/remoteshare.js?ver=20211115"></script>
+<script type="text/javascript" src="/resources/js/app/sharelink.js?ver=20220520"></script><script type="text/javascript">
+  //<!--
+  //<![CDATA[
+  $(document).ready(function () {
+    var options = {};
+    options.contextPath = '';
+    options.requestTime = '';
+    options.contentsToken = '1661761090182LZm8AZg';
+    options.contentsTotalCnt = '1';
+    options.uploadCompleted = 'true';
+    options.linkUrl = 'https://linksharing.samsungcloud.com/fcOKAr25FnRV';
+    options.linkUrlVersion = 'V1'
+    options.selectMode = 'false';
+    options.selectItemsMsg = 'Select items';
+    options.selectItemsSingular = 'lenPlaceholder selected';
+    options.selectItemsPlural = 'lenPlaceholder selected';
+    ShareLink.list.functions.init(options);
+
+    //Add loading of page
+    if(options.selectMode == 'false'){
+      $('#loading_bar').css('display', 'block');
+    }
+    window.addEventListener('load', (event) => {
+      $('#loading_bar').css('display', 'none');
+    });
+
+    /* manipulate dom elements */
+    var expiredTime = parseInt('1661983199000') / 1000;
+    var dateExpiration = moment.unix(expiredTime).format('D MMM YYYY');
+    var currentDate = parseInt((new Date().getTime() / 1000).toFixed(0));
+    var newdate = moment.unix(currentDate).format('D MMM YYYY');
+    document.getElementById("expiredId").innerHTML = 'Available until ' + dateExpiration +'';
+    document.getElementById("infoShareId").innerHTML = 'Shared on ' + newdate +'';
+    
+    //CSS adjustment OnLoad for body with variable header height
+    setTimeout(() => {
+    ShareLink.list.functions.updateBodyTop();
+    }, 50); //Added timeout to ensure body is rendered
+    
+    if(sessionStorage.getItem('selectAllTriggered') == 'true'){
+      sessionStorage.setItem('selectAllTriggered', false);
+      ShareLink.list.functions.selectAllCheckbox();
+    }
+
+    if(!ShareLink.globals.uploadCompleted && 
+    sessionStorage.getItem('backTriggered') == 'true' && 
+    sessionStorage.getItem('refreshTriggered') == 'true'){
+      ShareLink.list.functions.refreshContents();
+      sessionStorage.setItem('backTriggered', false);
+    }
+
+    if ('false' === 'true') {
+      window.history.pushState(null, null, window.location.href.split('?')[0]);
+      $('#unsupportedMsg').show();
+      $('body').css('overflow', 'hidden').on('touchmove', function (e) {
+        e.preventDefault();
+      });
+    }
+
+    window.addEventListener('pageshow', (event) => {
+      if (options.selectMode == 'true') {
+        let isInitialSelection = sessionStorage.getItem('selectedIds' + options.requestTime) === null
+        var selectedIds = sessionStorage.getItem('selectedIds' + options.requestTime) ?
+                sessionStorage.getItem('selectedIds' + options.requestTime).split(',') : [];
+        if (isInitialSelection) {
+          selectedIds = Array.from({ length: ShareLink.globals.contentsTotalCnt}, (_, index) => index + 1);
+          sessionStorage.setItem('selectedIds' + options.requestTime, selectedIds.join(','));
+        }
+        var $checkBoxElements = $('*[id^="chk"][id!="checkAll"]');
+        $checkBoxElements.each(function (index) {
+          if (selectedIds.indexOf((index + 1).toString()) > -1) {
+            $(this).prop("checked", true);
+            $(this).hide().show(0);
+          } else {
+            $(this).prop("checked", false);
+            $(this).hide().show(0);
+          }
+        });
+        if (selectedIds.length > 0) {
+          $('#downloadFilesBtn').removeClass('off');
+          $('#downloadFilesBtn').addClass('on');
+        }
+        setTimeout(() => {
+          if (selectedIds.length > 0) {
+            if (selectedIds.length == $('#contentList input[type=checkbox]').length) {
+              $('#checkAll').prop('checked', true);
+            } else {
+              $('#checkAll').prop('checked', false);
+            }
+          } else {
+            $('#downloadFilesBtn').removeClass('on');
+            $('#downloadFilesBtn').addClass('off');
+            $('#checkAll').prop('checked', false);
+          }
+        }, 0);
+        ShareLink.list.functions.updateCheckboxDesc();
+      }
+    });
+
+    if (!ShareLink.globals.uploadCompleted || ''.length > 0) {
+	    if ($('#contentList > li').length > 0) {
+		    $('#sub_content').addClass('mr_t240');
+	    }
+    }
+
+    if (ShareLink.globals.contentsTotalCnt <= 0) {
+      $('#showCheckBox').hide();
+      $("#downloadAllBtn").hide();
+      $("#downloadFilesBtn").hide();
+      $(".select_container").hide();
+    }
+
+    if (ShareLink.globals.contentsTotalCnt === 1) {
+      $(".select_container").hide();
+    }
+
+    if ('1' === '1') {
+      $('#selectFilesBtn').addClass('on');
+      document.getElementById("selectFilesBtn").innerHTML = 'Download';
+    }
+
+    if (ShareLink.list.selectMode) {
+      $('#contentList').addClass('select_area');
+    }
+
+    if (RemoteShare.SupportedWindows.isDesktop()) {
+      $('.photo').unwrap('a');
+      $('.sender').text('Quick Share');
+      $('.open_in_app').text('Open in app');
+    } else {
+      $('.photo').unwrap('a');
+      $('.sender').text('Quick Share');
+      $('.open_in_app').remove();
+    }
+
+    /* attach event binding */
+    $('#showCheckBox').on('click', function (e) {
+      if ($('#contentList > li').length === 1) {
+        ShareLink.list.functions.downloadSingleContent();
+      } else {
+        window.location.href = ShareLink.urls.contentsListUrl + '?' + $.param({
+          'contentsToken': ShareLink.globals.contentsToken,
+          'checkbox': true,
+          'callExtraInfo': 'showCheckBox',
+          'linkUrlVersion': ShareLink.globals.linkUrlVersion
+        });
+      }
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    $('#selectFilesBtn').on('click', function (e) {
+      if ('1' === '1') {
+        ShareLink.list.functions.downloadSingleContent();
+      } else {
+        //sessionStorage.setItem('selectedIds' + options.requestTime, '');
+        //sessionStorage.setItem('clearSelectedIds', 'true');
+        sessionStorage.setItem('selectAllTriggered', true);
+        window.location.href = ShareLink.globals.contextPath + ShareLink.urls.contentsListUrl + '?' + $.param({
+          'contentsToken': ShareLink.globals.contentsToken,
+          'reqDt': 1661761242401,
+          'checkbox': true,
+          'callExtraInfo': 'showCheckBox',
+          'linkUrlVersion': ShareLink.globals.linkUrlVersion
+        });
+      }
+      $('.footer_link').removeClass('check-true');
+      $('.footer_link').addClass('check-false');
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    $('#downloadFilesBtn').on('click', function (e) {
+      ShareLink.list.functions.downloadContents();
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    // $('#downloadBtn').on('click', function (e) {
+    //   ShareLink.list.functions.downloadContents();
+    //   $(this).children('a').blur();
+    //   e.preventDefault();
+    //   e.stopPropagation();
+    // });
+
+    $('.expandBtn').on('click', function (e) {
+      window.location.href = ShareLink.globals.contextPath + ShareLink.urls.contentsViewUrl + '?' + $.param({
+        'contentsToken': ShareLink.globals.contentsToken,
+        'reqDt': ShareLink.globals.requestTime,
+        'currentIndex': this.id,
+        'checkbox': ShareLink.list.selectMode,
+        'linkUrlVersion': ShareLink.globals.linkUrlVersion
+      });
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    $('.file_wrap').on('click', function (e) {
+      window.location.href = ShareLink.globals.contextPath + ShareLink.urls.contentsViewUrl + '?' + $.param({ 
+        'contentsToken': ShareLink.globals.contentsToken,
+        'currentIndex': this.id,
+        'linkUrlVersion': ShareLink.globals.linkUrlVersion
+      });
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    $('#checkAll').on('change', function () {
+      $(this).next('label').removeClass('sel');
+      $('input:checkbox').not(this).prop('checked', this.checked).trigger('change');
+    });
+
+    $('#contentList input:checkbox').on('change', function () {
+      $(this).next('label').removeClass('sel');
+      ShareLink.list.functions.updateCounter();
+      ShareLink.list.functions.updateCheckboxDesc();
+    });
+
+    /* This fires after dom loading in IE.
+    $('#contentList img').one('error', function () {
+        //TODO: hosung: Need to modify to show video fallback images. (file_type_icon/ic_f_video.png)
+        $(this).attr('src', '/resources/images/file_type_icon/broken.svg');
+    });
+    */
+
+    // $('input:checkbox, #downloadBtn').on('focus', function () {
+    //   $('label[for="' + this.id + '"]').addClass('sel');
+    // });
+
+    // $('input:checkbox, #downloadBtn').on('blur', function () {
+    //   $('label[for="' + this.id + '"]').removeClass('sel');
+    // });
+
+    $('#cancelSelectBtn').on('click', function (e) {
+      sessionStorage.setItem('backTriggered', true);
+      history.go(-1);
+      e.preventDefault();
+      $('.footer_link').removeClass('check-false');
+      $('.footer_link').addClass('check-true');
+    });
+
+    $('#downloadAllBtn').on('click', function (e) {
+      $('input:checkbox').prop('checked', true);
+      ShareLink.list.functions.downloadAllContents();
+      e.preventDefault();
+      e.stopPropagation();
+    });
+  });
+
+  $(document).on('click', '.refresh', function (e) {
+    $('.refresh img').attr('src', "/resources/images/loadingbar.gif");
+
+    sessionStorage.setItem('refreshTriggered', true);
+    ShareLink.list.functions.refreshContents();
+    $('#loading_bar').css('display', 'none');
+  });
+
+  $(document).on('click', '#installBtn, .open_in_app', function (e) {
+    var url;
+    e.preventDefault();
+    if (RemoteShare.SupportedWindows.isDesktop() && '460' !== '') {
+        url = 'samsung-linksharing-add-link:?linkurl={linkUrl}';
+        RemoteShare.functions.recordOpenAppLog('linkshare', ShareLink.globals.contentsToken);
+        url = url.replace('{linkUrl}', ShareLink.globals.linkUrl);
+        window.location.href = url;
+    } else {
+      $('#unsupportedMsg').show();
+      $('body').css('overflow', 'hidden').on('touchmove', function (e) {
+        e.preventDefault();
+      });
+    }
+  }).on('click', '#okBtn', function (e) {
+    $('#unsupportedMsg').hide();
+    $('body').css('overflow', 'auto').off('touchmove');
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
+  $(document).on('click', '.file_wrap.handlebars_file', function (e) {
+      window.location.href = ShareLink.globals.contextPath + ShareLink.urls.contentsViewUrl + '?' + $.param({ 
+        'contentsToken': ShareLink.globals.contentsToken,
+        'currentIndex': this.id,
+        'linkUrlVersion': ShareLink.globals.linkUrlVersion
+      });
+      e.preventDefault();
+      e.stopPropagation();
+  });
+
+  $(window).resize(function() { 
+    //CSS adjustment on resize for body with variable header height
+    var subContentBody = document.getElementById("sub_content");
+    if (subContentBody){
+      ShareLink.list.functions.updateBodyTop();
+    }
+  });
+
+  $(window).load(function () {
+    //CSS adjustment on load for body with variable header height
+    ShareLink.list.functions.updateBodyTop();
+
+    $('#contentList img').each(function () {
+      if (!this.complete || typeof this.naturalWidth === "undefined" || this.naturalWidth === 0) {
+        this.src = '/resources/images/file_type_icon/broken.svg';
+        this.parentElement.classList.add('file_broken');
+      }
+    });
+  });
+
+//]]&gt;
+//-->
+</script>
+</head>
+
+<body>
+  <!-- wrap -->
+  <div id="wrap" class="body_container check-true exp-false">
+    <!-- header -->
+    <header id="headerId">
+      <div class="fix_wrap">
+        <div class="header_container">
+          <a id="installBtn" href="#/">
+            <span class="photo"><img src="/resources/images/Webview_app_icon_quick_share.png"
+                alt="install link icon"></span>
+            <span class="sender"></span>
+          </a>
+          <div class="open_in_app_area">
+            <span class="open_in_app"></span>
+          </div>
+        </div>
+      </div>
+      
+          <div class="info_wrap">
+
+            <div class="button_wrap">
+              <div class="header_container">
+                <span id="listInfo" class="list_info info_container">
+                  <span id="infoShareId" class="infoShareText"></span>
+                  <span>
+                    <span class="file">
+                          1 file&nbsp;(3.4 MB)
+                        </span>
+                      </span>
+    
+                  <span>
+                    <span id="expiredId" class="expired">
+                    </span>
+                  </span>
+                </span>
+
+                <span class="download_container">
+                  <a href="#/" id="downloadAllBtn" class="link_button on link_button_mod">Download</a>
+                    </span>
+              </div>
+
+              <div class="header_spacer"></div>
+                    <div class="select_container">
+                <a href="#/" id="selectFilesBtn">
+                      Select</a>
+                  </div>
+              
+            </div>
+          </div>
+    
+    </header>
+  
+    <!-- sub_content -->
+    <div id="sub_content" class="sub-cont-false check-true">
+
+      <!-- list -->
+      <div class="list">
+        <!--img_wrap -->
+        <ul id="contentList" class="img_wrap">
+          <li id="1" class="file_wrap content_class"><a href="#/">
+                          <img src="https://linksharing.samsungcloud.com/ls/public/v1/links/1661761090182LZm8AZg/contents/22102880277311ed89a41a3ba1e15813/resized/760?signature=KBNoHMgUK6vfyaIajYqss8v8IObbKY2LR_eDRbY0UEhqbHIIvLTK4dlX0Vlcf_c3wp1mN3zFrQtkOgQdws2te1q3BYNUmyqkIvP4hCxzhdEdR4eRiFJ-gfQo_jszulcC-iNkQgfUxTfet6TM2ncuaQ&storageType=file"
+                              alt="20220829_090819.jpg" longdesc="https://linksharing.samsungcloud.com/ls/public/v1/links/1661761090182LZm8AZg/contents/22102880277311ed89a41a3ba1e15813?signature=KBNoHMgUK6vfyaIajYqss8v8IObbKY2LR_eDRbY0UEhqbHIIvLTK4dlX0Vlcf_c3wp1mN3zFrQtkOgQdws2te1q3BYNUmyqkIvP4hCxzhdEdR4eRiFJ-gfQo_jszulcC-iNkQgfUxTfet6TM2ncuaQ&storageType=file"
+                              onerror="this.src='/resources/images/file_type_icon/broken.svg'; this.parentElement.classList.add('file_broken');" />
+                        </a></li>
+                      </ul>
+        <!-- //img_wrap -->
+      </div>
+      <!-- //list -->
+    </div>
+    <!-- //sub_content -->
+
+    <!-- layer pop-->
+    <!--     <div id="" class="bg_pop"> -->
+    <!--       <div class="layer_pop"> -->
+    <!--          <p class="txt_service">Link Sharing application will be available soon.</p> -->
+    <!--       </div> -->
+    <!--     </div> -->
+    <!-- layer pop-->
+    <div id="unsupportedMsg" class="bg_pop">
+      <div class="layer_pop ok">
+        <h3>
+          App not available</h3>
+        <p class="txt_service">
+          Link Sharing will be available soon.</p>
+        <p id="okBtn" class="pop_btns ok"><a href="#" class="btn_ok">
+            OK</a></p>
+      </div>
+    </div>
+
+    <!-- footer -->
+<footer>
+  <div class="footer_link">
+    <div class="area_pol_new">
+      <div class="logo"><img src="/resources/images/Samsung_Orig_Wordmark_BLACK_RGB.png" ></div>
+      <div class="info_pol">Quick Share works best in Samsung Internet on your phone and in Chrome on computers.</div>
+    </div>
+  </div>
+</footer>
+<!-- //footer -->
+<div id="loading_bar">
+  <div class="loading_big"></div>
+</div></div>
+  <!-- //wrap -->
+
+  <script id="list-template" type="text/x-handlebars-template">
+{{!-- {{#each contents}} can be replaced with {{#contents}}  --}}
+{{#compare ../contentsTotalToUpload "!==" -1}}
+  {{#each contents}}
+    {{#compare (incr @index) ">" ../previousItemCnt}}
+      {{#unless thumbnail}}
+        <li id="{{incr @index}}" class="file_wrap content_class handlebars_file"><a href="#/"><span class="file_type new">{{name}}</span><img src="{{fileTypeCategoryThumbnailPath}}" alt="{{name}}" longdesc="{{original}}" /></a></li>
+      {{else}}
+        {{#isVideoType contentType}}
+          <li id="{{incr @index}}" class="file_wrap content_class handlebars_file">
+            <a href="#/">
+              <img src="{{thumbnail}}" alt="{{name}}" longdesc="{{original}}" />
+              <span class="movie_wrap"></span><span class="movie_type"><img src="/resources/images/linksharing_view_movie_ic.png" alt="movie icon"></span><span class="file_capacity">{{formattedFileSize}}</span>
+            </a>
+          </li>
+        {{else}}
+          <li id="{{incr @index}}" class="file_wrap content_class handlebars_file"><a href="#/"><img src="{{thumbnail}}" alt="{{name}}" longdesc="{{original}}" onerror="this.src='/resources/images/file_type_icon/broken.svg'; this.parentElement.classList.add('file_broken');" /></a></li>
+        {{/isVideoType}}
+      {{/unless}}
+    {{/compare}}
+  {{/each}}
+{{/compare}}
+</script>
+
+  <script id="list-selectMode-template" type="text/x-handlebars-template">
+{{#compare ../contentsTotalToUpload "!==" -1}}
+  {{#each contents}}
+    {{#compare (incr @index) ">" ../previousItemCnt}}
+      {{#unless thumbnail}}
+        <li id="{{incr @index}}"><input type="checkbox" id="chk{{@index}}" /><label for="chk{{@index}}"><span class="file_type new">{{name}}</span><img src="{{fileTypeCategoryThumbnailPath}}" alt="{{name}}" longdesc="{{original}}" /></label></li>
+      {{else}}
+        {{#isVideoType contentType}}
+          <li id="{{incr @index}}">
+              <input type="checkbox" id="chk{{@index}}" />
+              <label for="chk{{incr @index}}" >
+                <img src="{{thumbnail}}" alt="{{name}}" longdesc="{{original}}" />
+                <span class="movie_wrap"></span><span class="movie_type"><img src="/resources/images/linksharing_view_movie_ic.png" alt="movie icon"></span><span class="file_capacity">{{formattedFileSize}}</span>
+              </label>
+          </li>
+        {{else}}
+          <li id="{{incr @index}}"><input type="checkbox" id="chk{{@index}}" /><label for="chk{{@index}}" ><img src="{{thumbnail}}" alt="{{name}}" longdesc="{{original}}" onerror="this.src='/resources/images/file_type_icon/broken.svg'; this.parentElement.classList.add('file_broken');" /></label></li>
+        {{/isVideoType}}
+      {{/unless}}
+    {{/compare}}
+  {{/each}}
+{{/compare}}
+</script>
+
+  <script id="listInfo-template" type="text/x-handlebars-template">
+{{#if uploadCompleted}}
+  <span class="infoShareText">Shared on curDatePlaceholder</span>
+  <span class="file">{{formattedContentsTotalCnt}}&nbsp;({{formattedContentsTotalFileSize}})</span>
+  <span class="expired">Available until expDatePlaceholder</span>
+{{else}}
+  <span class="infoShareText">Shared on curDatePlaceholder</span>
+  <span class="file">{{formattedContentsTotalCnt}}&nbsp;({{formattedContentsTotalFileSize}})</span>
+  <span class="expired">Available until expDatePlaceholder</span>
+  
+{{/if}}
+</script>
+  </body>
+
+</html>

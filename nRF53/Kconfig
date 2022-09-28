@@ -1,0 +1,100 @@
+#
+# Copyright (c) 2021 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+menu "HIVE_HUB"
+
+# 
+
+config THINGY53
+	bool "Flag for if you're using a Thingy or not."
+	default n
+
+config THINGY53_LOGGING
+	bool "Flag for if you want Thingy:53 to log."
+	default n
+
+config HIGH_RES_SAMPLING_THINGY
+	bool "Enable for high sample rate on Thingy52"
+	default n
+	
+config BEE_COUNTER_NAME
+	string "Name of your Bee Counter Device"
+	default "ItsyBitsy"
+
+config BEE_COUNTER_ENABLE
+	bool "Enable if you want the device to connect to the Bee Counter"
+	default y
+
+#Add Broodminder address, if we figure out how to add an address
+
+config BROODMINDER_WEIGHT_ENABLE
+	bool "Enable if you want the device to scan for the Broodminder Weight"
+	default y
+
+config BROODMINDER_WEIGHT_NAME
+	string "Name of your broodminder weight, in the format of xx:yy:zz"
+	default "57:01:FD"
+
+config WOODPECKER_ENABLE
+	bool "Enable if you want the device to run Edge Impulse woodpecker detector"
+	default y
+	select AUDIO
+	select AUDIO_DMIC
+
+config WOODPECKER_SAMPLE_RATE
+	int "Time between Edge Impulse woodpecker detector data get sent to nRF91"
+	default 30
+
+config THINGY_ENABLE
+	bool "Enable if you want the device to connect to a Thingy:52"
+	default y
+
+config THINGY_CONNECTIONS
+	int "Number of Thingy:52 in the hive"
+	default 0 if !THINGY_ENABLE
+	default 1
+
+config THINGY_NAME
+	string "Name of your thingy"
+	default "Thingy"
+
+config THINGY_SAMPLE_RATE 
+	int "Thingy:52 sample rate in seconds"
+	default 60
+
+# default horizon: 12 = 1hour for default res sampling
+# high res horizon: 60 = 1 hour for high res sampling 
+# Aiming for default = 24 for default res sampling and 120 for high res
+config THINGY_DATA_BUFFER_SIZE
+	int "Size of Thingy data buffer- This decides the time horizon"
+	default 120 if HIGH_RES_SAMPLING_THINGY
+	default 12
+
+#For high res: 20 (every 20th minute with 1 min sample time)
+#For default res: 4 (every 20th minute with 5 min sample time)
+config THINGY_SAMPLE_TO_SEND
+	int "Send data every nth minute"
+	default 20 if HIGH_RES_SAMPLING_THINGY
+	default 4
+	# default 1	
+
+config BLE_TO_CLOUD_APP_VERSION
+	string "Bluetooth to cloud application firmware version"
+	default "0.0.0-development"
+
+config BLE_TO_CLOUD_APP_VERSION_MAX_LEN
+	int "Maximum length of application firmware version"
+	default 150
+
+endmenu
+
+menu "Zephyr Kernel"
+source "Kconfig.zephyr"
+endmenu
+
+module = APPLICATION_MODULE
+module-str = Application module
+source "subsys/logging/Kconfig.template.log_config"

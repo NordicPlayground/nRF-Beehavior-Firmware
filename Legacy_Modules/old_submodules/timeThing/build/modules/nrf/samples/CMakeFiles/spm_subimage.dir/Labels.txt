@@ -1,0 +1,13 @@
+# Target labels
+ spm_subimage
+# Source files and their labels
+/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/nrf/samples/CMakeFiles/spm_subimage
+/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/nrf/samples/CMakeFiles/spm_subimage.rule
+/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/nrf/samples/CMakeFiles/spm_subimage-complete.rule
+/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/nrf/samples/spm_subimage-prefix/src/spm_subimage-stamp/spm_subimage-build.rule
+/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/nrf/samples/spm_subimage-prefix/src/spm_subimage-stamp/spm_subimage-configure.rule
+/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/nrf/samples/spm_subimage-prefix/src/spm_subimage-stamp/spm_subimage-download.rule
+/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/nrf/samples/spm_subimage-prefix/src/spm_subimage-stamp/spm_subimage-install.rule
+/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/nrf/samples/spm_subimage-prefix/src/spm_subimage-stamp/spm_subimage-mkdir.rule
+/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/nrf/samples/spm_subimage-prefix/src/spm_subimage-stamp/spm_subimage-patch.rule
+/home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/modules/nrf/samples/spm_subimage-prefix/src/spm_subimage-stamp/spm_subimage-update.rule

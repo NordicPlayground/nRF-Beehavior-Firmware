@@ -1,0 +1,30 @@
+# Available runners configured by board.cmake.
+runners:
+- nrfjprog
+- jlink
+
+# Default flash runner if --runner is not given.
+flash-runner: nrfjprog
+
+# Default debug runner if --runner is not given.
+debug-runner: jlink
+
+# Common runner configuration values.
+config:
+  board_dir: /home/moho/ncs/nrf/boards/arm/thingy91_nrf9160
+  # Build outputs:
+  elf_file: zephyr.elf
+  hex_file: /home/moho/Documents/nRF-Beehavior-Firmware/timeThing/build/zephyr/merged.hex
+  bin_file: zephyr.bin
+  # Host tools:
+  gdb: /home/moho/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-gdb
+
+# Runner specific arguments
+args:
+  nrfjprog:
+    - --nrf-family=NRF91
+    - --softreset
+  jlink:
+    - --dt-flash=y
+    - --device=cortex-m33
+    - --speed=4000

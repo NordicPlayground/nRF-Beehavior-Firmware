@@ -1,0 +1,28 @@
+# Thingy:91 nRF52840 board configuration
+#
+# Copyright (c) 2019 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+
+if BOARD_THINGY91_NRF52840
+
+config BOARD_ENABLE_DCDC
+	bool "Enable DCDC mode"
+	select SOC_DCDC_NRF52X
+	default y
+
+config BOARD_THINGY91_NRF52840_RESET
+	bool "Enable GPIO reset line"
+	default y
+	help
+	  Let the nRF52840 be reset from the nRF9160 via a GPIO line.
+	  The GPIO line may only be one of the first 6 MCU interface pins.
+	  The line is active high.
+
+	
+module = BOARD_THINGY91
+module-str = Board Control
+source "subsys/logging/Kconfig.template.log_config"
+
+
+endif # BOARD_THINGY91_NRF52840

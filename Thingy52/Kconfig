@@ -1,0 +1,11 @@
+#
+# Copyright (c) 2018 Nordic Semiconductor
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+source "Kconfig.zephyr"
+
+menu "Thingy:52 GATT for nRF-Beehaviour Monitoring"
+
+endmenu

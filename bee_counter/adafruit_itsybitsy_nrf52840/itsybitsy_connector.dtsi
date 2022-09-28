@@ -1,0 +1,39 @@
+/*
+ * Copyright (c) 2021 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/ {
+	itsybitsy_header: connector {
+		compatible = "adafruit-itsybitsy-header";
+		#gpio-cells = <2>;
+		gpio-map-mask = <0xffffffff 0xffffffc0>;
+		gpio-map-pass-thru = <0 0x3f>;
+		gpio-map = <0 0 &gpio0 4 0>,	/* A0 */
+			   <1 0 &gpio0 30 0>,	/* A1 */
+			   <2 0 &gpio0 28 0>,	/* A2 */
+			   <3 0 &gpio0 31 0>,	/* A3 */
+			   <4 0 &gpio0 2 0>,	/* A4 */
+			   <5 0 &gpio0 3 0>,	/* A5 */
+			   <6 0 &gpio0 13 0>,	/* SCK */
+			   <7 0 &gpio0 15 0>,	/* MOSI */
+			   <8 0 &gpio0 20 0>,	/* MISO */
+			   <9 0 &gpio1 2 0>,	/* D2 */
+			   <10 0 &gpio0 12 0>,	/* D13 */
+			   <11 0 &gpio0 11 0>,	/* D12 */
+			   <12 0 &gpio0 16 0>,	/* D11 */
+			   <13 0 &gpio0 5 0>,	/* D10 */
+			   <14 0 &gpio0 7 0>,	/* D9 */
+			   <15 0 &gpio1 7 0>,	/* D7 */
+			   <16 0 &gpio0 27 0>,	/* D5 */
+			   <17 0 &gpio0 14 0>,	/* SCL */
+			   <18 0 &gpio0 16 0>,	/* SDA */
+			   <19 0 &gpio0 1 0>,	/* TX */
+			   <20 0 &gpio1 0 0>;	/* RX */
+	};
+};
+
+itsybitsy_serial: &uart0 {};
+itsybitsy_i2c: &i2c0 {};
+itsybitsy_spi: &spi1 {};

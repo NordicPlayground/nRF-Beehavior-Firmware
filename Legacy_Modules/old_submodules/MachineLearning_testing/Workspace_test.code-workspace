@@ -1,0 +1,34 @@
+{
+	"folders": [
+		{
+			"name": "TEST",
+			"path": "..\\TEST"
+		},
+		{
+			"name": "MyFirstApp",
+			"path": "MyFirstApp"
+		},
+		{
+			"path": "..\\.."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"zephyr.h": "c",
+			"kernel.h": "c"
+		},
+		"kconfig.zephyr.west": "c:\\Users\\tagr\\ncs\\v1.6.1\\toolchain\\opt\\bin\\Scripts\\west.exe",
+		"kconfig.zephyr.base": "c:\\Users\\tagr\\ncs\\v1.6.1\\zephyr",
+		"nrf-connect.applications": [
+			"c:\\ncs\\nRF-Beehavior-Firmware\\MachineLearning_testing",
+			"c:\\ncs\\nRF-Beehavior-Firmware\\TEST"
+		],
+		"kconfig.zephyr.board": {
+			"board": "thingy52_nrf52832",
+			"arch": "arm",
+			"dir": "c:\\ncs\\zephyr\\boards\\arm\\thingy52_nrf52832"
+		},
+		"nrf-connect.toolchain.path": "c:\\Users\\tagr\\ncs\\v1.6.1\\toolchain",
+		"nrf-connect.topdir": "c:\\Users\\tagr\\ncs\\v1.6.1"
+	}
+}

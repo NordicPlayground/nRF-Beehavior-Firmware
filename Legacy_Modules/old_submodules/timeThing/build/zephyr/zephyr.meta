@@ -1,0 +1,193 @@
+modules:
+- name: nrf
+  path: /home/moho/ncs/nrf
+  revision: 3b0fa17d816431c164f277b77a92b21834ae2d7e
+- name: mcuboot
+  path: /home/moho/ncs/bootloader/mcuboot
+  revision: 132a537bf94044be93240a43b7622b3040bd017e
+- name: mbedtls
+  path: /home/moho/ncs/mbedtls
+  revision: cefdd9954bcc92c08ce2ba41d87b57c29b73482b
+- name: trusted-firmware-m
+  path: /home/moho/ncs/modules/tee/tf-m/trusted-firmware-m
+  revision: e6f3c85f618e51b6b8fb0105e2ce9fa6372ba8f0
+- name: tfm-mcuboot
+  path: /home/moho/ncs/modules/tee/tfm-mcuboot
+  revision: 4aa516e7281fc6f9a2dce0b0efda9acc580fa254
+- name: cjson
+  path: /home/moho/ncs/modules/lib/cjson
+  revision: c6af068b7f05207b28d68880740e4b9ec1e4b50a
+- name: cddl-gen
+  path: /home/moho/ncs/modules/lib/cddl-gen
+  revision: 1c2656daa87ebf4cd3c45ee8eafa336260d589bc
+- name: memfault-firmware-sdk
+  path: /home/moho/ncs/modules/lib/memfault-firmware-sdk
+  revision: b7eea3b5d8e533d04c6bedbb8148938667334b91
+- name: canopennode
+  path: /home/moho/ncs/modules/lib/canopennode
+  revision: 53d3415c14d60f8f4bfca54bfbc5d5a667d7e724
+- name: civetweb
+  path: /home/moho/ncs/modules/lib/civetweb
+  revision: 094aeb41bb93e9199d24d665ee43e9e05d6d7b1c
+- name: cmsis
+  path: /home/moho/ncs/modules/hal/cmsis
+  revision: b0612c97c1401feeb4160add6462c3627fe90fc7
+- name: fatfs
+  path: /home/moho/ncs/modules/fs/fatfs
+  revision: 9237454a30bcf6e14a89db174e8dbeb8f31831d2
+- name: hal_nordic
+  path: /home/moho/ncs/modules/hal/nordic
+  revision: 1f9145e8c8359f103b4ac5085c6f5d2e66a2557d
+- name: st
+  path: /home/moho/ncs/modules/hal/st
+  revision: 575de9d461aa6f430cf62c58a053675377e700f3
+- name: libmetal
+  path: /home/moho/ncs/modules/hal/libmetal
+  revision: f237c9d420a51cc43bc37d744e41191ad613f348
+- name: littlefs
+  path: /home/moho/ncs/modules/fs/littlefs
+  revision: 7b2cf4ba759bd530b543644e2790b07cf20cd6aa
+- name: loramac-node
+  path: /home/moho/ncs/modules/lib/loramac-node
+  revision: 12019623bbad9eb54fe51066847a7cbd4b4eac57
+- name: lvgl
+  path: /home/moho/ncs/modules/lib/gui/lvgl
+  revision: aae1c11102138cf596687e662c0d54b72f72bf9b
+- name: lz4
+  path: /home/moho/ncs/modules/lib/lz4
+  revision: 8e303c264fc21c2116dc612658003a22e933124d
+- name: mbedtls
+  path: /home/moho/ncs/modules/crypto/mbedtls
+  revision: 3e3e58a92de76069730c63e0d524f40fea948a61
+- name: mipi-sys-t
+  path: /home/moho/ncs/modules/debug/mipi-sys-t
+  revision: d9da086b11cda494d85f4d8a9829f505c2d5e380
+- name: nanopb
+  path: /home/moho/ncs/modules/lib/nanopb
+  revision: d148bd26718e4c10414f07a7eb1bd24c62e56c5d
+- name: nrf_hw_models
+  path: /home/moho/ncs/modules/bsim_hw_models/nrf_hw_models
+  revision: b8cea37dbdc8fc58cc14b4e19fa850877a9da520
+- name: open-amp
+  path: /home/moho/ncs/modules/lib/open-amp
+  revision: cfd050ff38a9d028dc211690b2ec35971128e45e
+- name: openthread
+  path: /home/moho/ncs/modules/lib/openthread
+  revision: 732203ee338b4700612dada157ca3e2c15a4dd10
+- name: segger
+  path: /home/moho/ncs/modules/debug/segger
+  revision: 3a52ab222133193802d3c3b4d21730b9b1f1d2f6
+- name: tinycbor
+  path: /home/moho/ncs/modules/lib/tinycbor
+  revision: 40daca97b478989884bffb5226e9ab73ca54b8c4
+- name: tinycrypt
+  path: /home/moho/ncs/modules/crypto/tinycrypt
+  revision: 3e9a49d2672ec01435ffbf0d788db6d95ef28de0
+- name: TraceRecorder
+  path: /home/moho/ncs/modules/debug/TraceRecorder
+  revision: e8ca3b6a83d19b2fc4738a0d9607190436e5e452
+- name: tf-m-tests
+  path: /home/moho/ncs/modules/tee/tf-m/tf-m-tests
+  revision: 52814181f0fde6d1422fac204d42cde30c62e40e
+- name: psa-arch-tests
+  path: /home/moho/ncs/modules/tee/tf-m/psa-arch-tests
+  revision: 0aab24602cbef30f6422e7ef1066a8473073e586
+- name: zscilib
+  path: /home/moho/ncs/modules/lib/zscilib
+  revision: 12bfe3f0a9fcbfe3edab7eabc9678b6c62875d34
+- name: nrfxlib
+  path: /home/moho/ncs/nrfxlib
+  revision: a1f6f66d6b0eb660ad55f1dd2ffedcba5dffdbab
+- name: connectedhomeip
+  path: /home/moho/ncs/modules/lib/matter
+  revision: a82a009ed2612c27c107af80fe80d012293ed51e
+west:
+  manifest: /home/moho/ncs/nrf/west.yml
+  projects:
+  - path: /home/moho/ncs/nrf
+    revision: 3b0fa17d816431c164f277b77a92b21834ae2d7e
+  - path: /home/moho/ncs/zephyr
+    revision: bb39dfe3121a1c245d7c5804de0e14e19b299b83
+  - path: /home/moho/ncs/bootloader/mcuboot
+    revision: 132a537bf94044be93240a43b7622b3040bd017e
+  - path: /home/moho/ncs/mbedtls
+    revision: cefdd9954bcc92c08ce2ba41d87b57c29b73482b
+  - path: /home/moho/ncs/nrfxlib
+    revision: a1f6f66d6b0eb660ad55f1dd2ffedcba5dffdbab
+  - path: /home/moho/ncs/modules/tee/tf-m/trusted-firmware-m
+    revision: e6f3c85f618e51b6b8fb0105e2ce9fa6372ba8f0
+  - path: /home/moho/ncs/modules/tee/tfm-mcuboot
+    revision: 4aa516e7281fc6f9a2dce0b0efda9acc580fa254
+  - path: /home/moho/ncs/modules/lib/matter
+    revision: a82a009ed2612c27c107af80fe80d012293ed51e
+  - path: /home/moho/ncs/modules/lib/cjson
+    revision: c6af068b7f05207b28d68880740e4b9ec1e4b50a
+  - path: /home/moho/ncs/test/cmock
+    revision: 9d092898ef26ece140d9225e037274b64d4f851e-dirty-off
+  - path: /home/moho/ncs/test/cmock/vendor/unity
+    revision: 74cde089e65c3435ce9aa87d5c69f4f16b7f6ade
+  - path: /home/moho/ncs/modules/alexa-embedded
+    revision: face92d8c62184832793f518bb1f19379538c5c1
+  - path: /home/moho/ncs/modules/lib/cddl-gen
+    revision: 1c2656daa87ebf4cd3c45ee8eafa336260d589bc
+  - path: /home/moho/ncs/modules/lib/memfault-firmware-sdk
+    revision: b7eea3b5d8e533d04c6bedbb8148938667334b91
+  - path: /home/moho/ncs/modules/lib/canopennode
+    revision: 53d3415c14d60f8f4bfca54bfbc5d5a667d7e724
+  - path: /home/moho/ncs/modules/lib/civetweb
+    revision: 094aeb41bb93e9199d24d665ee43e9e05d6d7b1c
+  - path: /home/moho/ncs/modules/hal/cmsis
+    revision: b0612c97c1401feeb4160add6462c3627fe90fc7
+  - path: /home/moho/ncs/tools/edtt
+    revision: 1fc2e6f7d2a01a01074456f2ef2ccf1f3df7fac1
+  - path: /home/moho/ncs/modules/fs/fatfs
+    revision: 9237454a30bcf6e14a89db174e8dbeb8f31831d2
+  - path: /home/moho/ncs/modules/hal/nordic
+    revision: 1f9145e8c8359f103b4ac5085c6f5d2e66a2557d
+  - path: /home/moho/ncs/modules/hal/st
+    revision: 575de9d461aa6f430cf62c58a053675377e700f3
+  - path: /home/moho/ncs/modules/hal/libmetal
+    revision: f237c9d420a51cc43bc37d744e41191ad613f348
+  - path: /home/moho/ncs/modules/fs/littlefs
+    revision: 7b2cf4ba759bd530b543644e2790b07cf20cd6aa
+  - path: /home/moho/ncs/modules/lib/loramac-node
+    revision: 12019623bbad9eb54fe51066847a7cbd4b4eac57
+  - path: /home/moho/ncs/modules/lib/gui/lvgl
+    revision: aae1c11102138cf596687e662c0d54b72f72bf9b
+  - path: /home/moho/ncs/modules/lib/lz4
+    revision: 8e303c264fc21c2116dc612658003a22e933124d
+  - path: /home/moho/ncs/modules/crypto/mbedtls
+    revision: 3e3e58a92de76069730c63e0d524f40fea948a61
+  - path: /home/moho/ncs/modules/debug/mipi-sys-t
+    revision: d9da086b11cda494d85f4d8a9829f505c2d5e380
+  - path: /home/moho/ncs/modules/lib/nanopb
+    revision: d148bd26718e4c10414f07a7eb1bd24c62e56c5d
+  - path: /home/moho/ncs/tools/net-tools
+    revision: f49bd1354616fae4093bf36e5eaee43c51a55127
+  - path: /home/moho/ncs/modules/bsim_hw_models/nrf_hw_models
+    revision: b8cea37dbdc8fc58cc14b4e19fa850877a9da520
+  - path: /home/moho/ncs/modules/lib/open-amp
+    revision: cfd050ff38a9d028dc211690b2ec35971128e45e
+  - path: /home/moho/ncs/modules/lib/openthread
+    revision: 732203ee338b4700612dada157ca3e2c15a4dd10
+  - path: /home/moho/ncs/modules/debug/segger
+    revision: 3a52ab222133193802d3c3b4d21730b9b1f1d2f6
+  - path: /home/moho/ncs/modules/lib/tinycbor
+    revision: 40daca97b478989884bffb5226e9ab73ca54b8c4
+  - path: /home/moho/ncs/modules/crypto/tinycrypt
+    revision: 3e9a49d2672ec01435ffbf0d788db6d95ef28de0
+  - path: /home/moho/ncs/modules/debug/TraceRecorder
+    revision: e8ca3b6a83d19b2fc4738a0d9607190436e5e452
+  - path: /home/moho/ncs/modules/tee/tf-m/tf-m-tests
+    revision: 52814181f0fde6d1422fac204d42cde30c62e40e
+  - path: /home/moho/ncs/modules/tee/tf-m/psa-arch-tests
+    revision: 0aab24602cbef30f6422e7ef1066a8473073e586
+  - path: /home/moho/ncs/modules/lib/zscilib
+    revision: 12bfe3f0a9fcbfe3edab7eabc9678b6c62875d34
+workspace:
+  dirty: true
+  extra: false
+  'off': true
+zephyr:
+  path: /home/moho/ncs/zephyr
+  revision: bb39dfe3121a1c245d7c5804de0e14e19b299b83
