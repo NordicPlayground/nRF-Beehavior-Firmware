@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/moho/Documents/testbase/ei_sample/build/modules/nrf/lib/edge_impulse/CMakeFiles/edge_impulse_project"
+		},
+		{
+			"file" : "/home/moho/Documents/testbase/ei_sample/build/modules/nrf/lib/edge_impulse/CMakeFiles/edge_impulse_project.rule"
+		},
+		{
+			"file" : "/home/moho/Documents/testbase/ei_sample/build/modules/nrf/lib/edge_impulse/CMakeFiles/edge_impulse_project-complete.rule"
+		},
+		{
+			"file" : "/home/moho/Documents/testbase/ei_sample/build/edge_impulse/src/edge_impulse_project-stamp/edge_impulse_project-build.rule"
+		},
+		{
+			"file" : "/home/moho/Documents/testbase/ei_sample/build/edge_impulse/src/edge_impulse_project-stamp/edge_impulse_project-configure.rule"
+		},
+		{
+			"file" : "/home/moho/Documents/testbase/ei_sample/build/edge_impulse/src/edge_impulse_project-stamp/edge_impulse_project-download.rule"
+		},
+		{
+			"file" : "/home/moho/Documents/testbase/ei_sample/build/edge_impulse/src/edge_impulse_project-stamp/edge_impulse_project-install.rule"
+		},
+		{
+			"file" : "/home/moho/Documents/testbase/ei_sample/build/edge_impulse/src/edge_impulse_project-stamp/edge_impulse_project-mkdir.rule"
+		},
+		{
+			"file" : "/home/moho/Documents/testbase/ei_sample/build/edge_impulse/src/edge_impulse_project-stamp/edge_impulse_project-patch.rule"
+		},
+		{
+			"file" : "/home/moho/Documents/testbase/ei_sample/build/edge_impulse/src/edge_impulse_project-stamp/edge_impulse_project-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"edge_impulse_project"
+		],
+		"name" : "edge_impulse_project"
+	}
+}
