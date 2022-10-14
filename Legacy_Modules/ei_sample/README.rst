@@ -20,16 +20,16 @@ Building and running
 | nRF5340DK                        |
 +----------------------------------+
 
-Building can be done using the vscode extension, or the following commands::
+Building can be done using the vscode extension, or the following commands:
 
 
 
 .. code-block:: build
 
-#For the nRF52
-west build -p -b nrf52840dk_nrf52840
-#For the nRF53
-west build -p -b nrf5340dk_nrf5340_cpuapp
+   #For the nRF52
+   west build -p -b nrf52840dk_nrf52840
+   #For the nRF53
+   west build -p -b nrf5340dk_nrf5340_cpuapp
 
 Testing
 =======
