@@ -27,6 +27,7 @@ west build -p -b nrf52840dk_nrf52840
 
 #For the nRF53
 west build -p -b nrf5340dk_nrf5340_cpuapp
+
 Testing
 =======
 
