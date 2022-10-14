@@ -123,10 +123,6 @@ static int do_pdm_transfer(const struct device *dmic_dev,
    
 	
     k_sleep(K_SECONDS(15));
-	const struct device *gpio_dev;
-	gpio_dev = device_get_binding("GPIO_0");
-	ret = gpio_pin_configure(gpio_dev, 31, GPIO_OUTPUT_HIGH);
-	k_sleep(K_SECONDS(5));
 	
 	const struct device *dmic_dev = DEVICE_DT_GET(DT_NODELABEL(dmic_dev));
 
@@ -166,32 +162,30 @@ static int do_pdm_transfer(const struct device *dmic_dev,
 	cfg.streams[0].block_size =
 		BLOCK_SIZE(cfg.streams[0].pcm_rate, cfg.channel.req_num_chan);
 
+
+	cfg.channel.req_num_chan = 2;
+	cfg.channel.req_chan_map_lo =
+		dmic_build_channel_map(0, 0, PDM_CHAN_LEFT) |
+		dmic_build_channel_map(1, 0, PDM_CHAN_RIGHT);
+	cfg.streams[0].pcm_rate = MAX_SAMPLE_RATE;
+	cfg.streams[0].block_size =
+		BLOCK_SIZE(cfg.streams[0].pcm_rate, cfg.channel.req_num_chan);
+
 	ret = dmic_configure(dmic_dev, &cfg);
 	if (ret < 0) {
 		return;
 	}
 
-	/* Configure the DOUT pin as an input.
-	 * So that we can wait for it to go high to sample the microphone. */
-	ret = gpio_pin_configure(gpio_dev, 25,
-				GPIO_INPUT | GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH);
 
 	while(true){
 
-		
-		/* Check if the noise have exceeded the threshold. */
-		 if(gpio_pin_get_raw(gpio_dev, 25) || CONFIG_BOARD == "nrf52840dk_nrf52840" || CONFIG_BOARD == "nrf5340dk_nrf5340_cpuapp"){
+
 			ret = do_pdm_transfer(dmic_dev, &cfg, 2 * BLOCK_COUNT);
 			if (ret < 0) {
 				return;
-			}
 			k_sleep(K_SECONDS(15));
 		 }
-		 else{
 			k_sleep(K_SECONDS(1));
-		 }
 	}
-
-	
 	}
 	
