@@ -1,0 +1,290 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Connector:USB_C_Receptacle J1
+U 1 1 6358EED8
+P 2250 3550
+F 0 "J1" H 2357 4817 50  0000 C CNN
+F 1 "USB_C_Receptacle" H 2357 4726 50  0000 C CNN
+F 2 "Connector_USB:USB_C_Receptacle_GCT_USB4085" H 2400 3550 50  0001 C CNN
+F 3 "https://www.usb.org/sites/default/files/documents/usb_type-c.zip" H 2400 3550 50  0001 C CNN
+	1    2250 3550
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R1
+U 1 1 63591603
+P 3200 2650
+F 0 "R1" H 3270 2696 50  0000 L CNN
+F 1 "10K" H 3270 2605 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 3130 2650 50  0001 C CNN
+F 3 "https://www.farnell.com/datasheets/3171135.pdf" H 3200 2650 50  0001 C CNN
+	1    3200 2650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2850 2850 3200 2850
+Wire Wire Line
+	3200 2850 3200 2800
+Wire Wire Line
+	2850 2750 3050 2750
+Wire Wire Line
+	3050 2750 3050 2800
+Wire Wire Line
+	3050 2800 3200 2800
+Connection ~ 3200 2800
+Wire Wire Line
+	3200 2500 2850 2500
+Wire Wire Line
+	2850 2500 2850 2550
+NoConn ~ 2850 3050
+NoConn ~ 2850 3150
+NoConn ~ 2850 3250
+NoConn ~ 2850 3350
+NoConn ~ 2850 3550
+NoConn ~ 2850 3650
+NoConn ~ 2850 3850
+NoConn ~ 2850 3950
+NoConn ~ 2850 4150
+NoConn ~ 2850 4250
+NoConn ~ 2850 4450
+NoConn ~ 2850 4550
+NoConn ~ 2850 4750
+NoConn ~ 2850 4850
+NoConn ~ 1950 5150
+$Comp
+L Device:CP1 C1
+U 1 1 635959EB
+P 3850 2900
+F 0 "C1" H 3965 2946 50  0000 L CNN
+F 1 "220µ" H 3965 2855 50  0000 L CNN
+F 2 "Capacitor_THT:CP_Radial_D12.5mm_P5.00mm" H 3850 2900 50  0001 C CNN
+F 3 "https://4donline.ihs.com/images/VipMasterIC/IC/VISH/VISH-S-A0012037942/VISH-S-A0012037942-1.pdf?hkey=6D3A4C79FDBF58556ACFDE234799DDF0" H 3850 2900 50  0001 C CNN
+	1    3850 2900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3200 2500 3850 2500
+Wire Wire Line
+	3850 2500 3850 2750
+Connection ~ 3200 2500
+Wire Wire Line
+	2250 5150 3850 5150
+Wire Wire Line
+	3850 5150 3850 3350
+$Comp
+L Device:LED D?
+U 1 1 6359A19E
+P 4350 2900
+F 0 "D?" V 4389 2783 50  0000 R CNN
+F 1 "LED" V 4298 2783 50  0000 R CNN
+F 2 "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder" H 4350 2900 50  0001 C CNN
+F 3 "https://www.farnell.com/datasheets/3497879.pdf" H 4350 2900 50  0001 C CNN
+	1    4350 2900
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R R2
+U 1 1 6359BBA9
+P 4350 3200
+F 0 "R2" H 4420 3246 50  0000 L CNN
+F 1 "1K" H 4420 3155 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 4280 3200 50  0001 C CNN
+F 3 "~" H 4350 3200 50  0001 C CNN
+	1    4350 3200
+	1    0    0    -1  
+$EndComp
+$Comp
+L USERDEF:RS6-0505S U?
+U 1 1 6359FF4D
+P 5500 4150
+F 0 "U?" H 5500 2985 50  0000 C CNN
+F 1 "RS6-0505S" H 5500 3076 50  0000 C CNN
+F 2 "OWN_DEF:RS6-0505S" H 5500 4150 50  0001 C CNN
+F 3 "" H 5500 4150 50  0001 C CNN
+	1    5500 4150
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	3850 2500 4350 2500
+Wire Wire Line
+	4350 2500 4350 2750
+Connection ~ 3850 2500
+Wire Wire Line
+	4350 3350 3850 3350
+Connection ~ 3850 3350
+Wire Wire Line
+	3850 3350 3850 3050
+Wire Wire Line
+	5050 3450 4350 3450
+Wire Wire Line
+	4350 3450 4350 3350
+Connection ~ 4350 3350
+Wire Wire Line
+	5050 3850 4800 3850
+Wire Wire Line
+	4800 3850 4800 2500
+Wire Wire Line
+	4800 2500 4350 2500
+Connection ~ 4350 2500
+NoConn ~ 5050 3650
+Wire Wire Line
+	5950 3850 6200 3850
+Wire Wire Line
+	6200 3850 6200 3950
+$Comp
+L Device:L L?
+U 1 1 635A5B59
+P 6550 3950
+F 0 "L?" V 6369 3950 50  0000 C CNN
+F 1 "L" V 6460 3950 50  0000 C CNN
+F 2 "" H 6550 3950 50  0001 C CNN
+F 3 "~" H 6550 3950 50  0001 C CNN
+	1    6550 3950
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	5950 3450 6400 3450
+$Comp
+L Device:L L?
+U 1 1 635A6AFC
+P 6550 3450
+F 0 "L?" V 6369 3450 50  0000 C CNN
+F 1 "L" V 6460 3450 50  0000 C CNN
+F 2 "" H 6550 3450 50  0001 C CNN
+F 3 "~" H 6550 3450 50  0001 C CNN
+	1    6550 3450
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	6200 3950 6400 3950
+$Comp
+L Device:C C3
+U 1 1 635A961E
+P 6700 3700
+F 0 "C3" H 6815 3746 50  0000 L CNN
+F 1 "22µ" H 6815 3655 50  0000 L CNN
+F 2 "Capacitor_SMD:C_1206_3216Metric" H 6738 3550 50  0001 C CNN
+F 3 "https://www.farnell.com/datasheets/2260753.pdf" H 6700 3700 50  0001 C CNN
+	1    6700 3700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6700 3450 6700 3550
+Wire Wire Line
+	6700 3850 6700 3950
+$Comp
+L Device:LED D?
+U 1 1 635AEA66
+P 7200 3850
+F 0 "D?" V 7239 3733 50  0000 R CNN
+F 1 "LED" V 7148 3733 50  0000 R CNN
+F 2 "LED_SMD:LED_0603_1608Metric" H 7200 3850 50  0001 C CNN
+F 3 "https://www.farnell.com/datasheets/3497879.pdf" H 7200 3850 50  0001 C CNN
+	1    7200 3850
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R R3
+U 1 1 635AEA6C
+P 7200 3550
+F 0 "R3" H 7270 3596 50  0000 L CNN
+F 1 "1K" H 7270 3505 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 7130 3550 50  0001 C CNN
+F 3 "~" H 7200 3550 50  0001 C CNN
+	1    7200 3550
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	6700 3950 6900 3950
+Wire Wire Line
+	6900 3950 6900 4000
+Wire Wire Line
+	6900 4000 7200 4000
+Connection ~ 6700 3950
+Wire Wire Line
+	6700 3450 6900 3450
+Wire Wire Line
+	6900 3450 6900 3400
+Wire Wire Line
+	6900 3400 7200 3400
+Connection ~ 6700 3450
+$Comp
+L Device:D_Zener D?
+U 1 1 635B5902
+P 7450 3650
+F 0 "D?" V 7496 3571 50  0000 R CNN
+F 1 "D_Zener" V 7405 3571 50  0000 R CNN
+F 2 "" H 7450 3650 50  0001 C CNN
+F 3 "~" H 7450 3650 50  0001 C CNN
+	1    7450 3650
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:CP1 C2
+U 1 1 635B51F8
+P 8100 3650
+F 0 "C2" H 8215 3696 50  0000 L CNN
+F 1 "220µ" H 8215 3605 50  0000 L CNN
+F 2 "Capacitor_THT:CP_Radial_D12.5mm_P5.00mm" H 8100 3650 50  0001 C CNN
+F 3 "~" H 8100 3650 50  0001 C CNN
+	1    8100 3650
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	7200 3400 7450 3400
+Wire Wire Line
+	7450 3400 7450 3500
+Connection ~ 7200 3400
+Wire Wire Line
+	8100 3500 8100 3400
+Wire Wire Line
+	8100 3400 7450 3400
+Connection ~ 7450 3400
+Wire Wire Line
+	7200 4000 7450 4000
+Wire Wire Line
+	7450 4000 7450 3800
+Connection ~ 7200 4000
+Wire Wire Line
+	7450 4000 8100 4000
+Wire Wire Line
+	8100 4000 8100 3800
+Connection ~ 7450 4000
+$Comp
+L USERDEF:66200221022 P?
+U 1 1 635C4C6A
+P 9000 3700
+F 0 "P?" V 8979 3728 50  0000 L CNN
+F 1 "66200221022" V 9070 3728 50  0000 L CNN
+F 2 "OWN_DEF:66200221022" H 9000 3750 50  0001 C CNN
+F 3 "https://www.we-online.com/katalog/datasheet/66201021022.pdf" H 9000 3750 50  0001 C CNN
+	1    9000 3700
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	8100 3400 8500 3400
+Wire Wire Line
+	8500 3400 8500 3350
+Wire Wire Line
+	8500 3350 8750 3350
+Connection ~ 8100 3400
+Wire Wire Line
+	8100 4000 8100 4100
+Wire Wire Line
+	8100 4100 8750 4100
+Connection ~ 8100 4000
+$EndSCHEMATC

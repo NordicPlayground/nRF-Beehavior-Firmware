@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name OWN_DEF)(type KiCad)(uri /home/moho/Documents/nRF-Beehavior-Firmware/hardware/New_PCB/usb-c)(options "")(descr ""))
+)
