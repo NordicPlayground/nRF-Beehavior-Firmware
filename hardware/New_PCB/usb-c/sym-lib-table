@@ -1,3 +1,4 @@
 (sym_lib_table
-  (lib (name USERDEF)(type Legacy)(uri /home/moho/Documents/nRF-Beehavior-Firmware/hardware/New_PCB/usb-c/USER_DEF.lib)(options "")(descr ""))
+  (lib (name USERDEF)(type Legacy)(uri ${KIPRJMOD}/USER_DEF.lib)(options "")(descr ""))
+  (lib (name usb-c-rescue)(type Legacy)(uri ${KIPRJMOD}/usb-c-rescue.lib)(options "")(descr ""))
 )
