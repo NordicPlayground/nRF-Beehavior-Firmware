@@ -57,12 +57,8 @@
 
 #include "nvs_module.h"
 #include "events/nvs_event.h"
-#include "sys/types.h"
-
-//#include "wdt_module.h"
-//#include "events/wdt_event.h"
-
 #include "events/cloud_event.h"
+#include "sys/types.h"
 
 #define MODULE nvs_module
 LOG_MODULE_REGISTER(MODULE, 4);
@@ -148,8 +144,6 @@ void nvs_wipe_function(void) {
 	
 	struct nvs_event *event = new_nvs_event();
 
-	// LOG_DBG("*************** %d *****************\n", event->wdt_channel_id); // Debugging
-
 	rc = nvs_read(&fs, WDT_CHANNEL_ID, &event->wdt_channel_id, sizeof(event->wdt_channel_id));
 	
 	LOG_DBG("*************** %d ***************** NVS WIPE\n", event->wdt_channel_id); // Debugging
@@ -216,8 +210,9 @@ static bool event_handler(const struct event_header *eh) {
 			return false;
 		}
 		if(event->type==NVS_SEND_TO_CLOUD){
+			
 			rc = nvs_read(&fs, WDT_CHANNEL_ID, &event->wdt_channel_id, sizeof(event->wdt_channel_id));
-			//LOG_DBG("num_of_wdt_channels = %d", event->num_of_wdt_channels); // Debugging to see if counts num of wdt channels right.
+			
 			if (rc > 0 && event->wdt_channel_id >= 0 && event->wdt_channel_id < NUM_OF_WDT_CHANNELS) {
 				LOG_DBG("%d event_handler(): [NVS_SEND_TO_CLOUD] Id: %d, wdt_channel_id: %d\n",
 				rc, WDT_CHANNEL_ID, event->wdt_channel_id);
@@ -226,14 +221,11 @@ static bool event_handler(const struct event_header *eh) {
 				struct cloud_event_abbr *cloud_send_wdt = new_cloud_event_abbr(10);
 				cloud_send_wdt->type = CLOUD_SEND_WDT;
 				cloud_send_wdt->dyndata.data[0] = event->wdt_channel_id; // Timed out channel id.
-				LOG_DBG("Sending to cloud...\n");
 				// Submit main write before reboot event.
 				APP_EVENT_SUBMIT(cloud_send_wdt);
-
-				//LOG_INF("event_handler(): NVS sent to cloud.\n");
 			}
 			else {
-				LOG_WRN("event_handler(): Invalid wdt channel number. Nothing sent to cloud.\n");
+				LOG_INF("event_handler(): Invalid wdt channel number. Nothing sent to cloud.\n");
 			}
 			return false;
 		}
@@ -254,9 +246,5 @@ static bool event_handler(const struct event_header *eh) {
 	return false;
 }
 
-
-//K_THREAD_DEFINE(nvs_thread, 1024, nvs_setup_function, NULL, NULL, NULL, K_LOWEST_APPLICATION_THREAD_PRIO, 0, 0);
-
 APP_EVENT_LISTENER(MODULE, event_handler);
 APP_EVENT_SUBSCRIBE(MODULE, nvs_event);
-//APP_EVENT_SUBSCRIBE(MODULE, wdt_event);

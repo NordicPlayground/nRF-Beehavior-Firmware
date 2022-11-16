@@ -16,12 +16,9 @@
 #include <sys/printk.h>
 #include <stdbool.h>
 #include "events/wdt_event.h"
-#include <logging/log.h>
-
-#include "wdt_module.h"
-
-//#include "nvs_module.h"
 #include "events/nvs_event.h"
+#include <logging/log.h>
+#include "wdt_module.h"
 
 #define MODULE wdt_module
 LOG_MODULE_REGISTER(MODULE, 4);
@@ -114,7 +111,7 @@ void watchdog_setup(void)
 		const struct device *hw_wdt_dev = NULL;
 	#endif
 
-	LOG_INF("wdt_setup(): Setting up task watchdog sample application.\n");
+	LOG_DBG("wdt_setup(): Setting up task watchdog sample application.\n");
 
 	if (!device_is_ready(hw_wdt_dev)) {
 		LOG_WRN("wdt_setup(): Hardware watchdog %s is not ready; ignoring it.\n",
@@ -156,7 +153,7 @@ void wdt_add_channels(int wdt_to_add) // wdt_to_add = WDT channel number to add
 	if (wdt_to_add == WDT_CHANNEL_NRF91_MAIN) {
 		// Adding wdt channel for main event
 		channel_id = task_wdt_add(RESET_TIME_MAIN, wdt_callback_main_event, (void *)k_current_get());
-		LOG_INF("wdt_add_channels(): Main watchdog added, ID: %d (actual %d)\n", WDT_CHANNEL_NRF91_MAIN, channel_id);
+		LOG_DBG("wdt_add_channels(): Main watchdog added, ID: %d (actual %d)\n", WDT_CHANNEL_NRF91_MAIN, channel_id);
 
 		// Create main feed event.
 		struct wdt_event *wdt_feed_main = new_wdt_event();
@@ -169,7 +166,7 @@ void wdt_add_channels(int wdt_to_add) // wdt_to_add = WDT channel number to add
 	if (wdt_to_add == WDT_CHANNEL_NRF91_NRF53_DEVICE) {
 		// Adding wdt channel for nRF53 event
 		channel_id = task_wdt_add(RESET_TIME_NRF53, wdt_callback_nrf53_event, (void *)k_current_get());
-		LOG_INF("wdt_add_channels(): nRF53 watchdog added, ID: %d (actual %d)\n", WDT_CHANNEL_NRF91_NRF53_DEVICE, channel_id);
+		LOG_DBG("wdt_add_channels(): nRF53 watchdog added, ID: %d (actual %d)\n", WDT_CHANNEL_NRF91_NRF53_DEVICE, channel_id);
 
 		// Create nRF53 feed event.
 		struct wdt_event *wdt_feed_nrf53 = new_wdt_event();
@@ -197,27 +194,27 @@ static bool event_handler(const struct event_header *eh)
 		}
 		if (event->type==WDT_ADD_MAIN){
 			wdt_add_channels(WDT_CHANNEL_NRF91_MAIN);
-			LOG_INF("event_handler(): Main watchdog added.\n");
+			LOG_DBG("event_handler(): Main watchdog added.\n");
 		}
 		if (event->type==WDT_ADD_NRF53){
 			wdt_add_channels(WDT_CHANNEL_NRF91_NRF53_DEVICE);
-			LOG_INF("event_handler(): nRF53 watchdog added.\n");
+			LOG_DBG("event_handler(): nRF53 watchdog added.\n");
 		}
 		if(event->type==WDT_FEED_MAIN){
-			LOG_INF("event_handler(): Main WDT being fed.\n");
+			LOG_DBG("event_handler(): Main WDT being fed.\n");
 			err_feed = task_wdt_feed(wdt_channel_main);
 			LOG_DBG("event_handler(): channel %d (actual %d) FEEDING: %d\n", WDT_CHANNEL_NRF91_MAIN, wdt_channel_main, err_feed); // Debugging
 			return false;
 		}
 		if(event->type==WDT_FEED_NRF53){
-			LOG_INF("event_handler(): nRF53 WDT being fed.\n");
+			LOG_DBG("event_handler(): nRF53 WDT being fed.\n");
 			err_feed = task_wdt_feed(wdt_channel_nrf53);
 			LOG_DBG("event_handler(): channel %d (actual %d) FEEDING: %d\n", WDT_CHANNEL_NRF91_NRF53_DEVICE, wdt_channel_nrf53, err_feed); // Debugging
 			return false;
 		}
 		if(event->type==WDT_TIMEOUT){
 			LOG_WRN("event_handler(): WDT channel %d timed out.\n", event->wdt_channel_id);
-			LOG_INF("event_handler(): Resetting device...\n");
+			LOG_DBG("event_handler(): Resetting device...\n");
 			int count;
 			int count_max = 1;
 			for (int i = 0; i < count_max+1; i++) {
@@ -235,11 +232,5 @@ static bool event_handler(const struct event_header *eh)
 	return false;
 }
 
-
-//K_THREAD_DEFINE(watchdog_thread, 1024, watchdog_setup, NULL, NULL, NULL, K_LOWEST_APPLICATION_THREAD_PRIO, 0, 1000);
-
 APP_EVENT_LISTENER(MODULE, event_handler);
 APP_EVENT_SUBSCRIBE(MODULE, wdt_event);
-APP_EVENT_SUBSCRIBE(MODULE, nvs_event);
-//APP_EVENT_SUBSCRIBE(MODULE, ble_event);
-//APP_EVENT_SUBSCRIBE(MODULE, cloud_event);

@@ -32,7 +32,10 @@
 
 #include <bluetooth/bluetooth.h>
 
-LOG_MODULE_REGISTER(cloud_module, CONFIG_LOG_DEFAULT_LEVEL);
+// Define cloud_module as current module.
+#define MODULE cloud_module
+
+LOG_MODULE_REGISTER(MODULE, CONFIG_LOG_DEFAULT_LEVEL);
 
 // Battery measurment stuff, only applicable to the Thingy:91.
 #if defined(CONFIG_BOARD_THINGY91)
@@ -147,6 +150,20 @@ static int connect_cloud()
 	}
 
 	LOG_INF("Connected to nRF Cloud");
+
+	// Set up WDT and add a channel for the main device.
+	// Set up wdt.
+	struct wdt_event *wdt_setup = new_wdt_event();
+	wdt_setup->type = WDT_SETUP;
+	// Submit wdt setup event.
+	APP_EVENT_SUBMIT(wdt_setup);
+
+	// Add wdt channel.
+	struct wdt_event *wdt_add_main = new_wdt_event();
+	wdt_add_main->type = WDT_ADD_MAIN;
+	// Submit wdt add main event.
+	APP_EVENT_SUBMIT(wdt_add_main);
+	
 	return 0;
 }
 
@@ -628,35 +645,6 @@ void cloud_setup_fn(void)
 	memcpy(cloud_setup->dyndata.data, log_strdup("Cloud ready"), strlen("Cloud ready"));
 
 	APP_EVENT_SUBMIT(cloud_setup);
-
-	// // ***** WDT ***** //	
-	// // Set up wdt.
-	// struct wdt_event *wdt_setup = new_wdt_event();
-	// wdt_setup->type = WDT_SETUP;
-	// // Submit wdt setup event.
-	// APP_EVENT_SUBMIT(wdt_setup);
-
-	// // Add wdt channel.
-	// struct wdt_event *wdt_add_main = new_wdt_event();
-	// wdt_add_main->type = WDT_ADD_MAIN;
-	// // Submit wdt add main event.
-	// APP_EVENT_SUBMIT(wdt_add_main);
-	// // ***** *** ***** //
-
-	// k_sleep(K_MSEC(1));
-	// // ** Send timed out wdt channel, registered in NVS, to cloud **
-	// struct nvs_event *nvs_send_to_cloud = new_nvs_event();
-	// nvs_send_to_cloud->type = NVS_SEND_TO_CLOUD;
-	// // Submit send to cloud event.
-	// APP_EVENT_SUBMIT(nvs_send_to_cloud);
-
-	// k_sleep(K_MSEC(1));
-	// // ** Wipe NVS **
-	// struct nvs_event *nvs_wipe = new_nvs_event();
-	// nvs_wipe->type = NVS_WIPE;
-	// // Submit NVS wipe event.
-	// APP_EVENT_SUBMIT(nvs_wipe);
-
 }
 
 static bool event_handler(const struct app_event_header *eh)
@@ -833,7 +821,7 @@ static bool event_handler(const struct app_event_header *eh)
 		// Legacy, no longer used due to LTE is off when not used.
 		if(event->type==BLE_SCANNING){
 			LOG_INF("Stopping Cloud sync");
-			return false;;
+			return false;
 		}
 		//Legacy
 		if(event->type==BLE_DONE_SCANNING){
@@ -861,8 +849,8 @@ static bool event_handler(const struct app_event_header *eh)
 			int64_t divide = 1000;
 			int64_t ts = unix_time_ms / divide;
 			
-			if (event->dyndata.data > WDT_CHANNEL_NRF91_NRF53_DEVICE) { // If wdt on nRF53
-				LOG_DBG("cloud_module: event_handler(): Time: %d", ts);
+			if (event->dyndata.data[0] > WDT_CHANNEL_NRF91_NRF53_DEVICE) { // If wdt on nRF53
+				LOG_DBG("nRF53 WDT data is being JSON-formatted");
 				// Format to JSON-string
 				uint16_t len = snprintk(message, 100, "{\"appID\":\"WDT\",\"Channel\":\"%d\",\"TIME\":\"%lld\",\"NAME\":\"%s\"}", 
 										*event->dyndata.data, ts, "nRF53_deviceNumber");
@@ -872,7 +860,7 @@ static bool event_handler(const struct app_event_header *eh)
 				return false;
 			}
 			else { // Else wdt on nRF91
-				LOG_DBG("cloud_module: event_handler(): Time: %d", ts);
+				LOG_DBG("nRF91 WDT data is being JSON-formatted");
 				// Format to JSON-string
 				uint16_t len = snprintk(message, 100, "{\"appID\":\"WDT\",\"Channel\":\"%d\",\"TIME\":\"%lld\",\"NAME\":\"%s\"}", 
 										*event->dyndata.data, ts, "nRF91");
@@ -894,5 +882,6 @@ K_THREAD_DEFINE(cloud_setup_thread, STACKSIZE,
 		cloud_setup_fn, NULL, NULL, NULL,
 		K_LOWEST_APPLICATION_THREAD_PRIO, 0, 0);
 
-APP_EVENT_LISTENER(cloud_module, event_handler);
-APP_EVENT_SUBSCRIBE_EARLY(cloud_module, ble_event);
+APP_EVENT_LISTENER(MODULE, event_handler);
+APP_EVENT_SUBSCRIBE_EARLY(MODULE, ble_event);
+APP_EVENT_SUBSCRIBE(MODULE, cloud_event_abbr);
