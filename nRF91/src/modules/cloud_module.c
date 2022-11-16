@@ -656,24 +656,35 @@ static bool event_handler(const struct app_event_header *eh)
         if(event->type==BLE_RECEIVED){
 
 			if(event->dyndata.size == 1){
-				LOG_DBG("WDT data is being JSON-formatted");
+				
+				// Create new CLOUD_SEND_NVS event.
+				struct cloud_event_abbr *cloud_send_wdt = new_cloud_event_abbr(10);
+				cloud_send_wdt->type = CLOUD_SEND_WDT;
+				cloud_send_wdt->dyndata.data[0] = event->dyndata.data[0]; // Timed out channel id.
+				for (uint8_t i=0; i < sizeof(event->name); i++){
+					cloud_send_wdt->name[i] = event->name[i];
+				}
+				// Submit main write before reboot event.
+				APP_EVENT_SUBMIT(cloud_send_wdt);
+				
+				// LOG_DBG("WDT data is being JSON-formatted");
 
-				char message[100];
+				// char message[100];
 
-				/* Get timestamp */
-				int64_t unix_time_ms = k_uptime_get();
-				err = date_time_now(&unix_time_ms);
-				int64_t divide = 1000;
-				int64_t ts = unix_time_ms / divide;
+				// /* Get timestamp */
+				// int64_t unix_time_ms = k_uptime_get();
+				// err = date_time_now(&unix_time_ms);
+				// int64_t divide = 1000;
+				// int64_t ts = unix_time_ms / divide;
 
-				LOG_DBG("Time: %d", ts);
+				// LOG_DBG("Time: %d", ts);
 
-				/* Format to JSON-string */
-				uint16_t len = snprintk(message, 100, "{\"appID\":\"WDT\",\"Channel\":%d,\"TIME\":%lld,\"NAME\":\"%s\"}" \
-					, event->dyndata.data, ts, event->name);
-				LOG_INF("Message formatted: %s, length: %i", message, len);
+				// /* Format to JSON-string */
+				// uint16_t len = snprintk(message, 100, "{\"appID\":\"WDT\",\"Channel\":%d,\"TIME\":%lld,\"NAME\":\"%s\"}" \
+				// 	, event->dyndata.data, ts, event->name);
+				// LOG_INF("Message formatted: %s, length: %i", message, len);
 
-				enqueue_message(message, len);
+				// enqueue_message(message, len);
 			}
 			if(event->dyndata.size == 4){
 				LOG_DBG("Bee Counter data is being JSON-formatted");
@@ -853,7 +864,7 @@ static bool event_handler(const struct app_event_header *eh)
 				LOG_DBG("nRF53 WDT data is being JSON-formatted");
 				// Format to JSON-string
 				uint16_t len = snprintk(message, 100, "{\"appID\":\"WDT\",\"Channel\":\"%d\",\"TIME\":\"%lld\",\"NAME\":\"%s\"}", 
-										*event->dyndata.data, ts, "nRF53_deviceNumber");
+										event->dyndata.data, ts, event->name);
 				LOG_INF("cloud_module: event_handler(): Message formatted: %s, length: %i", message, len);
 				enqueue_message(message, len);
 

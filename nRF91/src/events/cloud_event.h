@@ -17,6 +17,7 @@ struct cloud_event_abbr {
         enum cloud_event_type_abbr type;
 
         /* Custom data fields. */
+        char name[20];
         struct event_dyndata dyndata;
 
 };
