@@ -47,6 +47,24 @@ The application makes use of the :ref:`app_event_manager` to distribute events b
 The event manager is used for all the communication between the modules.
 The final messages sent to the Cloud module of the project is taken from BLE data messages which supports up to 20 bytes.
 
++-----------------------+-----------------------------------------------------------+
+| Module                | Description                                               |
++=======================+===========================================================+
+| BLE module            | BLE communication between nRF91 and BLE peripherals.      |
++-----------------------+-----------------------------------------------------------+
+| Cloud Module          | Communication between nRF91 and cloud.                    |
++-----------------------+-----------------------------------------------------------+
+| HTTPS Client Module   | Communication between nRF91 and webpage, through cloud.   |
++-----------------------+-----------------------------------------------------------+
+| NVS Module            | How WDT data is stored to NVS (Non-Volatile Storage).     |
++-----------------------+-----------------------------------------------------------+
+| Post Module           | *Deprecated* (?)                                          |
++-----------------------+-----------------------------------------------------------+
+| SMS Module            | SMS communication from the nRF91.                         |
++-----------------------+-----------------------------------------------------------+
+| WDT Module            | WatchDog Timer                                            |
++-----------------------+-----------------------------------------------------------+
+
 
 Data types
 ==========
@@ -113,7 +131,7 @@ WoodPecker
 ------------------
 +---------------+---------------+-------------------------------------------------------------------+-----------+-----------+
 | Data          | ID            | Description                                                       | Data size | [Unit]    |
-+===============+===============+===================================================+===========+===========+
++===============+===============+===================================================================+===========+===========+
 | Total         | TOTAL         | Amount of times noise have exceeded the threshold                 | 2 bytes   | Unitless  |
 +---------------+---------------+-------------------------------------------------------------------+-----------+-----------+
 | Postive       | POSITIVE      | Amount of times likelihood of woodpecker exceeded the threshold   | 1 byte    | Unitless  |
@@ -136,7 +154,7 @@ The following table shows the LED behavior demonstrated by the application:
 +----------------------------------+-------------------------+--------------------------+
 | Connected to nRF53/peripheral    | LED2 on                 | Green                    |
 +----------------------------------+-------------------------+--------------------------+
-| WIP! Error                       |  all 4 LEDs blinking    | Red                      |
+| WIP! Error                       | all 4 LEDs blinking     | Red                      |
 +----------------------------------+-------------------------+--------------------------+
 
 
