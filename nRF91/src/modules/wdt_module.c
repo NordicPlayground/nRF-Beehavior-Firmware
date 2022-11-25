@@ -217,9 +217,9 @@ static bool event_handler(const struct event_header *eh)
 			LOG_DBG("event_handler(): Resetting device...\n");
 			int count;
 			int count_max = 1;
-			for (int i = 0; i < count_max+1; i++) {
+			for (int i = 0; i < count_max+1; i++) { // Need this loop to create delay before reset.
 				count = i;
-				LOG_DBG("count %d\n", count);
+				// LOG_DBG("count %d\n", count);
 				k_sleep(K_MSEC(1000));
 			}
 			if (count == count_max) {
