@@ -4,5 +4,5 @@
 ## Thingy:53
 ## Website
 ## Hardware
-### [PCB](NordicPlayground/nRF-Beehavior-Firmware/tree/watchdog/hardware/PCB_Hardware/README.md)
+### [PCB](hardware/PCB_Hardware/README.md)
 ## Hives
