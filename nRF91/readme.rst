@@ -72,20 +72,20 @@ Data types
 Data from multiple peripherals are collected to construct information about the weight, battery and environment. 
 The application supports the following sensor types:
 
-+--------------------+------------------------------------------------------------------------+---------------+
-| Sensor type        | Description                                                            | App ID        |
-+====================+========================================================================+===============+
-| BeeCounter         | Bees in and out of hive                                                | BEE-CNT       |
-+--------------------+------------------------------------------------------------------------+---------------+
-| BroodMinder Weight | Weight and Temperature                                                 | BM-W          |
-+--------------------+------------------------------------------------------------------------+---------------+
-| Thingy:52          | Temperature, Humidity, Air Pressure and battery                        | THINGY        |
-+--------------------+------------------------------------------------------------------------+---------------+
-| WoodPecker         | Likelihood of woodpecker, positive and total triggers                  | W-PECK        |
-+--------------------+------------------------------------------------------------------------+---------------+
-+--------------------+------------------------------------------------------------------------+---------------+
-| WatchDog Timer     | Not really a sensor but a timer resetting the device if it gets stuck. | W-PECK        |
-+--------------------+------------------------------------------------------------------------+---------------+
++--------------------+------------------------------------------------------------------------+---------+
+| Sensor type        | Description                                                            | App ID  |
++====================+========================================================================+=========+
+| BeeCounter         | Bees in and out of hive                                                | BEE-CNT |
++--------------------+------------------------------------------------------------------------+---------+
+| BroodMinder Weight | Weight and Temperature                                                 | BM-W    |
++--------------------+------------------------------------------------------------------------+---------+
+| Thingy:52          | Temperature, Humidity, Air Pressure and battery                        | THINGY  |
++--------------------+------------------------------------------------------------------------+---------+
+| WoodPecker         | Likelihood of woodpecker, positive and total triggers                  | W-PECK  |
++--------------------+------------------------------------------------------------------------+---------+
++--------------------+------------------------------------------------------------------------+---------+
+| WatchDog Timer     | Not really a sensor but a timer resetting the device if it gets stuck. | WDT     |
++--------------------+------------------------------------------------------------------------+---------+
 
 The sets of sensor data that are published to the cloud service consist of relative `timestamps <Timestamping_>`_ that originate from the time
 the nRF91 unit received the data. All data are sent with a NAME to differentiate messages from different peripherals/hives.
@@ -144,6 +144,19 @@ WoodPecker
 +---------------+---------------+-------------------------------------------------------------------+-----------+-----------+
 | Battery       | BTRY          | Remaining battery percentage of the Thingy:53                     | 1 bytes   | [%]       |
 +---------------+---------------+-------------------------------------------------------------------+-----------+-----------+
+
+WatchDog Timer
+------------------
++-----------+-----------+-----------------------------------------------+-----------+-----------+
+| Data      | ID        | Description                                   | Data size | [Unit]    |
++===========+===========+===============================================+===========+===========+
+| Channel   | CHANNEL   | The watchdog channel which has been triggered | ? bytes   | Unitless  |
++-----------+-----------+-----------------------------------------------+-----------+-----------+
+| Time      | TIME      | The time when the message was sent            | 8 bytes   | [seconds] |
++-----------+-----------+-----------------------------------------------+-----------+-----------+
+| Name      | NAME      | Which device the timeout occured on           | ? bytes   | Unitless  |
++-----------+-----------+-----------------------------------------------+-----------+-----------+
+
 
 User interface
 **************

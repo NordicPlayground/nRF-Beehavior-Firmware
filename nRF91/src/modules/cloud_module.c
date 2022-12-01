@@ -863,7 +863,7 @@ static bool event_handler(const struct app_event_header *eh)
 			if (event->dyndata.data[0] > WDT_CHANNEL_NRF91_NRF53_DEVICE) { // If wdt on nRF53
 				LOG_DBG("nRF53 WDT data is being JSON-formatted");
 				// Format to JSON-string
-				uint16_t len = snprintk(message, 100, "{\"appID\":\"WDT\",\"Channel\":\"%d\",\"TIME\":\"%lld\",\"NAME\":\"%s\"}", 
+				uint16_t len = snprintk(message, 100, "{\"appID\":\"WDT\",\"CHANNEL\":\"%d\",\"TIME\":\"%lld\",\"NAME\":\"%s\"}", 
 										event->dyndata.data, ts, event->name);
 				LOG_INF("cloud_module: event_handler(): Message formatted: %s, length: %i", message, len);
 				enqueue_message(message, len);
