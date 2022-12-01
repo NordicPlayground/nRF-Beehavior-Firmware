@@ -855,10 +855,10 @@ static bool event_handler(const struct app_event_header *eh)
 			// LOG_DBG("cloud_module: event_handler(): Time! %i", date_time_is_valid());
 
 			// Get timestamp
-			int64_t unix_time_ms = k_uptime_get();
+			int32_t unix_time_ms = k_uptime_get_32();
 			int err = date_time_now(&unix_time_ms);
-			int64_t divide = 1000;
-			int64_t ts = unix_time_ms / divide;
+			int32_t divide = 1000;
+			int32_t ts = unix_time_ms / divide;
 			
 			if (event->dyndata.data[0] > WDT_CHANNEL_NRF91_NRF53_DEVICE) { // If wdt on nRF53
 				LOG_DBG("nRF53 WDT data is being JSON-formatted");
