@@ -5,4 +5,5 @@
 ## Website
 ## Hardware
 ### [PCB](hardware/PCB_Hardware/README.md)
+### [Hub Box](hardware\hub_housing\README.md)
 ## Hives
