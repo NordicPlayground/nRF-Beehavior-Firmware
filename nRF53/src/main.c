@@ -25,6 +25,8 @@ bool led_on;
 void main(void)
 {	
 
+	LOG_INF("In main() main.c");
+
 #if defined(CONFIG_THINGY53)
 	/* Disable unnecessary peripherals to save power. */ 
 	const struct device *gpio0_dev;
