@@ -150,19 +150,6 @@ static int connect_cloud()
 	}
 
 	LOG_INF("Connected to nRF Cloud");
-
-	// Set up WDT and add a channel for the main device.
-	// Set up wdt.
-	struct wdt_event *wdt_setup = new_wdt_event();
-	wdt_setup->type = WDT_SETUP;
-	// Submit wdt setup event.
-	APP_EVENT_SUBMIT(wdt_setup);
-
-	// Add wdt channel.
-	struct wdt_event *wdt_add_main = new_wdt_event();
-	wdt_add_main->type = WDT_ADD_MAIN;
-	// Submit wdt add main event.
-	APP_EVENT_SUBMIT(wdt_add_main);
 	
 	return 0;
 }
@@ -645,6 +632,19 @@ void cloud_setup_fn(void)
 	memcpy(cloud_setup->dyndata.data, log_strdup("Cloud ready"), strlen("Cloud ready"));
 
 	APP_EVENT_SUBMIT(cloud_setup);
+
+	// Set up WDT and add a channel for the main device.
+	// Set up wdt.
+	struct wdt_event *wdt_setup = new_wdt_event();
+	wdt_setup->type = WDT_SETUP;
+	// Submit wdt setup event.
+	APP_EVENT_SUBMIT(wdt_setup);
+
+	// Add wdt channel.
+	struct wdt_event *wdt_add_main = new_wdt_event();
+	wdt_add_main->type = WDT_ADD_MAIN;
+	// Submit wdt add main event.
+	APP_EVENT_SUBMIT(wdt_add_main);
 }
 
 static bool event_handler(const struct app_event_header *eh)
@@ -667,24 +667,24 @@ static bool event_handler(const struct app_event_header *eh)
 				// Submit main write before reboot event.
 				APP_EVENT_SUBMIT(cloud_send_wdt);
 				
-				// LOG_DBG("WDT data is being JSON-formatted");
+				LOG_DBG("WDT data is being JSON-formatted");
 
-				// char message[100];
+				char message[100];
 
-				// /* Get timestamp */
-				// int64_t unix_time_ms = k_uptime_get();
-				// err = date_time_now(&unix_time_ms);
-				// int64_t divide = 1000;
-				// int64_t ts = unix_time_ms / divide;
+				/* Get timestamp */
+				int64_t unix_time_ms = k_uptime_get();
+				err = date_time_now(&unix_time_ms);
+				int64_t divide = 1000;
+				int64_t ts = unix_time_ms / divide;
 
-				// LOG_DBG("Time: %d", ts);
+				LOG_DBG("Time: %d", ts);
 
-				// /* Format to JSON-string */
-				// uint16_t len = snprintk(message, 100, "{\"appID\":\"WDT\",\"Channel\":%d,\"TIME\":%lld,\"NAME\":\"%s\"}" \
-				// 	, event->dyndata.data, ts, event->name);
-				// LOG_INF("Message formatted: %s, length: %i", message, len);
+				/* Format to JSON-string */
+				uint16_t len = snprintk(message, 100, "{\"appID\":\"WDT\",\"Channel\":%d,\"TIME\":%lld,\"NAME\":\"%s\"}" \
+					, event->dyndata.data, ts, event->name);
+				LOG_INF("Message formatted: %s, length: %i", message, len);
 
-				// enqueue_message(message, len);
+				enqueue_message(message, len);
 			}
 			if(event->dyndata.size == 4){
 				LOG_DBG("Bee Counter data is being JSON-formatted");
@@ -855,10 +855,10 @@ static bool event_handler(const struct app_event_header *eh)
 			// LOG_DBG("cloud_module: event_handler(): Time! %i", date_time_is_valid());
 
 			// Get timestamp
-			int32_t unix_time_ms = k_uptime_get_32();
+			int64_t unix_time_ms = k_uptime_get();
 			int err = date_time_now(&unix_time_ms);
-			int32_t divide = 1000;
-			int32_t ts = unix_time_ms / divide;
+			int64_t divide = 1000;
+			int64_t ts = unix_time_ms / divide;
 			
 			if (event->dyndata.data[0] > WDT_CHANNEL_NRF91_NRF53_DEVICE) { // If wdt on nRF53
 				LOG_DBG("nRF53 WDT data is being JSON-formatted");
@@ -870,7 +870,7 @@ static bool event_handler(const struct app_event_header *eh)
 
 				return false;
 			}
-			else { // Else wdt on nRF91
+			else { // Else wdt is on nRF91
 				LOG_DBG("nRF91 WDT data is being JSON-formatted");
 				// Format to JSON-string
 				uint16_t len = snprintk(message, 100, "{\"appID\":\"WDT\",\"Channel\":\"%d\",\"TIME\":\"%lld\",\"NAME\":\"%s\"}", 
