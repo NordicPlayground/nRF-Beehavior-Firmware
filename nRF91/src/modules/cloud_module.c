@@ -140,7 +140,7 @@ static int connect_cloud()
 			LOG_ERR("cloud_connect, error: %d", err);
 		}
 
-		/* Wait for cloud connection success. If succeessful, break out of the loop. */
+		/* Wait for cloud connection success. If successful, break out of the loop. */
 		if(!k_sem_take(&cloud_connecting, K_SECONDS(20))) {
 			break;
 		}
@@ -192,7 +192,7 @@ extern void send_message(){
 		}
 	}
 	else{
-		LOG_DBG("LTE allready on");
+		LOG_DBG("LTE already on");
 	}
 
 	for(uint8_t i=0; i<last_queue;i++){

@@ -59,7 +59,7 @@
 /*Temp bool for testing*/
 bool is_swarming = false;
 
-/* ID of this unit given the nRF91. */
+/* ID of this unit given to the nRF91. */
 char id;
 /* Variables used for the Thingy:52 data processing. */
 static uint16_t sample_counter = 0;
@@ -163,27 +163,29 @@ static void connected(struct bt_conn *conn, uint8_t conn_err)
 		LOG_INF("Setting LED 2 for successful connection with 91. \n");
 		//dk_set_led_on(LED_2);
 		//Update connection parameters to reduce power consumption
+
+		// // Send NVS to nRF91
+		// // Create new nvs to nRF91 event.
+		// struct nvs_event *nvs_send_to_nrf91 = new_nvs_event();
+		// nvs_send_to_nrf91->type = NVS_SEND_TO_NRF91;
+		// // Submit nvs to nRF91 event.
+		// APP_EVENT_SUBMIT(nvs_send_to_nrf91);
+
+		// k_sleep(K_MSEC(1));
+
+		// // Wiping NVS
+		// // Create new nvs wipe event.
+		// struct nvs_event *nvs_wipe = new_nvs_event();
+		// nvs_wipe->type = NVS_WIPE;
+		// // Submit nvs wipe event.
+		// APP_EVENT_SUBMIT(nvs_wipe);
+
 		err = bt_conn_le_param_update(conn, conn_param);
 		if (err) {
 			LOG_ERR("Connection parameters update failed: %d",
 					err);
 		}
 	}
-
-	// Send NVS to nRF91
-	// Create new nvs to nRF91 event.
-	struct nvs_event *ble_nvs_send_to_nrf91 = new_nvs_event();
-	ble_nvs_send_to_nrf91->type = BLE_NVS_SEND_TO_NRF91;
-	// Submit nvs to nRF91 event.
-	APP_EVENT_SUBMIT(ble_nvs_send_to_nrf91);
-
-	// Wiping NVS
-	// Create new nvs wipe event.
-	struct nvs_event *nvs_wipe = new_nvs_event();
-	nvs_wipe->type = NVS_WIPE;
-	// Submit nvs wipe event.
-	APP_EVENT_SUBMIT(nvs_wipe);
-
 }
 
 static void disconnected(struct bt_conn *conn, uint8_t reason)
@@ -321,7 +323,7 @@ static int thingy_event_push_buffer(){
         err = 0;
     } 
     else { 
-		// LOG_INF("thingy_event_push_buffer(): Thingy_buffer[THINGY_BUFFER_SIZE] is has non-zero elements \n");
+		// LOG_INF("thingy_event_push_buffer(): Thingy_buffer[THINGY_BUFFER_SIZE] has non-zero elements \n");
 	    err = 1;
     }
 	return err;
@@ -374,7 +376,24 @@ void peripheral_module_thread_fn(void)
 	LOG_INF("peripheral_module_thread_fn(): bt_nus_init and bt_le_adv_start completed. \n");
 
 	
-	// ***** WDT ***** //	
+	// ***** WDT ***** //
+
+	// // ** Send timed out wdt channel, registered in NVS, to nRF91 **
+	// struct nvs_event *nvs_send_to_nrf91 = new_nvs_event();
+	// nvs_send_to_nrf91->type = NVS_SEND_TO_NRF91;
+	// // Submit send to nRF91 event.
+	// APP_EVENT_SUBMIT(nvs_send_to_nrf91);
+
+	// k_sleep(K_MSEC(1));
+
+	// // ** Wipe NVS **
+	// struct nvs_event *nvs_wipe = new_nvs_event();
+	// nvs_wipe->type = NVS_WIPE;
+	// // Submit NVS wipe event.
+	// APP_EVENT_SUBMIT(nvs_wipe);
+
+	k_sleep(K_MSEC(100));
+
 	// Set up wdt.
 	struct wdt_event *wdt_setup = new_wdt_event();
 	wdt_setup->type = WDT_SETUP;
@@ -387,8 +406,7 @@ void peripheral_module_thread_fn(void)
 	// Submit wdt add main event.
 	APP_EVENT_SUBMIT(wdt_add_main);
 	// ***** *** ***** //
-
-	k_sleep(K_MSEC(1));
+	
 	// ** Send timed out wdt channel, registered in NVS, to nRF91 **
 	struct nvs_event *nvs_send_to_nrf91 = new_nvs_event();
 	nvs_send_to_nrf91->type = NVS_SEND_TO_NRF91;
@@ -418,20 +436,42 @@ static bool event_handler(const struct event_header *eh)
 		}
 
 		if(event->type==BLE_NVS_SEND_TO_NRF91){
+			
+			LOG_INF("event_handler(): Sending NVS to nRF91 over BLE, giving sem 'ble_init_ok'. \n");
+			k_sem_give(&ble_init_ok);
+			
+			k_sleep(K_MSEC(100));
+
 			LOG_INF("event_handler(): Data stored (channel %d timeout) in NVS being sent to nRF91.\n", event->wdt_channel_id);
 
-			uint8_t nvs_wdt_data[3] = { (uint8_t)'*', id-(uint8_t)'0'};
+			uint8_t nvs_wdt_data[3] = { (uint8_t)'*', id-(uint8_t)'0', event->wdt_channel_id};
 			nvs_wdt_data[2] = event->wdt_channel_id;
 
-        	if(hub_conn){
-        	    LOG_INF("event_handler(): Hub is connected, sending nvs_wdt_data over nus. ");
-        	    int err = bt_nus_send(hub_conn, nvs_wdt_data, 3);
-        	}
-			else{
-				//TODO: Save untill reconnected to nrf91 TO DO
-				LOG_WRN("event_handler(): Hub is NOT connected, cannot send nvs_wdt_data over nus. ");
-				return false;
-			}
+			uint8_t nvs_wdt_data_to_send[sizeof(nvs_wdt_data)];
+			// LOG_DBG("sizeof(nvs_wdt_data) = %d", sizeof(nvs_wdt_data));
+			memcpy(nvs_wdt_data_to_send, nvs_wdt_data, sizeof(nvs_wdt_data));
+
+        	int err = bt_nus_send(hub_conn, nvs_wdt_data_to_send, sizeof(nvs_wdt_data_to_send));
+			LOG_DBG("Trying to send: err %d %d %d", nvs_wdt_data_to_send[0], nvs_wdt_data_to_send[1], nvs_wdt_data_to_send[2]);
+			LOG_DBG("is_ble_event(eh): bt_nus_send() returns: err %d", err);
+
+			// k_sleep(K_MSEC(1));
+
+        	// if(hub_conn){
+        	//     LOG_INF("event_handler(): Hub is connected, sending nvs_wdt_data over nus. ");
+
+			// 	uint8_t nvs_wdt_data_to_send[sizeof(nvs_wdt_data)];
+			// 	memcpy(nvs_wdt_data_to_send, nvs_wdt_data, sizeof(nvs_wdt_data));
+
+        	//  	int err = bt_nus_send(hub_conn, nvs_wdt_data_to_send, sizeof(nvs_wdt_data_to_send));
+
+			// 	k_sleep(K_MSEC(1));
+        	// }
+			// else{
+			// 	//TODO: Save untill reconnected to nrf91 TO DO
+			// 	LOG_WRN("event_handler(): Hub is NOT connected, cannot send nvs_wdt_data over nus. ");
+			// 	return false;
+			// }
 			return false;
 		}
 		return false;
@@ -518,7 +558,7 @@ static bool event_handler(const struct event_header *eh)
 			// If it is not the first sample, add the values to temp-vals for average computation
 			if (sample_counter > 0 && !FIRST_SAMPLE){
 				thingy_event_compute_temp_sums(event);
-				LOG_INF("Partial sums has been added");
+				LOG_INF("Partial sums have been added");
 			}
 		}	
 
@@ -568,7 +608,7 @@ static bool event_handler(const struct event_header *eh)
 			*/
 			if (sample_counter == 0 && FIRST_SAMPLE){
 				LOG_INF("event_handler(): Hub is connected, and first sample received. Sending sample over nus. \n");
-				LOG_INF("Current sample number is now %i: \n", sample_counter);
+				LOG_INF("Current sample number is now: %i \n", sample_counter);
 				
 				uint8_t first_sample[11];				
 				memcpy(first_sample, thingy_data, sizeof(thingy_data));
@@ -581,7 +621,13 @@ static bool event_handler(const struct event_header *eh)
 				}
 
 				int err = bt_nus_send(hub_conn, first_sample, 11);
-				LOG_INF("First sample: No fatal crash when sending");
+				LOG_DBG("1st is_thingy_event(eh): bt_nus_send() returns: err %d", err);
+				if (!(err))	{
+					LOG_INF("First sample: No fatal crash when sending");
+				}
+				else {
+					LOG_INF("First sample: Could not be sent, err %d", err);
+				}
 				sample_counter += 1;
 				LOG_INF("sample_counter incremented, now at sample num %i \n ", sample_counter);
 				FIRST_SAMPLE = false;
@@ -674,6 +720,7 @@ static bool event_handler(const struct event_header *eh)
 
 					int err = bt_nus_send(hub_conn, thingy_data, 11);
 					// int err = bt_nus_send(hub_conn, avg_thingy_data, 11);
+					LOG_DBG("2nd is_thingy_event(eh): bt_nus_send() returns: err %d", err);
 					LOG_INF("Nth sample: No fatal crash when sending");
 				}
 				
@@ -688,6 +735,7 @@ static bool event_handler(const struct event_header *eh)
 					
 					int err = bt_nus_send(hub_conn, thingy_data, 11);
 					// int err = bt_nus_send(hub_conn, avg_thingy_data, 11);
+					LOG_DBG("3rd is_thingy_event(eh): bt_nus_send() returns: err %d", err);
 					LOG_INF("Nth sample: No fatal crash when sending");
 				}
 			}

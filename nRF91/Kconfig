@@ -71,6 +71,9 @@ config SAMPLE_TFM_MBEDTLS
 	  Use TF-M and MbedTLS in this sample instead of using
 	  the offloaded TLS stack in the modem.
 
+config WATCHDOG_ENABLE
+	bool "Enable if you want the watchdog timer to be active"
+	default n
 
 endmenu
 

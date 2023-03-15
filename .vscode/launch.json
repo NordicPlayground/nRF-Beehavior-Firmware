@@ -15,7 +15,7 @@
             "name": "Launch build",
             "type": "nrf-connect",
             "request": "launch",
-            "config": "c:\\ncs\\nRF-Beehavior-Firmware\\v2.0Woodpecker\\build",
+            "config": "c:\\ncs\\nRF-Beehavior-Firmware\\build",
             "runToEntryPoint": "main"
         }
     ]

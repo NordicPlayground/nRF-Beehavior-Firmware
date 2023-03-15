@@ -89,6 +89,10 @@ config BLE_TO_CLOUD_APP_VERSION_MAX_LEN
 	int "Maximum length of application firmware version"
 	default 150
 
+config WATCHDOG_ENABLE
+	bool "Enable if you want the watchdog timer to be active"
+	default n
+
 endmenu
 
 menu "Zephyr Kernel"

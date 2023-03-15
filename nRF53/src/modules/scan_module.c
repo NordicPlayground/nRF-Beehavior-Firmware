@@ -299,7 +299,7 @@ static void weight_scan_fn(struct k_work *work)
 
 	err = bt_scan_start(BT_SCAN_TYPE_SCAN_ACTIVE);
 	if (err) {
-		LOG_ERR("Scanning for %s failed to start (err %d)\n", "Penis", err);
+		LOG_ERR("Scanning for %s failed to start (err %d)\n", "BroodMinder weight", err);
 	}
 	k_work_reschedule(&weight_interval, K_MINUTES(15));
 }
@@ -361,8 +361,9 @@ static bool event_handler(const struct event_header *eh)
 			start_scan(event->scan_name, event->len);
 		}
 		if(event->type==HUB_CONNECTED){
-			LOG_INF("HUB connected, searching for weight");
+			// LOG_INF("HUB connected, searching for weight");
 			#if defined(CONFIG_BROODMINDER_WEIGHT_ENABLE)
+			LOG_INF("HUB connected, searching for weight");
 			k_work_reschedule(&weight_interval, K_NO_WAIT);
 			#endif
 		}

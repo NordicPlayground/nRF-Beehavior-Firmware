@@ -28,7 +28,7 @@ LOG_MODULE_REGISTER(MODULE, 4);
 
 // Reset times for the different watchdog timer channels (1000 ms = 1 s):
 
-#define RESET_TIME_MAIN 300000U
+#define RESET_TIME_MAIN 120000U
 #define RESET_TIME_BEE_COUNTER 300000U
 #define RESET_TIME_THINGY 300000U
 

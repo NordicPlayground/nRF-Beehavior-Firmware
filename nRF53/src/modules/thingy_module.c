@@ -624,7 +624,7 @@ static struct bt_conn_auth_info_cb conn_auth_info_callbacks = {
 /* Schedulable function for periodically scanning for the Thingy:52. */
 static void scan_cycle_fn(struct k_work *work){
 	if(thingy_conn){
-		LOG_INF("Thingy:52 allready connected, canceling scan cycle.");
+		LOG_INF("Thingy:52 already connected, canceling scan cycle.");
 		return;
 	}
 	struct ble_event *thingy_scan = new_ble_event();
@@ -639,7 +639,7 @@ static void scan_cycle_fn(struct k_work *work){
 
 	
 	k_work_reschedule(&scan_cycle, K_MINUTES(1));
-	LOG_INF("Queing scan in 1 minute.");
+	LOG_INF("Queuing scan in 1 minute.");
 }
 
 void thingy_module_thread_fn(void)
