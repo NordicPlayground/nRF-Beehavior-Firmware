@@ -392,8 +392,6 @@ void peripheral_module_thread_fn(void)
 	// // Submit NVS wipe event.
 	// APP_EVENT_SUBMIT(nvs_wipe);
 
-	k_sleep(K_MSEC(100));
-
 	// Set up wdt.
 	struct wdt_event *wdt_setup = new_wdt_event();
 	wdt_setup->type = WDT_SETUP;
@@ -406,20 +404,24 @@ void peripheral_module_thread_fn(void)
 	// Submit wdt add main event.
 	APP_EVENT_SUBMIT(wdt_add_main);
 	// ***** *** ***** //
-	
-	// ** Send timed out wdt channel, registered in NVS, to nRF91 **
-	struct nvs_event *nvs_send_to_nrf91 = new_nvs_event();
-	nvs_send_to_nrf91->type = NVS_SEND_TO_NRF91;
-	// Submit send to nRF91 event.
-	APP_EVENT_SUBMIT(nvs_send_to_nrf91);
 
 	k_sleep(K_MSEC(1));
-	// ** Wipe NVS **
-	struct nvs_event *nvs_wipe = new_nvs_event();
-	nvs_wipe->type = NVS_WIPE;
-	// Submit NVS wipe event.
-	APP_EVENT_SUBMIT(nvs_wipe);
+	
+	// // ** Send timed out wdt channel, registered in NVS, to nRF91 **
+	// struct nvs_event *nvs_send_to_nrf91 = new_nvs_event();
+	// nvs_send_to_nrf91->type = NVS_SEND_TO_NRF91;
+	// // Submit send to nRF91 event.
+	// APP_EVENT_SUBMIT(nvs_send_to_nrf91);
 
+	// k_sleep(K_MSEC(1));
+
+	// // ** Wipe NVS **
+	// struct nvs_event *nvs_wipe = new_nvs_event();
+	// nvs_wipe->type = NVS_WIPE;
+	// // Submit NVS wipe event.
+	// APP_EVENT_SUBMIT(nvs_wipe);
+
+	// k_sleep(K_MSEC(1));
 
 }
 
@@ -437,11 +439,9 @@ static bool event_handler(const struct event_header *eh)
 
 		if(event->type==BLE_NVS_SEND_TO_NRF91){
 			
-			LOG_INF("event_handler(): Sending NVS to nRF91 over BLE, giving sem 'ble_init_ok'. \n");
-			k_sem_give(&ble_init_ok);
+			// LOG_INF("event_handler(): Sending NVS to nRF91 over BLE, giving sem 'ble_init_ok'. \n");
+			// k_sem_give(&ble_init_ok);
 			
-			k_sleep(K_MSEC(100));
-
 			LOG_INF("event_handler(): Data stored (channel %d timeout) in NVS being sent to nRF91.\n", event->wdt_channel_id);
 
 			uint8_t nvs_wdt_data[3] = { (uint8_t)'*', id-(uint8_t)'0', event->wdt_channel_id};
@@ -452,7 +452,8 @@ static bool event_handler(const struct event_header *eh)
 			memcpy(nvs_wdt_data_to_send, nvs_wdt_data, sizeof(nvs_wdt_data));
 
         	int err = bt_nus_send(hub_conn, nvs_wdt_data_to_send, sizeof(nvs_wdt_data_to_send));
-			LOG_DBG("Trying to send: err %d %d %d", nvs_wdt_data_to_send[0], nvs_wdt_data_to_send[1], nvs_wdt_data_to_send[2]);
+			LOG_DBG("Trying to send: err %d; %d; %d = %d", 
+			nvs_wdt_data_to_send[0], nvs_wdt_data_to_send[1], nvs_wdt_data_to_send[2], event->wdt_channel_id);
 			LOG_DBG("is_ble_event(eh): bt_nus_send() returns: err %d", err);
 
 			// k_sleep(K_MSEC(1));
@@ -722,6 +723,26 @@ static bool event_handler(const struct event_header *eh)
 					// int err = bt_nus_send(hub_conn, avg_thingy_data, 11);
 					LOG_DBG("2nd is_thingy_event(eh): bt_nus_send() returns: err %d", err);
 					LOG_INF("Nth sample: No fatal crash when sending");
+
+					/* Try to send NVS data here, as 53 is likely connected to 91 */
+					
+					// Send NVS to nRF91
+					// Create new nvs to nRF91 event.
+					struct nvs_event *nvs_send_to_nrf91 = new_nvs_event();
+					nvs_send_to_nrf91->type = NVS_SEND_TO_NRF91;
+					// Submit nvs to nRF91 event.
+					APP_EVENT_SUBMIT(nvs_send_to_nrf91);
+			
+					k_sleep(K_MSEC(1));
+			
+					// Wiping NVS
+					// Create new nvs wipe event.
+					struct nvs_event *nvs_wipe = new_nvs_event();
+					nvs_wipe->type = NVS_WIPE;
+					// Submit nvs wipe event.
+					APP_EVENT_SUBMIT(nvs_wipe);
+
+					/* **** */
 				}
 				
 				if(IS_SWARMING){

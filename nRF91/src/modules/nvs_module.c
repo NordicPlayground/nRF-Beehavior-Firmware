@@ -221,6 +221,10 @@ static bool event_handler(const struct event_header *eh) {
 				struct cloud_event_abbr *cloud_send_wdt = new_cloud_event_abbr(10);
 				cloud_send_wdt->type = CLOUD_SEND_WDT;
 				cloud_send_wdt->dyndata.data[0] = event->wdt_channel_id; // Timed out channel id.
+				char device_name[5] = {'n', 'R', 'F', '9', '1'};
+				for (uint8_t i=0; i < sizeof(device_name); i++){
+					cloud_send_wdt->name[i] = device_name[i];
+				}
 				// Submit main write before reboot event.
 				APP_EVENT_SUBMIT(cloud_send_wdt);
 			}

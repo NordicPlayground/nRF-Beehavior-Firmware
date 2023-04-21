@@ -134,7 +134,7 @@ static uint8_t ble_data_received(struct bt_nus_client *nus, const uint8_t *const
 		// Length 3 means WDT data
 		if(len==3){	
 			
-			struct ble_event *ble_event = new_ble_event(1); // len-2 = 1 corresponds to number of bits of data.
+			struct ble_event *ble_event = new_ble_event(len-2); // len-2 = 1 corresponds to number of bits of data.
 
 			// LOG_DBG("Bits of data: %d", len-2);
 
@@ -142,7 +142,7 @@ static uint8_t ble_data_received(struct bt_nus_client *nus, const uint8_t *const
 
 			/* Send the data without the * and ID to cloud_module */
 			uint8_t data_array[1];
-			data_array[0] = (uint8_t)data[2]; // len-1 = 2 corresponds to last index
+			data_array[0] = (uint8_t)data[len-1]; // len-1 = 2 corresponds to last index
 			LOG_DBG("%.02x", data_array[0]);
 
 			// LOG_DBG("Bits of data: %d", len-1);

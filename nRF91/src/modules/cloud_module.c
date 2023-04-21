@@ -667,24 +667,6 @@ static bool event_handler(const struct app_event_header *eh)
 				// Submit main write before reboot event.
 				APP_EVENT_SUBMIT(cloud_send_wdt);
 				
-				LOG_DBG("WDT data is being JSON-formatted");
-
-				char message[100];
-
-				/* Get timestamp */
-				int64_t unix_time_ms = k_uptime_get();
-				err = date_time_now(&unix_time_ms);
-				int64_t divide = 1000;
-				int64_t ts = unix_time_ms / divide;
-
-				LOG_DBG("Time: %d", ts);
-
-				/* Format to JSON-string */
-				uint16_t len = snprintk(message, 100, "{\"appID\":\"WDT\",\"Channel\":%d,\"TIME\":%lld,\"NAME\":\"%s\"}" \
-					, event->dyndata.data, ts, event->name);
-				LOG_INF("Message formatted: %s, length: %i", message, len);
-
-				enqueue_message(message, len);
 			}
 			if(event->dyndata.size == 4){
 				LOG_DBG("Bee Counter data is being JSON-formatted");
@@ -860,26 +842,34 @@ static bool event_handler(const struct app_event_header *eh)
 			int64_t divide = 1000;
 			int64_t ts = unix_time_ms / divide;
 			
-			if (event->dyndata.data[0] > WDT_CHANNEL_NRF91_NRF53_DEVICE) { // If wdt on nRF53
-				LOG_DBG("nRF53 WDT data is being JSON-formatted");
-				// Format to JSON-string
-				uint16_t len = snprintk(message, 100, "{\"appID\":\"WDT\",\"CHANNEL\":\"%d\",\"TIME\":\"%lld\",\"NAME\":\"%s\"}", 
-										event->dyndata.data, ts, event->name);
-				LOG_INF("cloud_module: event_handler(): Message formatted: %s, length: %i", message, len);
-				enqueue_message(message, len);
+			// if (event->dyndata.data[0] > WDT_CHANNEL_NRF91_NRF53_DEVICE) { // If wdt on nRF53 (one of the hives)
+			// 	LOG_DBG("nRF53 WDT data is being JSON-formatted");
+			// 	// Format to JSON-string
+			// 	uint16_t len = snprintk(message, 100, "{\"appID\":\"WDT\",\"CHANNEL\":\"%d\",\"TIME\":\"%lld\",\"NAME\":\"%s\"}", 
+			// 							*event->dyndata.data, ts, event->name);
+			// 	LOG_INF("cloud_module: event_handler(): Message formatted: %s, length: %i", message, len);
+			// 	enqueue_message(message, len);
 
-				return false;
-			}
-			else { // Else wdt is on nRF91
-				LOG_DBG("nRF91 WDT data is being JSON-formatted");
-				// Format to JSON-string
-				uint16_t len = snprintk(message, 100, "{\"appID\":\"WDT\",\"Channel\":\"%d\",\"TIME\":\"%lld\",\"NAME\":\"%s\"}", 
-										*event->dyndata.data, ts, "nRF91");
-				LOG_INF("cloud_module: event_handler(): Message formatted: %s, length: %i", message, len);
-				enqueue_message(message, len);
+			// 	return false;
+			// }
+			// else { // Else wdt is on nRF91
+			// 	LOG_DBG("nRF91 WDT data is being JSON-formatted");
+			// 	// Format to JSON-string
+			// 	uint16_t len = snprintk(message, 100, "{\"appID\":\"WDT\",\"Channel\":\"%d\",\"TIME\":\"%lld\",\"NAME\":\"%s\"}", 
+			// 							*event->dyndata.data, ts, "nRF91");
+			// 	LOG_INF("cloud_module: event_handler(): Message formatted: %s, length: %i", message, len);
+			// 	enqueue_message(message, len);
 
-				return false;
-			}
+			// 	return false;
+			// }
+
+			LOG_DBG("WDT data is being JSON-formatted");
+			// Format to JSON-string
+			uint16_t len = snprintk(message, 100, "{\"appID\":\"WDT\",\"CHANNEL\":\"%d\",\"TIME\":\"%lld\",\"NAME\":\"%s\"}", 
+									*event->dyndata.data, ts, event->name);
+			LOG_INF("cloud_module: event_handler(): Message formatted: %s, length: %i", message, len);
+			enqueue_message(message, len);
+
 			return false;
 		}
 		return false;

@@ -29,8 +29,8 @@ LOG_MODULE_REGISTER(MODULE, 4);
 // Reset times for the different watchdog timer channels (1000 ms = 1 s):
 
 #define RESET_TIME_MAIN 120000U
-#define RESET_TIME_BEE_COUNTER 300000U
-#define RESET_TIME_THINGY 300000U
+#define RESET_TIME_BEE_COUNTER 90000U
+#define RESET_TIME_THINGY 60000U
 
 /*
  * To use this sample, either the devicetree's /aliases must have a
@@ -175,7 +175,7 @@ void watchdog_setup(void)
 
 
 // Adding wdt channels
-void wdt_add_channels(int wdt_to_add) // wdt_to_add = 0 -> main ; wdt_to_add = 1 -> bee counter ; wdt_to_add = 2 -> thingy
+void wdt_add_channels(int wdt_to_add)
 {
 	int channel_id;
 	
