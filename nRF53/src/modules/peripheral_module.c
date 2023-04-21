@@ -406,23 +406,6 @@ void peripheral_module_thread_fn(void)
 	// ***** *** ***** //
 
 	k_sleep(K_MSEC(1));
-	
-	// // ** Send timed out wdt channel, registered in NVS, to nRF91 **
-	// struct nvs_event *nvs_send_to_nrf91 = new_nvs_event();
-	// nvs_send_to_nrf91->type = NVS_SEND_TO_NRF91;
-	// // Submit send to nRF91 event.
-	// APP_EVENT_SUBMIT(nvs_send_to_nrf91);
-
-	// k_sleep(K_MSEC(1));
-
-	// // ** Wipe NVS **
-	// struct nvs_event *nvs_wipe = new_nvs_event();
-	// nvs_wipe->type = NVS_WIPE;
-	// // Submit NVS wipe event.
-	// APP_EVENT_SUBMIT(nvs_wipe);
-
-	// k_sleep(K_MSEC(1));
-
 }
 
 
@@ -442,9 +425,9 @@ static bool event_handler(const struct event_header *eh)
 			// LOG_INF("event_handler(): Sending NVS to nRF91 over BLE, giving sem 'ble_init_ok'. \n");
 			// k_sem_give(&ble_init_ok);
 			
-			LOG_INF("event_handler(): Data stored (channel %d timeout) in NVS being sent to nRF91.\n", event->wdt_channel_id);
+			LOG_INF("event_handler(): Data stored in NVS (channel %d timeout) being sent to nRF91.\n", event->wdt_channel_id);
 
-			uint8_t nvs_wdt_data[3] = { (uint8_t)'*', id-(uint8_t)'0', event->wdt_channel_id};
+			uint8_t nvs_wdt_data[3] = { (uint8_t)'*', id-(uint8_t)'0', 0};
 			nvs_wdt_data[2] = event->wdt_channel_id;
 
 			uint8_t nvs_wdt_data_to_send[sizeof(nvs_wdt_data)];

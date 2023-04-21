@@ -16,7 +16,7 @@ struct wdt_event {
         enum wdt_event_type type;
 
         /* Custom WDT data fields. */
-       uint8_t wdt_channel_id; // Used for timeout events.
+        uint8_t wdt_channel_id; // Used for timeout events.
        
 };
 

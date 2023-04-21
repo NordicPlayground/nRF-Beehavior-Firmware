@@ -13,8 +13,7 @@ struct nvs_event {
         enum nvs_event_type type;
 
         /* Custom NVS data fields. */
-        uint8_t wdt_channel_id;
-        char name[20];        
+        uint8_t wdt_channel_id;    
 };
 
 APP_EVENT_TYPE_DECLARE(nvs_event);

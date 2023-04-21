@@ -65,7 +65,6 @@ static void wdt_callback_main_event(uint8_t channel_id, void *user_data)
 	struct nvs_event *nvs_write_before_reboot = new_nvs_event();
 	nvs_write_before_reboot->type = NVS_WRITE_BEFORE_REBOOT;
 	nvs_write_before_reboot->wdt_channel_id = WDT_CHANNEL_MAIN; // wdt_channel_id to be written to nvs must be set to timed out channel id.
-	// LOG_DBG("################## %d ################## WDT MAIN CB", nvs_write_before_reboot->wdt_channel_id); // Debugging
 	// Submit main write before reboot event.
 	APP_EVENT_SUBMIT(nvs_write_before_reboot);
 
@@ -92,7 +91,6 @@ static void wdt_callback_bee_counter_event(uint8_t channel_id, void *user_data)
 	struct nvs_event *nvs_write_before_reboot = new_nvs_event();
 	nvs_write_before_reboot->type = NVS_WRITE_BEFORE_REBOOT;
 	nvs_write_before_reboot->wdt_channel_id = WDT_CHANNEL_BEE_COUNTER; // wdt_channel_id to be written to nvs must be set to timed out channel id.
-	// LOG_DBG("################## %d ################## WDT BEE COUNTER CB", nvs_write_before_reboot->wdt_channel_id); // Debugging
 	// Submit bee counter write before reboot event.
 	APP_EVENT_SUBMIT(nvs_write_before_reboot);
 
@@ -119,7 +117,6 @@ static void wdt_callback_thingy_event(uint8_t channel_id, void *user_data)
 	struct nvs_event *nvs_write_before_reboot = new_nvs_event();
 	nvs_write_before_reboot->type = NVS_WRITE_BEFORE_REBOOT;
 	nvs_write_before_reboot->wdt_channel_id = WDT_CHANNEL_THINGY; // wdt_channel_id to be written to nvs must be set to timed out channel id.
-	// LOG_DBG("################## %d ################## WDT THINGY CB 1", nvs_write_before_reboot->wdt_channel_id); // Debugging
 	// Submit nvs write before reboot event.
 	APP_EVENT_SUBMIT(nvs_write_before_reboot);
 
@@ -251,22 +248,16 @@ static bool event_handler(const struct event_header *eh)
 		if(event->type==WDT_FEED_MAIN){
 			LOG_INF("event_handler(): Main WDT being fed.\n");
 			err_feed = task_wdt_feed(wdt_channel_main);
-			// LOG_DBG("event_handler(): channel %d (actual %d) FEEDING: %d\n",
-			// 		WDT_CHANNEL_MAIN, wdt_channel_main, err_feed); // Debugging
 			return false;
 		}
 		if(event->type==WDT_FEED_BEE_COUNTER){
 			LOG_INF("event_handler(): Bee counter WDT being fed.\n");
 			err_feed = task_wdt_feed(wdt_channel_bee_counter);
-			// LOG_DBG("event_handler(): channel %d (actual %d) FEEDING: %d\n",
-			// 		WDT_CHANNEL_BEE_COUNTER, wdt_channel_bee_counter, err_feed); // Debugging
 			return false;
 		}
 		if(event->type==WDT_FEED_THINGY){
 			LOG_INF("event_handler(): Thingy WDT being fed.\n");
 			err_feed = task_wdt_feed(wdt_channel_thingy);
-			// LOG_DBG("event_handler(): channel %d (actual %d) FEEDING: %d\n",
-			// 		WDT_CHANNEL_THINGY, wdt_channel_thingy, err_feed); // Debugging
 			return false;
 		}
 		if(event->type==WDT_TIMEOUT){
@@ -276,7 +267,6 @@ static bool event_handler(const struct event_header *eh)
 			int count_max = 1;
 			for (int i = 0; i < count_max+1; i++) { // Need this loop to create delay before reset
 				count = i;
-				// LOG_DBG("count %d", count);
 				k_sleep(K_MSEC(1000));
 			}
 			if (count == count_max) {
@@ -288,9 +278,6 @@ static bool event_handler(const struct event_header *eh)
 	}
 	return false;
 }
-
-
-//K_THREAD_DEFINE(watchdog_thread, 1024, watchdog_setup, NULL, NULL, NULL, K_LOWEST_APPLICATION_THREAD_PRIO, 0, 1000);
 
 APP_EVENT_LISTENER(MODULE, event_handler);
 APP_EVENT_SUBSCRIBE(MODULE, wdt_event);
