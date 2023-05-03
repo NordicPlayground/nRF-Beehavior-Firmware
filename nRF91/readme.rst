@@ -151,7 +151,7 @@ WatchDog Timer
 +===========+===========+===============================================+===========+===========+
 | Channel   | CHANNEL   | The watchdog channel which has been triggered | 1 byte    | Unitless  |
 +-----------+-----------+-----------------------------------------------+-----------+-----------+
-| Name      | NAME      | Which device the timeout occured on           | 5* bytes   | Unitless |
+| Name      | NAME      | Which device the timeout occured on           | 5* bytes  | Unitless  |
 +-----------+-----------+-----------------------------------------------+-----------+-----------+
 \* As long as device name only consists of five characters, i.e., data size in bytes is the same as the number of characters in the device name.
 
