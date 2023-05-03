@@ -30,7 +30,7 @@ LOG_MODULE_REGISTER(MODULE, 4);
 
 #define RESET_TIME_MAIN 120000U
 #define RESET_TIME_BEE_COUNTER 90000U
-#define RESET_TIME_THINGY 60000U
+#define RESET_TIME_THINGY 120000U
 
 /*
  * To use this sample, either the devicetree's /aliases must have a

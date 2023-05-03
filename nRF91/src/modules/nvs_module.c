@@ -123,7 +123,7 @@ void nvs_setup_function(void) {
 		LOG_INF("nvs_setup_function(): Id: %d, wdt_channel_id: %d\n",
 			WDT_CHANNEL_ID, event->wdt_channel_id);		
 		// Sending NVS data to cloud
-		// Create new nvs send to cloud event (not yet implemented).
+		// Create new nvs send to cloud event.
 		struct nvs_event *nvs_send_to_cloud = new_nvs_event();
 		nvs_send_to_cloud->type = NVS_SEND_TO_CLOUD;
 		nvs_send_to_cloud->wdt_channel_id = event->wdt_channel_id;
@@ -222,14 +222,15 @@ static bool event_handler(const struct event_header *eh) {
 				cloud_send_wdt->type = CLOUD_SEND_WDT;
 				cloud_send_wdt->dyndata.data[0] = event->wdt_channel_id; // Timed out channel id.
 				char device_name[5] = {'n', 'R', 'F', '9', '1'};
-				for (uint8_t i=0; i < sizeof(device_name); i++){
+				for (uint8_t i=0; i < strlen(device_name); i++){
 					cloud_send_wdt->name[i] = device_name[i];
+					LOG_DBG("%c", device_name[i]);
 				}
 				// Submit main write before reboot event.
 				APP_EVENT_SUBMIT(cloud_send_wdt);
 			}
 			else {
-				LOG_INF("event_handler(): Invalid wdt channel number. Nothing sent to cloud.\n");
+				LOG_INF("event_handler(): Empty NVS or invalid wdt channel number. Nothing sent to cloud.\n");
 			}
 			return false;
 		}

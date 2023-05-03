@@ -53,6 +53,10 @@
 #include <device.h>
 #include <soc.h>
 
+// #if defined(CONFIG_WATCHDOG_ENABLE)
+// #include "wdt_module.h"
+// #endif
+
 #define DEVICE_NAME CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN	(sizeof(DEVICE_NAME) - 1)
 
@@ -375,23 +379,8 @@ void peripheral_module_thread_fn(void)
 
 	LOG_INF("peripheral_module_thread_fn(): bt_nus_init and bt_le_adv_start completed. \n");
 
-	
+	#if defined(CONFIG_WATCHDOG_ENABLE)
 	// ***** WDT ***** //
-
-	// // ** Send timed out wdt channel, registered in NVS, to nRF91 **
-	// struct nvs_event *nvs_send_to_nrf91 = new_nvs_event();
-	// nvs_send_to_nrf91->type = NVS_SEND_TO_NRF91;
-	// // Submit send to nRF91 event.
-	// APP_EVENT_SUBMIT(nvs_send_to_nrf91);
-
-	// k_sleep(K_MSEC(1));
-
-	// // ** Wipe NVS **
-	// struct nvs_event *nvs_wipe = new_nvs_event();
-	// nvs_wipe->type = NVS_WIPE;
-	// // Submit NVS wipe event.
-	// APP_EVENT_SUBMIT(nvs_wipe);
-
 	// Set up wdt.
 	struct wdt_event *wdt_setup = new_wdt_event();
 	wdt_setup->type = WDT_SETUP;
@@ -406,6 +395,7 @@ void peripheral_module_thread_fn(void)
 	// ***** *** ***** //
 
 	k_sleep(K_MSEC(1));
+	#endif
 }
 
 
@@ -428,7 +418,7 @@ static bool event_handler(const struct event_header *eh)
 			LOG_INF("event_handler(): Data stored in NVS (channel %d timeout) being sent to nRF91.\n", event->wdt_channel_id);
 
 			uint8_t nvs_wdt_data[3] = { (uint8_t)'*', id-(uint8_t)'0', 0};
-			nvs_wdt_data[2] = event->wdt_channel_id;
+			nvs_wdt_data[2] = event->wdt_channel_id; // Adds timed out wdt channel to last index of nvs wdt data.
 
 			uint8_t nvs_wdt_data_to_send[sizeof(nvs_wdt_data)];
 			// LOG_DBG("sizeof(nvs_wdt_data) = %d", sizeof(nvs_wdt_data));
@@ -708,7 +698,7 @@ static bool event_handler(const struct event_header *eh)
 					LOG_INF("Nth sample: No fatal crash when sending");
 
 					/* Try to send NVS data here, as 53 is likely connected to 91 */
-					
+					#if defined(CONFIG_WATCHDOG_ENABLE)
 					// Send NVS to nRF91
 					// Create new nvs to nRF91 event.
 					struct nvs_event *nvs_send_to_nrf91 = new_nvs_event();
@@ -724,7 +714,7 @@ static bool event_handler(const struct event_header *eh)
 					nvs_wipe->type = NVS_WIPE;
 					// Submit nvs wipe event.
 					APP_EVENT_SUBMIT(nvs_wipe);
-
+					#endif
 					/* **** */
 				}
 				

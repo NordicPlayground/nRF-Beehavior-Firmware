@@ -26,7 +26,7 @@
 #include "events/nvs_event.h"
 
 #include "fota_support.h"
-#include "wdt_module.h"
+// #include "wdt_module.h"
 
 #include <date_time.h>
 
@@ -42,6 +42,10 @@ LOG_MODULE_REGISTER(MODULE, CONFIG_LOG_DEFAULT_LEVEL);
 #include <nrf_modem_at.h>
 #define AT_CMD_VBAT		"AT%XVBAT"
 static struct k_work_delayable get_thingy_voltage;
+#endif
+
+#if defined(CONFIG_WATCHDOG_ENABLE)
+#include "wdt_module.h"
 #endif
 
 // Not currently used, but can be convenient for dummy data for testing.
@@ -633,6 +637,7 @@ void cloud_setup_fn(void)
 
 	APP_EVENT_SUBMIT(cloud_setup);
 
+	#if defined(CONFIG_WATCHDOG_ENABLE)
 	// Set up WDT and add a channel for the main device.
 	// Set up wdt.
 	struct wdt_event *wdt_setup = new_wdt_event();
@@ -645,6 +650,7 @@ void cloud_setup_fn(void)
 	wdt_add_main->type = WDT_ADD_MAIN;
 	// Submit wdt add main event.
 	APP_EVENT_SUBMIT(wdt_add_main);
+	#endif
 }
 
 static bool event_handler(const struct app_event_header *eh)
@@ -828,6 +834,8 @@ static bool event_handler(const struct app_event_header *eh)
         
 		if(event->type==CLOUD_SEND_WDT){
 			
+			uint8_t wdt_channel = *event->dyndata.data;
+			
 			char message[100];
 			
 			while(!date_time_is_valid()){
@@ -842,31 +850,10 @@ static bool event_handler(const struct app_event_header *eh)
 			int64_t divide = 1000;
 			int64_t ts = unix_time_ms / divide;
 			
-			// if (event->dyndata.data[0] > WDT_CHANNEL_NRF91_NRF53_DEVICE) { // If wdt on nRF53 (one of the hives)
-			// 	LOG_DBG("nRF53 WDT data is being JSON-formatted");
-			// 	// Format to JSON-string
-			// 	uint16_t len = snprintk(message, 100, "{\"appID\":\"WDT\",\"CHANNEL\":\"%d\",\"TIME\":\"%lld\",\"NAME\":\"%s\"}", 
-			// 							*event->dyndata.data, ts, event->name);
-			// 	LOG_INF("cloud_module: event_handler(): Message formatted: %s, length: %i", message, len);
-			// 	enqueue_message(message, len);
-
-			// 	return false;
-			// }
-			// else { // Else wdt is on nRF91
-			// 	LOG_DBG("nRF91 WDT data is being JSON-formatted");
-			// 	// Format to JSON-string
-			// 	uint16_t len = snprintk(message, 100, "{\"appID\":\"WDT\",\"Channel\":\"%d\",\"TIME\":\"%lld\",\"NAME\":\"%s\"}", 
-			// 							*event->dyndata.data, ts, "nRF91");
-			// 	LOG_INF("cloud_module: event_handler(): Message formatted: %s, length: %i", message, len);
-			// 	enqueue_message(message, len);
-
-			// 	return false;
-			// }
-
 			LOG_DBG("WDT data is being JSON-formatted");
 			// Format to JSON-string
 			uint16_t len = snprintk(message, 100, "{\"appID\":\"WDT\",\"CHANNEL\":\"%d\",\"TIME\":\"%lld\",\"NAME\":\"%s\"}", 
-									*event->dyndata.data, ts, event->name);
+									wdt_channel, ts, event->name);
 			LOG_INF("cloud_module: event_handler(): Message formatted: %s, length: %i", message, len);
 			enqueue_message(message, len);
 

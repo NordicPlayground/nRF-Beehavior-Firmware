@@ -83,7 +83,6 @@ The application supports the following sensor types:
 +--------------------+------------------------------------------------------------------------+---------+
 | WoodPecker         | Likelihood of woodpecker, positive and total triggers                  | W-PECK  |
 +--------------------+------------------------------------------------------------------------+---------+
-+--------------------+------------------------------------------------------------------------+---------+
 | WatchDog Timer     | Not really a sensor but a timer resetting the device if it gets stuck. | WDT     |
 +--------------------+------------------------------------------------------------------------+---------+
 
@@ -91,6 +90,31 @@ The sets of sensor data that are published to the cloud service consist of relat
 the nRF91 unit received the data. All data are sent with a NAME to differentiate messages from different peripherals/hives.
 
 The sensor data used in the system so far can be seen in the following tables:
+
+Bee Counter
+------------------
++---------------+-------+-----------------------+----------------+------------------------+
+| Data          | ID    | Description           | Data size      | [Unit]                 |
++===============+=======+=======================+================+========================+
+| Bees Out      | OUT   | Flux of bees out      | 2 bytes        | [Bees/min]             |
++---------------+-------+-----------------------+----------------+------------------------+
+| Bees In       | IN    | Flux of bees in       | 2 bytes        | [Bees/min]             |
++---------------+-------+-----------------------+----------------+------------------------+
+
+BroodMinder Weight
+------------------
++---------------+-------+-----------------------+----------------+------------------------+
+| Data          | ID    | Description           | Data size      | [Unit]                 |
++===============+=======+=======================+================+========================+
+| Weight        | RTW   | Weight in Kg          | 2 bytes        | [Kg]                   |
++---------------+-------+-----------------------+----------------+------------------------+
+| Temperature   | TEMP  | Temperature in Celsius| 2 bytes        | [Celsius]              |
++---------------+-------+-----------------------+----------------+------------------------+
+| Weight Right* | WT-R  | Weight on right side  | 2 bytes        | [Kg]                   |
++---------------+-------+-----------------------+----------------+------------------------+
+| Weight Left*  | WT-L  | Weight on left side   | 2 bytes        | [Kg]                   |
++---------------+-------+-----------------------+----------------+------------------------+
+\*Not sent to cloud to save power and data.
 
 Thingy:52
 ---------
@@ -106,31 +130,6 @@ Thingy:52
 | Battery charge        | BTRY  | Battery charge in %   | 1 byte         | [%]                    |
 +-----------------------+-------+-----------------------+----------------+------------------------+        
 
-BroodMinder Weight
-------------------
-+---------------+-------+-----------------------+----------------+------------------------+
-| Data          | ID    | Description           | Data size      | [Unit]                 |
-+===============+=======+=======================+================+========================+
-| Weight        | RTW   | Weight in Kg          | 2 bytes        | [Kg]                   |
-+---------------+-------+-----------------------+----------------+------------------------+
-| Temperature   | TEMP  | Temperature in Celsius| 2 bytes        | [Celsius]              |
-+---------------+-------+-----------------------+----------------+------------------------+
-| Weight Right* | WT-R  | Weight on right side  | 2 bytes        | [Kg]                   |
-+---------------+-------+-----------------------+----------------+------------------------+
-| Weight Left*  | WT-L  | Weight on left side   | 2 bytes        | [Kg]                   |
-+---------------+-------+-----------------------+----------------+------------------------+
-*Not sent to cloud to save power and data.
-
-Bee Counter
-------------------
-+---------------+-------+-----------------------+----------------+------------------------+
-| Data          | ID    | Description           | Data size      | [Unit]                 |
-+===============+=======+=======================+================+========================+
-| Bees Out      | OUT   | Flux of bees out      | 2 bytes        | [Bees/min]             |
-+---------------+-------+-----------------------+----------------+------------------------+
-| Bees In       | IN    | Flux of bees in       | 2 bytes        | [Bees/min]             |
-+---------------+-------+-----------------------+----------------+------------------------+
-
 WoodPecker
 ------------------
 +---------------+---------------+-------------------------------------------------------------------+-----------+-----------+
@@ -140,9 +139,9 @@ WoodPecker
 +---------------+---------------+-------------------------------------------------------------------+-----------+-----------+
 | Postive       | POSITIVE      | Amount of times likelihood of woodpecker exceeded the threshold   | 1 byte    | Unitless  |
 +---------------+---------------+-------------------------------------------------------------------+-----------+-----------+
-| Probability   | PROBABILITY   | Highest probability of woodpecker                                 | 1 bytes   | [%]       |
+| Probability   | PROBABILITY   | Highest probability of woodpecker                                 | 1 byte   | [%]       |
 +---------------+---------------+-------------------------------------------------------------------+-----------+-----------+
-| Battery       | BTRY          | Remaining battery percentage of the Thingy:53                     | 1 bytes   | [%]       |
+| Battery       | BTRY          | Remaining battery percentage of the Thingy:53                     | 1 byte   | [%]       |
 +---------------+---------------+-------------------------------------------------------------------+-----------+-----------+
 
 WatchDog Timer
@@ -150,13 +149,11 @@ WatchDog Timer
 +-----------+-----------+-----------------------------------------------+-----------+-----------+
 | Data      | ID        | Description                                   | Data size | [Unit]    |
 +===========+===========+===============================================+===========+===========+
-| Channel   | CHANNEL   | The watchdog channel which has been triggered | ? bytes   | Unitless  |
+| Channel   | CHANNEL   | The watchdog channel which has been triggered | 1 byte    | Unitless  |
 +-----------+-----------+-----------------------------------------------+-----------+-----------+
-| Time      | TIME      | The time when the message was sent            | 8 bytes   | [seconds] |
+| Name      | NAME      | Which device the timeout occured on           | 5* bytes   | Unitless  |
 +-----------+-----------+-----------------------------------------------+-----------+-----------+
-| Name      | NAME      | Which device the timeout occured on           | ? bytes   | Unitless  |
-+-----------+-----------+-----------------------------------------------+-----------+-----------+
-
+\* As long as device name only consists of five characters, i.e., data size in bytes is the same as the number of characters in the device name.
 
 User interface
 **************
