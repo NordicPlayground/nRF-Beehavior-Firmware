@@ -139,9 +139,9 @@ WoodPecker
 +---------------+---------------+-------------------------------------------------------------------+-----------+-----------+
 | Postive       | POSITIVE      | Amount of times likelihood of woodpecker exceeded the threshold   | 1 byte    | Unitless  |
 +---------------+---------------+-------------------------------------------------------------------+-----------+-----------+
-| Probability   | PROBABILITY   | Highest probability of woodpecker                                 | 1 byte   | [%]       |
+| Probability   | PROBABILITY   | Highest probability of woodpecker                                 | 1 byte    | [%]       |
 +---------------+---------------+-------------------------------------------------------------------+-----------+-----------+
-| Battery       | BTRY          | Remaining battery percentage of the Thingy:53                     | 1 byte   | [%]       |
+| Battery       | BTRY          | Remaining battery percentage of the Thingy:53                     | 1 byte    | [%]       |
 +---------------+---------------+-------------------------------------------------------------------+-----------+-----------+
 
 WatchDog Timer
@@ -151,7 +151,7 @@ WatchDog Timer
 +===========+===========+===============================================+===========+===========+
 | Channel   | CHANNEL   | The watchdog channel which has been triggered | 1 byte    | Unitless  |
 +-----------+-----------+-----------------------------------------------+-----------+-----------+
-| Name      | NAME      | Which device the timeout occured on           | 5* bytes   | Unitless  |
+| Name      | NAME      | Which device the timeout occured on           | 5* bytes   | Unitless |
 +-----------+-----------+-----------------------------------------------+-----------+-----------+
 \* As long as device name only consists of five characters, i.e., data size in bytes is the same as the number of characters in the device name.
 
