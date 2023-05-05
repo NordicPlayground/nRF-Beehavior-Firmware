@@ -22,7 +22,8 @@ Implementation of the above features required a rework of existing nrf samples a
 .. note::
     The code is currently a work in progress and is not fully optimized yet. It will undergo changes and improvements in the future.
 
-# Overview
+Overview
+********
 
 The application initializes the modem and retrives the current time from the modem, before scanning for the peripheral units by UUID. 
 When connecting to a peripheral it sends the peripheral a unique id and stores its name. That way the nRF9160 knows which unit it receives data from.
