@@ -6,6 +6,31 @@
 
 /*
 ** This module is based on the task_wdt sample in "...\zephyr\samples\subsys\task_wdt".
+
+The watchdog timer is a hardware timer that can reset the system or generate an interrupt if the system doesn't respond within a specific time period.
+This is useful in embedded systems where the system might get stuck, and the watchdog timer can reset the system to its initial state.
+The code provides a watchdog timer for one or two channels, one for the main event and another for nRF53 devices (also possible to add more channels).
+The reset times for the different watchdog timer channels are adjusted by RESET_TIME_MAIN and RESET_TIME_NRF53.
+
+The code starts with defining the module and its logging level. Then it defines the reset times for the different watchdog timer channels.
+The code checks the compatibility of the device with the Nordic nRF board using the DT_HAS_COMPAT_STATUS_OKAY macro with nordic_nrf_wdt.
+If the device is not compatible, an assertion error is raised, and the program exits.
+
+The wdt_callback_main_event function is called when the main event's watchdog timer channel times out,
+and wdt_callback_nrf53_event is called when the nRF53 device's watchdog timer channel times out.
+Both functions create a new event for the corresponding channel and submit it using the APP_EVENT_SUBMIT macro.
+The wdt_callback_main_event function also creates a new general write (to NVS) before the reboot event and submits it.
+
+The watchdog_setup function sets up the task watchdog sample application.
+It initializes the task watchdog with task_wdt_init function and sets up NVS by creating a new nvs setup event and submitting it.
+The wdt_add_channels function adds the watchdog timer channels. The event_handler function is the event handler for the events.
+In this module it handles the events of type WDT_SETUP, WDT_ADD_MAIN, WDT_ADD_NRF53, WDT_FEED_MAIN, WDT_FEED_NRF53, and WDT_TIMEOUT.
+
+The code uses Zephyr's event system to handle the events.
+The APP_EVENT_LISTENER macro creates an event listener for the module,
+and the APP_EVENT_SUBSCRIBE macro subscribes the module to the wdt_event.
+When an event of type wdt_event is generated, the event_handler function is called to handle the event.
+
 */
 
 #include <zephyr.h>
