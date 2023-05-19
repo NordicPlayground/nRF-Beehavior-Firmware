@@ -92,7 +92,7 @@ Testing
 After programming the application and all the prerequisites to your Thingy:52, test the application by performing the following steps:
 
 1. |connect_kit|
-#. Connect to the kit with using J-LINK RTT viewer. Note: the Thingy:52 does not have a debugger, so you will need an external debugger (for example the nRF5340 development kit) and a T pin.
+#. Connect to the kit with using J-LINK RTT viewer. Note: the Thingy:52 does not have a debugger, so you will need an external debugger (for example the nRF5340 development kit) and a :ref:`10-pin cable <https://www.adafruit.com/product/1675>`.
 #. Reset the Thingy:52.
 #. Observe in the terminal window that the THINGY:52 starts up and that the application starts.
    This is indicated by several <inf> module_name: "placeholder text" outputs and observe in the terminal window that the advertising has started, indicated by the following output::
