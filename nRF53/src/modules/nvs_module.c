@@ -53,12 +53,6 @@ static struct nvs_fs fs;
 
 #define STORAGE_NODE_LABEL storage
 
-/* 1000 msec = 1 sec */
-// #define SLEEP_TIME      100
-/* maximum reboot counts, make high enough to trigger sector change (buffer */
-/* rotation). */
-// #define MAX_REBOOT 400
-
 #define WDT_CHANNEL_ID 1
 
 #define NUM_OF_WDT_CHANNELS 3
@@ -122,8 +116,6 @@ void nvs_setup_function(void) {
 // The nvs_send_to_nrf91() function is defined, which reads the wdt channel from the NVS.
 // If the item is found, it sends the channel number to nRF91 using BLE by submitting a ble_event.
 // If the channel number is invalid, nothing is sent.
-
-
 void nvs_send_to_nrf91(void) {
 	int rc;
 
@@ -159,33 +151,39 @@ void nvs_send_to_nrf91(void) {
 	return false;
 }
 
+
+// The nvs_wipe_function() function is defined, which reads the timed out wdt channel from the NVS.
+// It then deletes the item from the NVS.
 void nvs_wipe_function(void) {
 	int rc = 0;
 	int err = 0;
 	
 	struct nvs_event *event = new_nvs_event();
 
-	//LOG_DBG("*************** %d ***************** before reading\n", event->wdt_channel_id); // Debugging
-
+	// Read NVS at ID locatoin of WDT_CHANNEL_ID.
 	rc = nvs_read(&fs, WDT_CHANNEL_ID, &event->wdt_channel_id, sizeof(event->wdt_channel_id));
 	
-	LOG_DBG("*************** %d ***************** NVS WIPE\n", event->wdt_channel_id); // Debugging
-
-	LOG_DBG("nvs_wipe_function(): Id: %d, wdt_channel_id: %d\n",
-			WDT_CHANNEL_ID, event->wdt_channel_id); // FOR TESTING
+	// If desired to log what was read from NVS:
+	// LOG_DBG("nvs_wipe_function(): Id: %d, wdt_channel_id: %d\n",
+	// 		WDT_CHANNEL_ID, event->wdt_channel_id); // FOR TESTING
+	
+	// Delete NVS at ID location of WDT_CHANNEL_ID.
 	err = nvs_delete(&fs, WDT_CHANNEL_ID);
 
-	if (err == 0) {
-		LOG_INF("nvs_wipe_function(): nvs_delete returned %d, delete SUCCESSFUL.\n\r", err);
-	}
-	else {
-		LOG_ERR("nvs_wipe_function(): nvs_delete returned %d, delete FAILED.\n\r", err);
-	}
-	LOG_DBG("nvs_wipe_function(): rc = %d\n", rc);
-	rc = nvs_read(&fs, WDT_CHANNEL_ID, &event->wdt_channel_id, sizeof(event->wdt_channel_id));
-	LOG_DBG("nvs_wipe_function(): rc = %d\n", rc);
-	LOG_DBG("nvs_wipe_function(): Id: %d, wdt_channel_id: %d\n",
-			WDT_CHANNEL_ID, event->wdt_channel_id); // FOR TESTING
+	// Can be used to check if NVS actually was wiped:
+
+	// if (err == 0) {
+	// 	LOG_INF("nvs_wipe_function(): nvs_delete returned %d, delete SUCCESSFUL.\n\r", err);
+	// }
+	// else {
+	// 	LOG_ERR("nvs_wipe_function(): nvs_delete returned %d, delete FAILED.\n\r", err);
+	// }
+	
+	// LOG_DBG("nvs_wipe_function(): rc = %d\n", rc);
+	// rc = nvs_read(&fs, WDT_CHANNEL_ID, &event->wdt_channel_id, sizeof(event->wdt_channel_id));
+	// LOG_DBG("nvs_wipe_function(): rc = %d\n", rc);
+	// LOG_DBG("nvs_wipe_function(): Id: %d, wdt_channel_id: %d\n",
+			// WDT_CHANNEL_ID, event->wdt_channel_id); // FOR TESTING
 }
 
 // Event handler for NVS events.
