@@ -10,10 +10,17 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  * 
- * 
- * 
+ * This is an implementation of using NVS in Zephyr for storing the channel of a watchdog timer before reboot
+ * and later sending the same information over BLE when connecting to a hub.
+ * The code defines functions for setting up the NVS file system, sending the channel number to nRF91, and wiping the NVS.
+ *
  */
 
+
+// The code begins with importing required libraries for the implementation, such as zephyr.h, sys/reboot.h, device.h, string.h, drivers/flash.h,
+// storage/flash_map.h, and zephyr/fs/nvs.h.
+// It also includes libraries for logging and events, such as sys/printk.h, logging/log.h, and sys/types.h.
+// It includes custom libraries for NVS events and watchdog timer events, such as nvs_module.h, nvs_event.h, and wdt_event.h.
 
 #include <zephyr.h>
 #include <sys/reboot.h>
@@ -40,21 +47,24 @@
 #define MODULE nvs_module
 LOG_MODULE_REGISTER(MODULE, 4);
 
+
+// Define a struct nvs_fs fs, which represents the NVS file system.
 static struct nvs_fs fs;
 
 #define STORAGE_NODE_LABEL storage
 
 /* 1000 msec = 1 sec */
-#define SLEEP_TIME      100
+// #define SLEEP_TIME      100
 /* maximum reboot counts, make high enough to trigger sector change (buffer */
 /* rotation). */
-#define MAX_REBOOT 400
+// #define MAX_REBOOT 400
 
 #define WDT_CHANNEL_ID 1
 
 #define NUM_OF_WDT_CHANNELS 3
 
 
+// The nvs_setup_function() function is defined, which sets up the NVS file system by defining its sector size, sector count, and offset.
 void nvs_setup_function(void) {
     int rc = 0;
 	struct flash_pages_info info;
@@ -108,40 +118,11 @@ void nvs_setup_function(void) {
 	}
 }
 
-/*
-void nvs_write_before_reboot(void) {
 
-}
-*/
+// The nvs_send_to_nrf91() function is defined, which reads the wdt channel from the NVS.
+// If the item is found, it sends the channel number to nRF91 using BLE by submitting a ble_event.
+// If the channel number is invalid, nothing is sent.
 
-void nvs_wipe_function(void) {
-	int rc = 0;
-	int err = 0;
-	
-	struct nvs_event *event = new_nvs_event();
-
-	//LOG_DBG("*************** %d ***************** before reading\n", event->wdt_channel_id); // Debugging
-
-	rc = nvs_read(&fs, WDT_CHANNEL_ID, &event->wdt_channel_id, sizeof(event->wdt_channel_id));
-	
-	LOG_DBG("*************** %d ***************** NVS WIPE\n", event->wdt_channel_id); // Debugging
-
-	LOG_DBG("nvs_wipe_function(): Id: %d, wdt_channel_id: %d\n",
-			WDT_CHANNEL_ID, event->wdt_channel_id); // FOR TESTING
-	err = nvs_delete(&fs, WDT_CHANNEL_ID);
-
-	if (err == 0) {
-		LOG_INF("nvs_wipe_function(): nvs_delete returned %d, delete SUCCESSFUL.\n\r", err);
-	}
-	else {
-		LOG_ERR("nvs_wipe_function(): nvs_delete returned %d, delete FAILED.\n\r", err);
-	}
-	LOG_DBG("nvs_wipe_function(): rc = %d\n", rc);
-	rc = nvs_read(&fs, WDT_CHANNEL_ID, &event->wdt_channel_id, sizeof(event->wdt_channel_id));
-	LOG_DBG("nvs_wipe_function(): rc = %d\n", rc);
-	LOG_DBG("nvs_wipe_function(): Id: %d, wdt_channel_id: %d\n",
-			WDT_CHANNEL_ID, event->wdt_channel_id); // FOR TESTING
-}
 
 void nvs_send_to_nrf91(void) {
 	int rc;
@@ -176,6 +157,35 @@ void nvs_send_to_nrf91(void) {
 		return false;
 	}
 	return false;
+}
+
+void nvs_wipe_function(void) {
+	int rc = 0;
+	int err = 0;
+	
+	struct nvs_event *event = new_nvs_event();
+
+	//LOG_DBG("*************** %d ***************** before reading\n", event->wdt_channel_id); // Debugging
+
+	rc = nvs_read(&fs, WDT_CHANNEL_ID, &event->wdt_channel_id, sizeof(event->wdt_channel_id));
+	
+	LOG_DBG("*************** %d ***************** NVS WIPE\n", event->wdt_channel_id); // Debugging
+
+	LOG_DBG("nvs_wipe_function(): Id: %d, wdt_channel_id: %d\n",
+			WDT_CHANNEL_ID, event->wdt_channel_id); // FOR TESTING
+	err = nvs_delete(&fs, WDT_CHANNEL_ID);
+
+	if (err == 0) {
+		LOG_INF("nvs_wipe_function(): nvs_delete returned %d, delete SUCCESSFUL.\n\r", err);
+	}
+	else {
+		LOG_ERR("nvs_wipe_function(): nvs_delete returned %d, delete FAILED.\n\r", err);
+	}
+	LOG_DBG("nvs_wipe_function(): rc = %d\n", rc);
+	rc = nvs_read(&fs, WDT_CHANNEL_ID, &event->wdt_channel_id, sizeof(event->wdt_channel_id));
+	LOG_DBG("nvs_wipe_function(): rc = %d\n", rc);
+	LOG_DBG("nvs_wipe_function(): Id: %d, wdt_channel_id: %d\n",
+			WDT_CHANNEL_ID, event->wdt_channel_id); // FOR TESTING
 }
 
 // Event handler for NVS events.
