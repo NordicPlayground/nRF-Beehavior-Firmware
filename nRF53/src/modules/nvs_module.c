@@ -4,42 +4,14 @@
 
 
 /*
- * NVS Sample for Zephyr using high level API, the sample illustrates the usage
- * of NVS for storing data of different kind (strings, binary blobs, unsigned
- * 32 bit integer) and also how to read them back from flash. The reading of
- * data is illustrated for both a basic read (latest added value) as well as
- * reading back the history of data (previously added values). Next to reading
- * and writing data it also shows how data can be deleted from flash.
- *
- * The sample stores the following items:
- * 1. A string representing an IP-address: stored at id=1, data="192.168.1.1"
- * 2. A binary blob representing a key: stored at id=2, data=FF FE FD FC FB FA
- *    F9 F8
- * 3. A reboot counter (32bit): stored at id=3, data=reboot_counter
- * 4. A string: stored at id=4, data="DATA" (used to illustrate deletion of
- * items)
- *
- * At first boot the sample checks if the data is available in flash and adds
- * the items if they are not in flash.
- *
- * Every reboot increases the values of the reboot_counter and updates it in
- * flash.
- *
- * At the 10th reboot the string item with id=4 is deleted (or marked for
- * deletion).
- *
- * At the 11th reboot the string item with id=4 can no longer be read with the
- * basic nvs_read() function as it has been deleted. It is possible to read the
- * value with nvs_read_hist()
- *
- * At the 78th reboot the first sector is full and a new sector is taken into
- * use. The data with id=1, id=2 and id=3 is copied to the new sector. As a
- * result of this the history of the reboot_counter will be removed but the
- * latest values of address, key and reboot_counter is kept.
+ * NVS Sample for Zephyr using high level API...
  *
  * Copyright (c) 2018 Laczen
  *
  * SPDX-License-Identifier: Apache-2.0
+ * 
+ * 
+ * 
  */
 
 
@@ -258,9 +230,5 @@ static bool event_handler(const struct event_header *eh) {
 	return false;
 }
 
-
-//K_THREAD_DEFINE(nvs_thread, 1024, nvs_setup_function, NULL, NULL, NULL, K_LOWEST_APPLICATION_THREAD_PRIO, 0, 0);
-
 APP_EVENT_LISTENER(MODULE, event_handler);
 APP_EVENT_SUBSCRIBE(MODULE, nvs_event);
-//APP_EVENT_SUBSCRIBE(MODULE, wdt_event);

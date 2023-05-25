@@ -55,7 +55,7 @@ The application supports the following data types:
 | Battery       | Remaining power                           |
 +---------------+-------------------------------------------+
 
-The sets of sensor data that are published to the cloud service consist of relative `timestamps <Timestamping_>`_. NOTE: The timestamp is from when the nRF91 unit receives the messagem, not when the sample was taken.
+The sets of sensor data that are published to the cloud service consist of relative `timestamps <Timestamping_>`_. NOTE: The timestamp is from when the nRF91 unit receives the messages, not when the sample was taken.
 WIP! The data sampling should be concatenated in a buffer matrix containing a finite number of measurements, f.ex 15 samples. 
 The elements in the buffer matrix contains the 15 prior measurements with a timestamp.
 If an event such as swarm event is triggered, all the measurements in the buffer are sent to increase the resolution of the graphs and figures.

@@ -1,7 +1,7 @@
 # nRF-Beehavior-Firmware
-## [Thingy:52](Thingy52/README.rst)
 ## [nRF53dk](nRF53/README.rst)
 ## [nRF91dk](nRF91/readme.rst)
+## [Thingy:52](Thingy52/README.rst)
 ## Thingy:53
 ## Website
 ## Hardware

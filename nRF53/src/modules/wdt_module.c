@@ -6,6 +6,24 @@
 
 /*
 ** This module is based on the task_wdt sample in "...\zephyr\samples\subsys\task_wdt".
+
+The code is an implementation of a watchdog timer on an nRF53 chip, using the Zephyr real-time operating system. 
+The watchdog timer is used to monitor the system's behavior and reset the device in case of a malfunction. The code is structured as follows:
+
+- The necessary header files are included, including the watchdog driver and Zephyr system libraries.
+- The reset times for the different watchdog timer channels are defined.
+- The hardware watchdog device is obtained from the device tree, if available. Otherwise, the task watchdog will be used without a hardware watchdog fallback.
+- Three callback functions are defined, one for each watchdog timer channel. These functions create events to be handled by the event handler,
+  indicating that the corresponding watchdog timer channel has timed out.
+- The watchdog_setup function initializes the task watchdog and sets up the NVS (Non-Volatile Storage) module.
+- The wdt_add_channels function adds the defined watchdog timer channels and creates the corresponding feed events.
+- The event_handler function handles the events created by the callback functions and the feed events,
+  and takes appropriate actions depending on the event type.
+- Finally, the code defines an event listener and subscribes to the wdt_event and nvs_event events.
+
+To summarize the code's functionality, it sets up the watchdog timer with three channels, each with a specific reset time.
+Whenever a channel times out, an event is created and handled by the event handler, which resets the device after a delay.
+The code also uses the NVS module to store the channel of the timed-out watchdog timer channel before the reset.
 */
 
 #include <zephyr.h>
@@ -160,14 +178,7 @@ void watchdog_setup(void)
 	nvs_setup->type = NVS_SETUP;
 	// Submit nvs setup event.
 	APP_EVENT_SUBMIT(nvs_setup);
-/*
-	// Wiping NVS
-	// Create new nvs wipe event.
-	struct nvs_event *nvs_wipe = new_nvs_event();
-	nvs_wipe->type = NVS_WIPE;
-	// Submit nvs wipe event.
-	APP_EVENT_SUBMIT(nvs_wipe);
-*/
+
 }
 
 
