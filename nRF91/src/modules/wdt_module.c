@@ -31,6 +31,10 @@ The APP_EVENT_LISTENER macro creates an event listener for the module,
 and the APP_EVENT_SUBSCRIBE macro subscribes the module to the wdt_event.
 When an event of type wdt_event is generated, the event_handler function is called to handle the event.
 
+When it comes to usage of the code in relation to the rest of the system, it will be wise to initiate the different wdts either at start-up
+or when different components are being connected. Then, it is important to set the different RESET_TIME_xxxxx to values that are high enough to avoid
+unnecessary restarts and also find suitable places in the proper codes (e.g., ble_module) to feed the different wdt channels.
+
 */
 
 #include <zephyr.h>

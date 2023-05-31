@@ -24,6 +24,11 @@ The watchdog timer is used to monitor the system's behavior and reset the device
 To summarize the code's functionality, it sets up the watchdog timer with three channels, each with a specific reset time.
 Whenever a channel times out, an event is created and handled by the event handler, which resets the device after a delay.
 The code also uses the NVS module to store the channel of the timed-out watchdog timer channel before the reset.
+
+When it comes to usage of the code in relation to the rest of the system, it will be wise to initiate the different wdts either at start-up
+or when different components are being connected. Then, it is important to set the different RESET_TIME_xxxxx to values that are high enough to avoid
+unnecessary restarts and also find suitable places in the proper codes (e.g., peripheral_module) to feed the different wdt channels.
+
 */
 
 #include <zephyr.h>
